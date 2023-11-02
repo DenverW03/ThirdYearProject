@@ -1,3 +1,4 @@
 .DS_Store
-*.o
+boids/*.o
+common/src/*.o
 boids/main
