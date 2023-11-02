@@ -4,17 +4,20 @@
 
 using namespace Stg;
 
-class SimpleRobot {
-public:
-    ModelPosition *pos;
-    ModelRanger *laser;
-    double xVel;
-    double yVel;
-    double turnVel;
-    // Function declarations
-    int SensorUpdate(Model *model);
-    int PositionUpdate(Model *model);
-    SimpleRobot(ModelPosition *modelPos);
-};
+namespace SimpleRBT {
+    class SimpleRobot {
+    public:
+        ModelPosition *pos;
+        ModelRanger *laser;
+        double xVel;
+        double yVel;
+        double turnVel;
+        // Function declarations
+        SimpleRobot();
+        SimpleRobot(ModelPosition *modelPos);
+        static int SensorUpdate(Model *, SimpleRobot *robot);
+        static int PositionUpdate(Model *, SimpleRobot *robot);
+    };
+}
 
 #endif

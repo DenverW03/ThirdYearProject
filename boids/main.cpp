@@ -1,14 +1,16 @@
 #include <stage.hh>
 #include "../common/src/SimpleRobot.hh"
 using namespace Stg;
+using namespace SimpleRBT;
 
-SIMPLE_ROBOT::SimpleRobot robot[10]; // Array length 10 to hold some robots during testing
+SimpleRobot robots[10]; // Array length 10 to hold some robots during testing
 
 int main(int argc, char* argv[]) {
     Init(&argc, &argv); // Initialising the stage library
-    WorldGUI world(635, 666, "Boids Simulation");
+    WorldGui world(635, 666, "Boids Simulation");
     world.Load(argv[1]);
     // Add robots
+    robots[0] = SimpleRobot((ModelPosition *)world.GetModel(argv[2]));
     world.Start();
     while(!world.TestQuit()) {
         if(!world.UpdateAll()) { // When UpdateAll() returns false, simulation continues
