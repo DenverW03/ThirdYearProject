@@ -4,14 +4,15 @@ using namespace Stg;
 using namespace SimpleRBT;
 // Default constructor for init
 SimpleRobot::SimpleRobot(){
-    pos = nullptr;
-    laser = nullptr;
-    xVel = 1;
-    yVel = 1;
-    turnVel = 0;
+    // No setup required in implicit constructor
 };
 // Constructor for the class with appropriate setup
 SimpleRobot::SimpleRobot(ModelPosition *modelPos) {
+    this->pos = nullptr;
+    this->laser = nullptr;
+    this->xVel = 1;
+    this->yVel = 1;
+    this->turnVel = 0;
     // Setting up positional model and callbacks
     this->pos = modelPos;
     this->pos->AddCallback(Model::CB_UPDATE, model_callback_t(PositionUpdate), this);
