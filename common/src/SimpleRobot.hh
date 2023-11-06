@@ -14,7 +14,7 @@ namespace SimpleRBT {
         double turnVel;
         // Function declarations
         SimpleRobot();
-        SimpleRobot(ModelPosition *modelPos);
+        SimpleRobot(ModelPosition *modelPos, int x, int y);
         static int SensorUpdate(Model *, SimpleRobot *robot);
         static int PositionUpdate(Model *, SimpleRobot *robot);
     };

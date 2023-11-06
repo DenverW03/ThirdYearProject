@@ -7,7 +7,7 @@ SimpleRobot::SimpleRobot(){
     // No setup required in implicit constructor
 };
 // Constructor for the class with appropriate setup
-SimpleRobot::SimpleRobot(ModelPosition *modelPos) {
+SimpleRobot::SimpleRobot(ModelPosition *modelPos, int x, int y) {
     this->pos = nullptr;
     this->laser = nullptr;
     this->xVel = 1;
@@ -21,6 +21,8 @@ SimpleRobot::SimpleRobot(ModelPosition *modelPos) {
     // Subscribing to callback updates
     this->pos->Subscribe();
     this->laser->Subscribe();
+    // Set the model initial position
+    this->pos->SetPose(Pose(x, y, 0, 0));
 }
 // Read the ranger data
 int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
