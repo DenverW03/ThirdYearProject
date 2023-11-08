@@ -7,7 +7,7 @@ SimpleRobot::SimpleRobot(){
     // No setup required in implicit constructor
 };
 // Constructor for the class with appropriate setup
-SimpleRobot::SimpleRobot(ModelPosition *modelPos, int x, int y, SimpleRobot *robots) {
+SimpleRobot::SimpleRobot(ModelPosition *modelPos, Pose pose, SimpleRobot *robots) {
     this->pos = nullptr;
     this->laser = nullptr;
     this->xVel = 1;
@@ -23,7 +23,7 @@ SimpleRobot::SimpleRobot(ModelPosition *modelPos, int x, int y, SimpleRobot *rob
     this->pos->Subscribe();
     this->laser->Subscribe();
     // Set the model initial position
-    this->pos->SetPose(Pose(x, y, 0, 0));
+    this->pos->SetPose(pose);
 }
 // Read the ranger data
 int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
@@ -51,10 +51,11 @@ int SimpleRobot::PositionUpdate(Model *, SimpleRobot* robot) {
     for(int i=0; i<3; i++) {
         if(robot->robots[i].pos == robot->pos) continue; // excluding self
         double distance = CalculateDistance(robot->robots[i].GetPose(), robot);
-        // decide what to do based on the distance, orient face in a similar direction
+        // decide what to do based on the distance, move velocity towards velocity of found robot
+        double targetTurnSpeed = robot->robots[i].GetPose().a; // getting the current rotation about the z axis in radians
+
     }
     robot->pos->SetSpeed(robot->xVel, robot->yVel, robot->turnVel);
-    robot->turnVel = 0;
     return 0; // run again
 }
 // Calculating the distance between the current robot and the given pose of another robot
