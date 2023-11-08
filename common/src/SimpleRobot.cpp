@@ -1,7 +1,9 @@
 #include "SimpleRobot.hh"
 #include <stage.hh>
+#include <cmath>
 using namespace Stg;
 using namespace SimpleRBT;
+#define PI 3.14159265358979323846 // defining a value for PI
 // Default constructor for init
 SimpleRobot::SimpleRobot(){
     // No setup required in implicit constructor
@@ -40,22 +42,49 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
     }
     // Avoiding an obstacle
     if(obstruction) {
-        robot->turnVel = 1 * prescaler;
+        //robot->turnVel = 2 * prescaler; // was originally 1 * prescaler
         obstruction = false; // resetting
     }
     return 0;
 }
 // Position update function for stage
 int SimpleRobot::PositionUpdate(Model *, SimpleRobot* robot) {
-    // Printing the distances from robots that are not this one
+    double visionRange = 3; // The vision range for the boid, should be moved into a class variable
+    double avoidanceDistance = 0.5;
+    double cohesion = 0.1;
+    double avoidance = 0.2;
+    // Variables used for calculating movement
+    double numNeighbours = 0;
+    double averageX = 0;
+    double averageY = 0;
+    double averageAngle = 0;
     for(int i=0; i<3; i++) {
         if(robot->robots[i].pos == robot->pos) continue; // excluding self
         double distance = CalculateDistance(robot->robots[i].GetPose(), robot);
-        // decide what to do based on the distance, move velocity towards velocity of found robot
-        double targetTurnSpeed = robot->robots[i].GetPose().a; // getting the current rotation about the z axis in radians
-
+        if(distance < visionRange) {
+            numNeighbours += 1;
+            averageX += robot->robots[i].GetPose().x;
+            averageX += robot->robots[i].GetPose().y;
+            averageAngle += robot->robots[i].GetPose().a;
+        }
     }
-    robot->pos->SetSpeed(robot->xVel, robot->yVel, robot->turnVel);
+    if(numNeighbours > 0) {
+        averageX = averageX / numNeighbours;
+        averageY = averageY / numNeighbours;
+        averageAngle = averageAngle / numNeighbours;
+        /*double thisAngle = robot->pos->GetPose().a;
+        // Change the turn velocity based on the difference between the current facing angle and average angle of the flock
+        double difference = thisAngle - averageAngle;
+        double direction = -1;
+        if(difference > PI) direction = 1;
+        robot->turnVel = direction * difference * cohesion;*/
+        robot->pos->GoTo(averageX, averageY, averageAngle);
+    }
+    else{
+        robot->pos->SetSpeed(robot->xVel, robot->yVel, robot->turnVel);
+    }
+    //robot->pos->SetSpeed(robot->xVel, robot->yVel, robot->turnVel);
+    //robot->turnVel = 0; // Resetting for obstacle avoidance
     return 0; // run again
 }
 // Calculating the distance between the current robot and the given pose of another robot
