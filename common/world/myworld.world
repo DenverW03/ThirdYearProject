@@ -37,6 +37,8 @@ floorplan
 #    sicklaser( pose [ 0 0 0 0 ] )
 #)
 
+# setting up individual models is a lot of effort, should create a python script to automate this probably
+
 pioneer2dx
 (
   # can refer to the robot by this name

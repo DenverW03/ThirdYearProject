@@ -3,16 +3,16 @@
 using namespace Stg;
 using namespace SimpleRBT;
 
-SimpleRobot robots[10]; // Array length 10 to hold some robots during testing
+SimpleRobot *robots = (SimpleRobot *) malloc(10 * sizeof(SimpleRobot)); // Array length 10 to hold some robots during testing
 
 int main(int argc, char* argv[]) {
     Init(&argc, &argv); // Initialising the stage library
     WorldGui world(635, 666, "Boids Simulation");
     world.Load(argv[1]);
     // Add robots (Writing individual stuff is tedious so automating this with a .py script or something would be much better)
-    robots[0] = SimpleRobot((ModelPosition *)world.GetModel(argv[2]), 1, 1);
-    robots[1] = SimpleRobot((ModelPosition *)world.GetModel(argv[3]), 0, 0);
-    robots[2] = SimpleRobot((ModelPosition *)world.GetModel(argv[4]), -1, -1);
+    //robots[0] = SimpleRobot((ModelPosition *)world.GetModel(argv[2]), 1, 1, robots);
+    robots[1] = SimpleRobot((ModelPosition *)world.GetModel(argv[3]), 0, 0, robots);
+    //robots[2] = SimpleRobot((ModelPosition *)world.GetModel(argv[4]), -1, -1, robots);
     world.Start();
     while(!world.TestQuit()) {
         if(!world.UpdateAll()) { // When UpdateAll() returns false, simulation continues
@@ -21,5 +21,6 @@ int main(int argc, char* argv[]) {
         };
     }
     // Cleanup
+    free(robots);
     exit(0);
 }
