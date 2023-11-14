@@ -13,7 +13,7 @@ SimpleRobot::SimpleRobot(ModelPosition *modelPos, Pose pose, SimpleRobot *robots
     this->pos = nullptr;
     this->laser = nullptr;
     this->xVel = 1;
-    this->yVel = 1;
+    this->yVel = 0; // y velocity is essentially useless to a robot bound for single direction movement (not omniwheel or ball)
     this->turnVel = 0;
     this->robots = robots;
     // Setting up positional model and callbacks
@@ -37,7 +37,9 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
     double prescaler = 1 / scan[0]; // if it turns to a super close object should turn faster
     for(uint32_t i = 0; i < sampleCount; i++) {
         if(scan[i] < minFrontDistance) {
-        obstruction = true;
+            obstruction = true;
+            Pose pose = robot->pos->GetPose();
+            robot->pos->SetPose(pose.x, pose.y, (2 * PI) - pose.a);
         }
     }
     // Avoiding an obstacle
@@ -49,8 +51,8 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
 }
 // Position update function for stage
 int SimpleRobot::PositionUpdate(Model *, SimpleRobot* robot) {
-    double visionRange = 3; // The vision range for the boid, should be moved into a class variable
-    double avoidanceDistance = 0.5;
+    double visionRange = 5; // The vision range for the boid, should be moved into a class variable
+    double avoidanceDistance = 1;
     double cohesion = 0.1;
     double avoidance = 0.2;
     // Variables used for calculating movement
@@ -58,31 +60,46 @@ int SimpleRobot::PositionUpdate(Model *, SimpleRobot* robot) {
     double averageX = 0;
     double averageY = 0;
     double averageAngle = 0;
+    double averageAngleTooClose = 0;
+    double numTooClose = 0;
     for(int i=0; i<3; i++) {
         if(robot->robots[i].pos == robot->pos) continue; // excluding self
         double distance = CalculateDistance(robot->robots[i].GetPose(), robot);
-        if(distance < visionRange) {
+        if(distance <= visionRange) {
             numNeighbours += 1;
             averageX += robot->robots[i].GetPose().x;
             averageX += robot->robots[i].GetPose().y;
             averageAngle += robot->robots[i].GetPose().a;
+        }
+        if(distance <= avoidanceDistance) {
+            numTooClose += 1;
+            averageAngleTooClose += robot->robots[i].GetPose().a;
         }
     }
     if(numNeighbours > 0) {
         averageX = averageX / numNeighbours;
         averageY = averageY / numNeighbours;
         averageAngle = averageAngle / numNeighbours;
-        /*double thisAngle = robot->pos->GetPose().a;
-        // Change the turn velocity based on the difference between the current facing angle and average angle of the flock
-        double difference = thisAngle - averageAngle;
-        double direction = -1;
-        if(difference > PI) direction = 1;
-        robot->turnVel = direction * difference * cohesion;*/
-        robot->pos->GoTo(averageX, averageY, averageAngle);
+        averageAngleTooClose = averageAngleTooClose / numTooClose;
+        // Cohesion
+        Pose position = robot->pos->GetPose();
+        double vector[2];
+        vector[0] = position.x - averageX; // getting a vector point transformation to the center of mass for the neighbours
+        vector[1] = position.y - averageY;
+        double goalAngle = atan2(vector[0], vector[1]);
+        if (goalAngle - position.a > 0) { // If the goal angle is larger than the current angle turn positively
+            robot->turnVel = 10 * cohesion * (goalAngle - position.a); // scale by cohesion factor and difference of angles
+        }
+        else {
+            robot->turnVel = -10 * cohesion * (goalAngle - position.a);
+        }
+
+        // Avoidance
     }
-    else{
-        robot->pos->SetSpeed(robot->xVel, robot->yVel, robot->turnVel);
+    else {
+        robot->turnVel = 0; // if no neighbours then travel straight
     }
+    robot->pos->SetSpeed(robot->xVel, robot->yVel, robot->turnVel);
     //robot->pos->SetSpeed(robot->xVel, robot->yVel, robot->turnVel);
     //robot->turnVel = 0; // Resetting for obstacle avoidance
     return 0; // run again
