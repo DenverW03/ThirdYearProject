@@ -33,18 +33,18 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
     uint32_t sampleCount = scan.size();
     if(sampleCount < 1) return 0; // not enough samples is not a legitimate reading for these purposes
     bool obstruction = false;
-    double minFrontDistance = 2.0;
+    double minFrontDistance = 1.0;
     double prescaler = 1 / scan[0]; // if it turns to a super close object should turn faster
     for(uint32_t i = 0; i < sampleCount; i++) {
         if(scan[i] < minFrontDistance) {
             obstruction = true;
-            Pose pose = robot->pos->GetPose();
-            robot->pos->SetPose(pose.x, pose.y, (2 * PI) - pose.a);
         }
     }
     // Avoiding an obstacle
     if(obstruction) {
         //robot->turnVel = 2 * prescaler; // was originally 1 * prescaler
+        Pose pose = robot->pos->GetPose();
+        robot->pos->SetPose(Pose(pose.x, pose.y, pose.z, (2 * PI) - pose.a));
         obstruction = false; // resetting
     }
     return 0;

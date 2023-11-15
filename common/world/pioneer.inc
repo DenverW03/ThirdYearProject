@@ -109,8 +109,8 @@ define pioneer_base position
   color "red"			# Default color.
   drive "diff"		 	# Differential steering model.
   gui_nose 1                  	# Draw a nose on the robot so we can see which way it points
-  obstacle_return 1           	# Can hit things.
-  ranger_return 0.5            	# reflects sonar beams
+  obstacle_return 0           	# Can hit things. (mainly other robots)
+  ranger_return 1            	  # reflects sonar beams
   blob_return 1               	# Seen by blobfinders  
   fiducial_return 1           	# Seen as "1" fiducial finders
 
