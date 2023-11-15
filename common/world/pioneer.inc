@@ -16,10 +16,12 @@ define p2dxsonar sensor
   fov 15
   # define the number of samples spread over the fov
   samples 1
+  obstacle_return 0
 )
 
 define p2dx_sonar ranger
 (
+  obstacle_return 0
  # 16 transducers spread about the robot as follows
  p2dxsonar( pose [ 0 0 0 0 ] ) # testing with a single sensor
  # p2dxsonar( pose [ 0.075 0.130 0 90 ] )

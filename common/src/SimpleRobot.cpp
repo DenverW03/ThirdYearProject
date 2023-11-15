@@ -44,14 +44,21 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
     if(obstruction) {
         //robot->turnVel = 2 * prescaler; // was originally 1 * prescaler
         Pose pose = robot->pos->GetPose();
-        robot->pos->SetPose(Pose(pose.x, pose.y, pose.z, (2 * PI) - pose.a));
+        double revAngle = (2 * PI) - pose.a;
+        if(revAngle > (3 * PI/4) | revAngle < ((5 * PI) / 4)) {
+            revAngle = PI - pose.a;
+        }
+        if(revAngle < (PI/4) | revAngle > ((7 * PI) / 4)) {
+            revAngle = PI - pose.a;
+        }
+        robot->pos->SetPose(Pose(pose.x, pose.y, pose.z, revAngle));
         obstruction = false; // resetting
     }
     return 0;
 }
 // Position update function for stage
 int SimpleRobot::PositionUpdate(Model *, SimpleRobot* robot) {
-    double visionRange = 5; // The vision range for the boid, should be moved into a class variable
+    double visionRange = 3; // The vision range for the boid, should be moved into a class variable
     double avoidanceDistance = 1;
     double cohesion = 0.1;
     double avoidance = 0.2;
@@ -81,20 +88,21 @@ int SimpleRobot::PositionUpdate(Model *, SimpleRobot* robot) {
         averageY = averageY / numNeighbours;
         averageAngle = averageAngle / numNeighbours;
         averageAngleTooClose = averageAngleTooClose / numTooClose;
-        // Cohesion
+        // COHESION
         Pose position = robot->pos->GetPose();
         double vector[2];
         vector[0] = position.x - averageX; // getting a vector point transformation to the center of mass for the neighbours
         vector[1] = position.y - averageY;
         double goalAngle = atan2(vector[0], vector[1]);
         if (goalAngle - position.a > 0) { // If the goal angle is larger than the current angle turn positively
-            robot->turnVel = 10 * cohesion * (goalAngle - position.a); // scale by cohesion factor and difference of angles
+            robot->turnVel = -10 * cohesion * (goalAngle - position.a); // scale by cohesion factor and difference of angles
         }
         else {
-            robot->turnVel = -10 * cohesion * (goalAngle - position.a);
+            robot->turnVel = 10 * cohesion * (goalAngle - position.a);
         }
-
-        // Avoidance
+        // ALIGNMENT
+        robot->pos->SetPose(Pose(position.x, position.y, position.z, averageAngle));
+        // AVOIDANCE
     }
     else {
         robot->turnVel = 0; // if no neighbours then travel straight
