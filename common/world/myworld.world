@@ -25,174 +25,274 @@ floorplan
   bitmap "bitmaps/empty.png"
 )
 
-# setting up individual models is a lot of effort, should create a python script to automate this probably
-
+# Robot data is appended here
 pioneer2dx
 (
-  # can refer to the robot by this name
-  name "MySimpleRobot1"
-  pose [ -6.946 -6.947 0 45.000 ] 
-
-  # pioneer2dx's sonars	will be ranger:0 and the laser will be ranger:1
-  sicklaser( pose [ 0 0 0 0 ] ) 
-
-  # report error-free position in world coordinates
-  localization "gps"
-  localization_origin [ 0 0 0 0 ]
-
-  trail_length 400
-    
+name "MySimpleRobot1"
+pose [ -6.946 -6.947 0 45.000 ]
+sicklaser( pose [ 0 0 0 0 ] )
+localization "gps"
+localization_origin [ 0 0 0 0 ]
+trail_length 400
 )
-
 pioneer2dx
 (
-  # can refer to the robot by this name
-  name "MySimpleRobot2"
-  pose [ -6.946 -6.947 0 45.000 ] 
-
-  # pioneer2dx's sonars	will be ranger:0 and the laser will be ranger:1
-  sicklaser( pose [ 0 0 0 0 ] ) 
-
-  # report error-free position in world coordinates
-  localization "gps"
-  localization_origin [ 0 0 0 0 ]
-
-  trail_length 400
-    
+name "MySimpleRobot2"
+pose [ -6.946 -6.947 0 45.000 ]
+sicklaser( pose [ 0 0 0 0 ] )
+localization "gps"
+localization_origin [ 0 0 0 0 ]
+trail_length 400
 )
-
 pioneer2dx
 (
-  # can refer to the robot by this name
-  name "MySimpleRobot3"
-  pose [ -6.946 -6.947 0 45.000 ] 
-
-  # pioneer2dx's sonars	will be ranger:0 and the laser will be ranger:1
-  sicklaser( pose [ 0 0 0 0 ] ) 
-
-  # report error-free position in world coordinates
-  localization "gps"
-  localization_origin [ 0 0 0 0 ]
-
-  trail_length 400
-    
+name "MySimpleRobot3"
+pose [ -6.946 -6.947 0 45.000 ]
+sicklaser( pose [ 0 0 0 0 ] )
+localization "gps"
+localization_origin [ 0 0 0 0 ]
+trail_length 400
 )
-
 pioneer2dx
 (
-  # can refer to the robot by this name
-  name "MySimpleRobot4"
-  pose [ -6.946 -6.947 0 45.000 ] 
-
-  # pioneer2dx's sonars	will be ranger:0 and the laser will be ranger:1
-  sicklaser( pose [ 0 0 0 0 ] ) 
-
-  # report error-free position in world coordinates
-  localization "gps"
-  localization_origin [ 0 0 0 0 ]
-
-  trail_length 400
-    
+name "MySimpleRobot4"
+pose [ -6.946 -6.947 0 45.000 ]
+sicklaser( pose [ 0 0 0 0 ] )
+localization "gps"
+localization_origin [ 0 0 0 0 ]
+trail_length 400
 )
-
 pioneer2dx
 (
-  # can refer to the robot by this name
-  name "MySimpleRobot5"
-  pose [ -6.946 -6.947 0 45.000 ] 
-
-  # pioneer2dx's sonars	will be ranger:0 and the laser will be ranger:1
-  sicklaser( pose [ 0 0 0 0 ] ) 
-
-  # report error-free position in world coordinates
-  localization "gps"
-  localization_origin [ 0 0 0 0 ]
-
-  trail_length 400
-    
+name "MySimpleRobot5"
+pose [ -6.946 -6.947 0 45.000 ]
+sicklaser( pose [ 0 0 0 0 ] )
+localization "gps"
+localization_origin [ 0 0 0 0 ]
+trail_length 400
 )
-
 pioneer2dx
 (
-  # can refer to the robot by this name
-  name "MySimpleRobot6"
-  pose [ -6.946 -6.947 0 45.000 ] 
-
-  # pioneer2dx's sonars	will be ranger:0 and the laser will be ranger:1
-  sicklaser( pose [ 0 0 0 0 ] ) 
-
-  # report error-free position in world coordinates
-  localization "gps"
-  localization_origin [ 0 0 0 0 ]
-
-  trail_length 400
-    
+name "MySimpleRobot6"
+pose [ -6.946 -6.947 0 45.000 ]
+sicklaser( pose [ 0 0 0 0 ] )
+localization "gps"
+localization_origin [ 0 0 0 0 ]
+trail_length 400
 )
-
 pioneer2dx
 (
-  # can refer to the robot by this name
-  name "MySimpleRobot7"
-  pose [ -6.946 -6.947 0 45.000 ] 
-
-  # pioneer2dx's sonars	will be ranger:0 and the laser will be ranger:1
-  sicklaser( pose [ 0 0 0 0 ] ) 
-
-  # report error-free position in world coordinates
-  localization "gps"
-  localization_origin [ 0 0 0 0 ]
-
-  trail_length 400
-    
+name "MySimpleRobot7"
+pose [ -6.946 -6.947 0 45.000 ]
+sicklaser( pose [ 0 0 0 0 ] )
+localization "gps"
+localization_origin [ 0 0 0 0 ]
+trail_length 400
 )
-
 pioneer2dx
 (
-  # can refer to the robot by this name
-  name "MySimpleRobot8"
-  pose [ -6.946 -6.947 0 45.000 ] 
-
-  # pioneer2dx's sonars	will be ranger:0 and the laser will be ranger:1
-  sicklaser( pose [ 0 0 0 0 ] ) 
-
-  # report error-free position in world coordinates
-  localization "gps"
-  localization_origin [ 0 0 0 0 ]
-
-  trail_length 400
-    
+name "MySimpleRobot8"
+pose [ -6.946 -6.947 0 45.000 ]
+sicklaser( pose [ 0 0 0 0 ] )
+localization "gps"
+localization_origin [ 0 0 0 0 ]
+trail_length 400
 )
-
 pioneer2dx
 (
-  # can refer to the robot by this name
-  name "MySimpleRobot9"
-  pose [ -6.946 -6.947 0 45.000 ] 
-
-  # pioneer2dx's sonars	will be ranger:0 and the laser will be ranger:1
-  sicklaser( pose [ 0 0 0 0 ] ) 
-
-  # report error-free position in world coordinates
-  localization "gps"
-  localization_origin [ 0 0 0 0 ]
-
-  trail_length 400
-    
+name "MySimpleRobot9"
+pose [ -6.946 -6.947 0 45.000 ]
+sicklaser( pose [ 0 0 0 0 ] )
+localization "gps"
+localization_origin [ 0 0 0 0 ]
+trail_length 400
 )
-
 pioneer2dx
 (
-  # can refer to the robot by this name
-  name "MySimpleRobot10"
-  pose [ -6.946 -6.947 0 45.000 ] 
-
-  # pioneer2dx's sonars	will be ranger:0 and the laser will be ranger:1
-  sicklaser( pose [ 0 0 0 0 ] ) 
-
-  # report error-free position in world coordinates
-  localization "gps"
-  localization_origin [ 0 0 0 0 ]
-
-  trail_length 400
-    
+name "MySimpleRobot10"
+pose [ -6.946 -6.947 0 45.000 ]
+sicklaser( pose [ 0 0 0 0 ] )
+localization "gps"
+localization_origin [ 0 0 0 0 ]
+trail_length 400
+)
+pioneer2dx
+(
+name "MySimpleRobot11"
+pose [ -6.946 -6.947 0 45.000 ]
+sicklaser( pose [ 0 0 0 0 ] )
+localization "gps"
+localization_origin [ 0 0 0 0 ]
+trail_length 400
+)
+pioneer2dx
+(
+name "MySimpleRobot12"
+pose [ -6.946 -6.947 0 45.000 ]
+sicklaser( pose [ 0 0 0 0 ] )
+localization "gps"
+localization_origin [ 0 0 0 0 ]
+trail_length 400
+)
+pioneer2dx
+(
+name "MySimpleRobot13"
+pose [ -6.946 -6.947 0 45.000 ]
+sicklaser( pose [ 0 0 0 0 ] )
+localization "gps"
+localization_origin [ 0 0 0 0 ]
+trail_length 400
+)
+pioneer2dx
+(
+name "MySimpleRobot14"
+pose [ -6.946 -6.947 0 45.000 ]
+sicklaser( pose [ 0 0 0 0 ] )
+localization "gps"
+localization_origin [ 0 0 0 0 ]
+trail_length 400
+)
+pioneer2dx
+(
+name "MySimpleRobot15"
+pose [ -6.946 -6.947 0 45.000 ]
+sicklaser( pose [ 0 0 0 0 ] )
+localization "gps"
+localization_origin [ 0 0 0 0 ]
+trail_length 400
+)
+pioneer2dx
+(
+name "MySimpleRobot16"
+pose [ -6.946 -6.947 0 45.000 ]
+sicklaser( pose [ 0 0 0 0 ] )
+localization "gps"
+localization_origin [ 0 0 0 0 ]
+trail_length 400
+)
+pioneer2dx
+(
+name "MySimpleRobot17"
+pose [ -6.946 -6.947 0 45.000 ]
+sicklaser( pose [ 0 0 0 0 ] )
+localization "gps"
+localization_origin [ 0 0 0 0 ]
+trail_length 400
+)
+pioneer2dx
+(
+name "MySimpleRobot18"
+pose [ -6.946 -6.947 0 45.000 ]
+sicklaser( pose [ 0 0 0 0 ] )
+localization "gps"
+localization_origin [ 0 0 0 0 ]
+trail_length 400
+)
+pioneer2dx
+(
+name "MySimpleRobot19"
+pose [ -6.946 -6.947 0 45.000 ]
+sicklaser( pose [ 0 0 0 0 ] )
+localization "gps"
+localization_origin [ 0 0 0 0 ]
+trail_length 400
+)
+pioneer2dx
+(
+name "MySimpleRobot20"
+pose [ -6.946 -6.947 0 45.000 ]
+sicklaser( pose [ 0 0 0 0 ] )
+localization "gps"
+localization_origin [ 0 0 0 0 ]
+trail_length 400
+)
+pioneer2dx
+(
+name "MySimpleRobot21"
+pose [ -6.946 -6.947 0 45.000 ]
+sicklaser( pose [ 0 0 0 0 ] )
+localization "gps"
+localization_origin [ 0 0 0 0 ]
+trail_length 400
+)
+pioneer2dx
+(
+name "MySimpleRobot22"
+pose [ -6.946 -6.947 0 45.000 ]
+sicklaser( pose [ 0 0 0 0 ] )
+localization "gps"
+localization_origin [ 0 0 0 0 ]
+trail_length 400
+)
+pioneer2dx
+(
+name "MySimpleRobot23"
+pose [ -6.946 -6.947 0 45.000 ]
+sicklaser( pose [ 0 0 0 0 ] )
+localization "gps"
+localization_origin [ 0 0 0 0 ]
+trail_length 400
+)
+pioneer2dx
+(
+name "MySimpleRobot24"
+pose [ -6.946 -6.947 0 45.000 ]
+sicklaser( pose [ 0 0 0 0 ] )
+localization "gps"
+localization_origin [ 0 0 0 0 ]
+trail_length 400
+)
+pioneer2dx
+(
+name "MySimpleRobot25"
+pose [ -6.946 -6.947 0 45.000 ]
+sicklaser( pose [ 0 0 0 0 ] )
+localization "gps"
+localization_origin [ 0 0 0 0 ]
+trail_length 400
+)
+pioneer2dx
+(
+name "MySimpleRobot26"
+pose [ -6.946 -6.947 0 45.000 ]
+sicklaser( pose [ 0 0 0 0 ] )
+localization "gps"
+localization_origin [ 0 0 0 0 ]
+trail_length 400
+)
+pioneer2dx
+(
+name "MySimpleRobot27"
+pose [ -6.946 -6.947 0 45.000 ]
+sicklaser( pose [ 0 0 0 0 ] )
+localization "gps"
+localization_origin [ 0 0 0 0 ]
+trail_length 400
+)
+pioneer2dx
+(
+name "MySimpleRobot28"
+pose [ -6.946 -6.947 0 45.000 ]
+sicklaser( pose [ 0 0 0 0 ] )
+localization "gps"
+localization_origin [ 0 0 0 0 ]
+trail_length 400
+)
+pioneer2dx
+(
+name "MySimpleRobot29"
+pose [ -6.946 -6.947 0 45.000 ]
+sicklaser( pose [ 0 0 0 0 ] )
+localization "gps"
+localization_origin [ 0 0 0 0 ]
+trail_length 400
+)
+pioneer2dx
+(
+name "MySimpleRobot30"
+pose [ -6.946 -6.947 0 45.000 ]
+sicklaser( pose [ 0 0 0 0 ] )
+localization "gps"
+localization_origin [ 0 0 0 0 ]
+trail_length 400
 )

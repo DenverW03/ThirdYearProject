@@ -42,14 +42,18 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
     }
     // Avoiding an obstacle
     if(obstruction) {
-        //robot->turnVel = 2 * prescaler; // was originally 1 * prescaler
         Pose pose = robot->pos->GetPose();
-        double revAngle = (2 * PI) - pose.a;
-        if(revAngle > (3 * PI/4) | revAngle < ((5 * PI) / 4)) {
+        //double revAngle = (2 * PI) - pose.a;
+        /*if(revAngle > (3 * PI/4) | revAngle < ((5 * PI) / 4)) {
             revAngle = PI - pose.a;
         }
         if(revAngle < (PI/4) | revAngle > ((7 * PI) / 4)) {
             revAngle = PI - pose.a;
+        }*/
+        double revAngle = pose.a + PI; // Invert direction by adding PI
+        // Make sure the angle is within [0, 2*PI)
+        if (revAngle >= 2 * PI) {
+            revAngle -= 2 * PI;
         }
         robot->pos->SetPose(Pose(pose.x, pose.y, pose.z, revAngle));
         obstruction = false; // resetting
@@ -58,7 +62,7 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
 }
 // Position update function for stage
 int SimpleRobot::PositionUpdate(Model *, SimpleRobot* robot) {
-    double visionRange = 3; // The vision range for the boid, should be moved into a class variable
+    double visionRange = 2; // The vision range for the boid, should be moved into a class variable
     double avoidanceDistance = 1;
     double cohesion = 0.1;
     double avoidance = 0.2;
