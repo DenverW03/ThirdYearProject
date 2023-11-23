@@ -21,25 +21,25 @@ define p2dxsonar sensor
 
 define p2dx_sonar ranger
 (
-  obstacle_return 0
+ # obstacle_return 0
  # 16 transducers spread about the robot as follows
- p2dxsonar( pose [ 0 0 0 0 ] ) # testing with a single sensor
- # p2dxsonar( pose [ 0.075 0.130 0 90 ] )
- # p2dxsonar( pose [ 0.115 0.115 0 50 ] )
- # p2dxsonar( pose [ 0.150 0.080 0 30 ] )
- # p2dxsonar( pose [ 0.170 0.025 0 10 ] )
- # p2dxsonar( pose [ 0.170 -0.025 0 -10 ] )
- # p2dxsonar( pose [ 0.150 -0.080 0 -30 ] )
- # p2dxsonar( pose [ 0.115 -0.115 0 -50 ] )
- # p2dxsonar( pose [ 0.075 -0.130 0 -90 ] )
- # p2dxsonar( pose [ -0.155 -0.130 0 -90 ] )
- # p2dxsonar( pose [ -0.195 -0.115 0 -130 ] )
- # p2dxsonar( pose [ -0.230 -0.080 0 -150 ] )
- # p2dxsonar( pose [ -0.250 -0.025 0 -170 ] )
- # p2dxsonar( pose [ -0.250 0.025 0 170 ] )
- # p2dxsonar( pose [ -0.230 0.080 0 150 ] )
- # p2dxsonar( pose [ -0.195 0.115 0 130 ] )
- # p2dxsonar( pose [ -0.155 0.130 0 90 ]	 )
+ # p2dxsonar( pose [ 0 0 0 0 ] ) # testing with a single sensor
+ p2dxsonar( pose [ 0.075 0.130 0 90 ] )
+ p2dxsonar( pose [ 0.115 0.115 0 50 ] )
+ p2dxsonar( pose [ 0.150 0.080 0 30 ] )
+ p2dxsonar( pose [ 0.170 0.025 0 10 ] )
+ p2dxsonar( pose [ 0.170 -0.025 0 -10 ] )
+ p2dxsonar( pose [ 0.150 -0.080 0 -30 ] )
+ p2dxsonar( pose [ 0.115 -0.115 0 -50 ] )
+ p2dxsonar( pose [ 0.075 -0.130 0 -90 ] )
+ p2dxsonar( pose [ -0.155 -0.130 0 -90 ] )
+ p2dxsonar( pose [ -0.195 -0.115 0 -130 ] )
+ p2dxsonar( pose [ -0.230 -0.080 0 -150 ] )
+ p2dxsonar( pose [ -0.250 -0.025 0 -170 ] )
+ p2dxsonar( pose [ -0.250 0.025 0 170 ] )
+ p2dxsonar( pose [ -0.230 0.080 0 150 ] )
+ p2dxsonar( pose [ -0.195 0.115 0 130 ] )
+ p2dxsonar( pose [ -0.155 0.130 0 90 ]	 )
 )
 
 define p2dx_sonar_front ranger

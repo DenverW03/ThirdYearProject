@@ -29,34 +29,32 @@ SimpleRobot::SimpleRobot(ModelPosition *modelPos, Pose pose, SimpleRobot *robots
 }
 // Read the ranger data
 int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
-    const std::vector<meters_t> &scan = robot->laser->GetSensors()[0].ranges;
-    uint32_t sampleCount = scan.size();
-    if(sampleCount < 1) return 0; // not enough samples is not a legitimate reading for these purposes
-    bool obstruction = false;
-    double minFrontDistance = 1.0;
-    double prescaler = 1 / scan[0]; // if it turns to a super close object should turn faster
-    for(uint32_t i = 0; i < sampleCount; i++) {
-        if(scan[i] < minFrontDistance) {
-            obstruction = true;
+    //const std::vector<meters_t> &scan = robot->laser->GetSensors()[0].ranges;
+    const std::vector<ModelRanger::Sensor> &sensors = robot->laser->GetSensors();
+    for(int j=0; j<sensors.size(); j++) {
+        const std::vector<meters_t> &scan = robot->laser->GetSensors()[j].ranges;
+        uint32_t sampleCount = scan.size();
+        if(sampleCount < 1) return 0; // not enough samples is not a legitimate reading for these purposes
+        bool obstruction = false;
+        double minFrontDistance = 1.0;
+        double prescaler = 1 / scan[0]; // if it turns to a super close object should turn faster
+        for(uint32_t i = 0; i < sampleCount; i++) {
+            if(scan[i] < minFrontDistance) {
+                obstruction = true;
+            }
+            // Avoiding an obstacle
+            if(obstruction) {
+                Pose pose = robot->pos->GetPose();
+                Pose laserPose = sensors[j].pose;
+                double revAngle = laserPose.a + PI; // Invert direction by adding PI
+                // Make sure the angle is within [0, 2*PI)
+                if (revAngle >= 2 * PI) {
+                    revAngle -= 2 * PI;
+                }
+                robot->pos->SetPose(Pose(pose.x, pose.y, pose.z, revAngle));
+                obstruction = false; // resetting
+            }
         }
-    }
-    // Avoiding an obstacle
-    if(obstruction) {
-        Pose pose = robot->pos->GetPose();
-        //double revAngle = (2 * PI) - pose.a;
-        /*if(revAngle > (3 * PI/4) | revAngle < ((5 * PI) / 4)) {
-            revAngle = PI - pose.a;
-        }
-        if(revAngle < (PI/4) | revAngle > ((7 * PI) / 4)) {
-            revAngle = PI - pose.a;
-        }*/
-        double revAngle = pose.a + PI; // Invert direction by adding PI
-        // Make sure the angle is within [0, 2*PI)
-        if (revAngle >= 2 * PI) {
-            revAngle -= 2 * PI;
-        }
-        robot->pos->SetPose(Pose(pose.x, pose.y, pose.z, revAngle));
-        obstruction = false; // resetting
     }
     return 0;
 }
