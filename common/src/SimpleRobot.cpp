@@ -69,11 +69,16 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
 }
 // Position update function for stage
 int SimpleRobot::PositionUpdate(Model *, SimpleRobot* robot) {
+    // SHOULD SWITCH THE BELOW VARIABLES INTO DEFINITONS REALLY (THEY AREN'T BEING USED AS VARIABLES ANYWAY)
+
     // Variables used as behaviour parameters
     double visionRange = 2; // The vision range for cohesion
     double avoidanceDistance = 1; // The vision range for avoidance
     double cohesion = 0.1; // Cohesion strength
     double avoidance = 0.2; // Avoidance strength
+
+    // A factor used to scale the rotational velocity
+    double turningFactor = 0.5;
 
     // Variables used for calculating movement
     double numNeighbours = 0;
@@ -103,6 +108,7 @@ int SimpleRobot::PositionUpdate(Model *, SimpleRobot* robot) {
         averageY = averageY / numNeighbours;
         averageAngle = averageAngle / numNeighbours;
         averageAngleTooClose = averageAngleTooClose / numTooClose;
+        
         // COHESION
         Pose position = robot->pos->GetPose();
         double vector[2];
@@ -115,8 +121,20 @@ int SimpleRobot::PositionUpdate(Model *, SimpleRobot* robot) {
         else {
             robot->turnVel = 10 * cohesion * (goalAngle - position.a);
         }
+        
         // ALIGNMENT
-        robot->pos->SetPose(Pose(position.x, position.y, position.z, averageAngle));
+        //robot->pos->SetPose(Pose(position.x, position.y, position.z, averageAngle));
+        double angleDiff = averageAngle - position.a; // angle difference in radians
+        // Angle diff being larger than 0 means average angle is larger than this robots angle so move anti-clockwise
+        if (angleDiff >= 0) goto point;
+        // Getting the magnitude of the difference if negative
+        angleDiff *= -1;
+        point: // Used for skipping negation when necessary
+        if (angleDiff <= 1) goto linear;
+        robot->turnVel = log(angleDiff) * turningFactor;
+        linear: // use linear maths instead of ln()
+        robot->turnVel = angleDiff * turningFactor;
+        if (angleDiff < 0) robot->turnVel *= -1;
         // AVOIDANCE
     }
     else {
