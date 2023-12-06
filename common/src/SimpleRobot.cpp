@@ -9,21 +9,25 @@ SimpleRobot::SimpleRobot(){
     // No setup required in implicit constructor
 };
 // Constructor for the class with appropriate setup
-SimpleRobot::SimpleRobot(ModelPosition *modelPos, Pose pose, SimpleRobot *robots) {
+SimpleRobot::SimpleRobot(ModelPosition *modelPos, Pose pose, SimpleRobot *robots, int numRobots) {
     this->pos = nullptr;
     this->laser = nullptr;
-    this->xVel = 1;
+    this->xVel = 1; // This velocity is the useful one for movement in this scenario
     this->yVel = 0; // y velocity is essentially useless to a robot bound for single direction movement (not omniwheel or ball)
-    this->turnVel = 0;
+    this->turnVel = 0; // This is the velocity used to control movement, positively anti-clockwise around the Z axis
     this->robots = robots;
+    this->numRobots = numRobots;
+
     // Setting up positional model and callbacks
     this->pos = modelPos;
     this->pos->AddCallback(Model::CB_UPDATE, model_callback_t(PositionUpdate), this);
     this->laser = (ModelRanger *) (this->pos->GetChild("ranger:0"));
     this->laser->AddCallback(Model::CB_UPDATE, model_callback_t(SensorUpdate), this);
+    
     // Subscribing to callback updates
     this->pos->Subscribe();
     this->laser->Subscribe();
+    
     // Set the model initial position
     this->pos->SetPose(pose);
 }
@@ -31,13 +35,18 @@ SimpleRobot::SimpleRobot(ModelPosition *modelPos, Pose pose, SimpleRobot *robots
 int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
     //const std::vector<meters_t> &scan = robot->laser->GetSensors()[0].ranges;
     const std::vector<ModelRanger::Sensor> &sensors = robot->laser->GetSensors();
+    // Looping through all sensors
     for(int j=0; j<sensors.size(); j++) {
         const std::vector<meters_t> &scan = robot->laser->GetSensors()[j].ranges;
         uint32_t sampleCount = scan.size();
         if(sampleCount < 1) return 0; // not enough samples is not a legitimate reading for these purposes
+
+        // Setting up some parameters
         bool obstruction = false;
         double minFrontDistance = 1.0;
         double prescaler = 1 / scan[0]; // if it turns to a super close object should turn faster
+        
+        // Going through the recorded samples to detect obstacles (current is a single recording per sensor update))
         for(uint32_t i = 0; i < sampleCount; i++) {
             if(scan[i] < minFrontDistance) {
                 obstruction = true;
@@ -60,10 +69,12 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
 }
 // Position update function for stage
 int SimpleRobot::PositionUpdate(Model *, SimpleRobot* robot) {
-    double visionRange = 2; // The vision range for the boid, should be moved into a class variable
-    double avoidanceDistance = 1;
-    double cohesion = 0.1;
-    double avoidance = 0.2;
+    // Variables used as behaviour parameters
+    double visionRange = 2; // The vision range for cohesion
+    double avoidanceDistance = 1; // The vision range for avoidance
+    double cohesion = 0.1; // Cohesion strength
+    double avoidance = 0.2; // Avoidance strength
+
     // Variables used for calculating movement
     double numNeighbours = 0;
     double averageX = 0;
@@ -71,7 +82,9 @@ int SimpleRobot::PositionUpdate(Model *, SimpleRobot* robot) {
     double averageAngle = 0;
     double averageAngleTooClose = 0;
     double numTooClose = 0;
-    for(int i=0; i<3; i++) {
+    
+    // Looping through all the robots, numRobots given on instantiation of this positional model
+    for(int i=0; i<robot->numRobots; i++) {
         if(robot->robots[i].pos == robot->pos) continue; // excluding self
         double distance = CalculateDistance(robot->robots[i].GetPose(), robot);
         if(distance <= visionRange) {
@@ -110,8 +123,6 @@ int SimpleRobot::PositionUpdate(Model *, SimpleRobot* robot) {
         robot->turnVel = 0; // if no neighbours then travel straight
     }
     robot->pos->SetSpeed(robot->xVel, robot->yVel, robot->turnVel);
-    //robot->pos->SetSpeed(robot->xVel, robot->yVel, robot->turnVel);
-    //robot->turnVel = 0; // Resetting for obstacle avoidance
     return 0; // run again
 }
 // Calculating the distance between the current robot and the given pose of another robot

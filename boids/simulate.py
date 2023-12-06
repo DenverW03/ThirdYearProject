@@ -20,9 +20,11 @@ f.close()
 # Editing the main method to match
 with open('main-template.cpp','r',encoding='utf-8') as mainFile:
     data = mainFile.readlines()
+# Edit line 6 to ensure we malloc correct data size
+data[5] = 'SimpleRobot *robots = (SimpleRobot *) malloc(' + str(numRobots) + ' * sizeof(SimpleRobot));\r\n'
 # Edit line 13 to add robot spawning lines
 for i in range(numRobots):
-    data[12] = data[12] + '\r\n    robots[' + str(i) + '] = SimpleRobot((ModelPosition *)world.GetModel(argv[' + str(i + 2) + ']), Pose::Random(-4, 4, -4, 4), robots);'
+    data[12] = data[12] + '    robots[' + str(i) + '] = SimpleRobot((ModelPosition *)world.GetModel(argv[' + str(i + 2) + ']), Pose::Random(-4, 4, -4, 4), robots, ' + str(numRobots) + ');\r\n'
 # Write new file structure to main
 with open('main.cpp', 'w', encoding='utf-8') as mainFile:
     mainFile.writelines(data)

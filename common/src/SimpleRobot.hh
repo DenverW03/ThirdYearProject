@@ -13,9 +13,10 @@ namespace SimpleRBT {
         double yVel;
         double turnVel;
         SimpleRobot* robots;
+        int numRobots;
         // Function declarations
         SimpleRobot();
-        SimpleRobot(ModelPosition *modelPos, Pose pose, SimpleRobot *robots);
+        SimpleRobot(ModelPosition *modelPos, Pose pose, SimpleRobot *robots, int numRobots);
         static int SensorUpdate(Model *, SimpleRobot *robot);
         static int PositionUpdate(Model *, SimpleRobot *robot);
         Pose GetPose();
