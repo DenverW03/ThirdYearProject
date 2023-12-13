@@ -86,9 +86,9 @@ int SimpleRobot::PositionUpdate(Model *, SimpleRobot* robot) {
     double avoidanceDistance = 1; // The vision range for avoidance
 
     // Behaviour
-    double cohesion = 10; // Cohesion Factor
-    double avoidance = 2; // Avoidance Factor
-    double alignment = 1.5; // Alignment Factor
+    double cohesion = 2; // Cohesion Factor
+    double avoidance = 100; // Avoidance Factor
+    double alignment = 20; // Alignment Factor
 
     // Separation
     double close_dx = 0;
@@ -104,7 +104,7 @@ int SimpleRobot::PositionUpdate(Model *, SimpleRobot* robot) {
     double averageYPos = 0;
     
     // Looping through all the robots, numRobots given on instantiation of this positional model
-    for(int i=0; i<robot->numRobots; i++) {
+    for(int i = 0; i < robot->numRobots; i++) {
         // Exclude self
         if(robot->robots[i].pos == robot->pos) continue;
 
@@ -162,18 +162,18 @@ int SimpleRobot::PositionUpdate(Model *, SimpleRobot* robot) {
     
     // Finding magnitude of linear velocity vector
 
-    linearVel = sqrt((robot->xVel)^2 + (robot->yVel)^2);
+    linearVel = sqrt(pow(2.0, (robot->xVel)) + pow(2.0, (robot->yVel)));
 
     // Computing the rotational velocity
 
     double newDirection = atan2(robot->yVel, robot->xVel);
-    double angleDiff = newDirection - robot->pos.a;
+    double angleDiff = newDirection - robot->GetPose().a;
 
-    rotationalVel = angleDiff / (1/30);
+    rotationalVel = angleDiff / (1/60);
 
     // Setting values for non-holonomic system
     robot->pos->SetSpeed(linearVel, 0, rotationalVel);
-    
+
     return 0; // run again
 }
 

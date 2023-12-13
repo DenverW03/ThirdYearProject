@@ -6,8 +6,8 @@ file = open("./template.world")
 # Read file to string buffer
 fileRead = file.read()
 file.close()
-# Take input for number of robots to add
-# numRobots = int(input("Number of robots in simulation: "))
+
+# Use command line to choose number of robots
 numRobots = int(sys.argv[1])
 # Append some number of robots based on number to buffer string
 for i in range(numRobots):
@@ -18,7 +18,7 @@ f.write(fileRead)
 f.close()
 
 # Editing the main method to match
-with open('main-template.cpp','r',encoding='utf-8') as mainFile:
+with open('main_template.cpp','r',encoding='utf-8') as mainFile:
     data = mainFile.readlines()
 # Edit line 6 to ensure we malloc correct data size
 data[5] = 'SimpleRobot *robots = (SimpleRobot *) malloc(' + str(numRobots) + ' * sizeof(SimpleRobot));\r\n'
@@ -32,7 +32,7 @@ with open('main.cpp', 'w', encoding='utf-8') as mainFile:
 # Running the terminal commands to get the simulation running
 subprocess.call(["sh","compile.sh"])
 # Editing the main method to match
-with open('run.sh','r',encoding='utf-8') as mainFile:
+with open('run_template.sh','r',encoding='utf-8') as mainFile:
     data = mainFile.readlines()
 # Edit line 13 to add robot spawning lines
 buffer = './main ../common/world/myworld.world'
@@ -42,5 +42,6 @@ data[3] = buffer
 # Write the new shell script
 with open('run.sh', 'w', encoding='utf-8') as mainFile:
     mainFile.writelines(data)
+
 # Run the shell script to run simulation
 subprocess.call(["sh","run.sh"])

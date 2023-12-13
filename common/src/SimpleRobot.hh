@@ -13,7 +13,6 @@ namespace SimpleRBT {
         double yPos;
         double xVel;
         double yVel;
-        double turnVel;
         SimpleRobot* robots;
         int numRobots;
         // Function declarations

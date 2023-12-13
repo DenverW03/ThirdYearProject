@@ -1,4 +1,11 @@
+# MACOS
 .DS_Store
+
+# OBJECT FILES
 boids/*.o
 common/src/*.o
+
+# GENERATED FILES
 boids/main
+boids/main.cpp
+boids/run.sh
