@@ -9,6 +9,8 @@ namespace SimpleRBT {
     public:
         ModelPosition *pos;
         ModelRanger *laser;
+        double xPos;
+        double yPos;
         double xVel;
         double yVel;
         double turnVel;

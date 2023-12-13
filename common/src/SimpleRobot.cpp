@@ -4,19 +4,27 @@
 using namespace Stg;
 using namespace SimpleRBT;
 #define PI 3.14159265358979323846 // defining a value for PI
+
 // Default constructor for init
 SimpleRobot::SimpleRobot(){
     // No setup required in implicit constructor
 };
+
 // Constructor for the class with appropriate setup
 SimpleRobot::SimpleRobot(ModelPosition *modelPos, Pose pose, SimpleRobot *robots, int numRobots) {
     this->pos = nullptr;
     this->laser = nullptr;
+    
+    // Robot Position Values
+    this->xPos = pose.x;
+    this->yPos = pose.y;
+    
+    // Robot Velocity Values
     this->xVel = 1; // This velocity is the useful one for movement in this scenario
-    this->yVel = 0; // y velocity is essentially useless to a robot bound for single direction movement (not omniwheel or ball)
-    this->turnVel = 0; // This is the velocity used to control movement, positively anti-clockwise around the Z axis
-    this->robots = robots;
-    this->numRobots = numRobots;
+    this->yVel = 1; // Even though this bot is non holonomic, treat as holonomic until running bounding algorithm
+    
+    this->robots = robots; // Holds all the robots in an array
+    this->numRobots = numRobots; // Holds the number of robots
 
     // Setting up positional model and callbacks
     this->pos = modelPos;
@@ -31,6 +39,7 @@ SimpleRobot::SimpleRobot(ModelPosition *modelPos, Pose pose, SimpleRobot *robots
     // Set the model initial position
     this->pos->SetPose(pose);
 }
+
 // Read the ranger data
 int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
     //const std::vector<meters_t> &scan = robot->laser->GetSensors()[0].ranges;
@@ -47,102 +56,127 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
         double prescaler = 1 / scan[0]; // if it turns to a super close object should turn faster
         
         // Going through the recorded samples to detect obstacles (current is a single recording per sensor update))
-        for(uint32_t i = 0; i < sampleCount; i++) {
-            if(scan[i] < minFrontDistance) {
-                obstruction = true;
-            }
-            // Avoiding an obstacle
-            if(obstruction) {
-                Pose pose = robot->pos->GetPose();
-                Pose laserPose = sensors[j].pose;
-                double revAngle = laserPose.a + PI; // Invert direction by adding PI
-                // Make sure the angle is within [0, 2*PI)
-                if (revAngle >= 2 * PI) {
-                    revAngle -= 2 * PI;
-                }
-                robot->pos->SetPose(Pose(pose.x, pose.y, pose.z, revAngle));
-                obstruction = false; // resetting
-            }
-        }
+        // for(uint32_t i = 0; i < sampleCount; i++) {
+        //     if(scan[i] < minFrontDistance) {
+        //         obstruction = true;
+        //     }
+        //     // Avoiding an obstacle
+        //     if(obstruction) {
+        //         Pose pose = robot->pos->GetPose();
+        //         Pose laserPose = sensors[j].pose;
+        //         double revAngle = laserPose.a + PI; // Invert direction by adding PI
+        //         // Make sure the angle is within [0, 2*PI)
+        //         if (revAngle >= 2 * PI) {
+        //             revAngle -= 2 * PI;
+        //         }
+        //         robot->pos->SetPose(Pose(pose.x, pose.y, pose.z, revAngle));
+        //         obstruction = false; // resetting
+        //     }
+        // }
     }
     return 0;
 }
+
 // Position update function for stage
 int SimpleRobot::PositionUpdate(Model *, SimpleRobot* robot) {
     // SHOULD SWITCH THE BELOW VARIABLES INTO DEFINITONS REALLY (THEY AREN'T BEING USED AS VARIABLES ANYWAY)
 
-    // Variables used as behaviour parameters
+    // Vision
     double visionRange = 2; // The vision range for cohesion
     double avoidanceDistance = 1; // The vision range for avoidance
-    double cohesion = 0.1; // Cohesion strength
-    double avoidance = 0.2; // Avoidance strength
 
-    // A factor used to scale the rotational velocity
-    double turningFactor = 0.5;
+    // Behaviour
+    double cohesion = 10; // Cohesion Factor
+    double avoidance = 2; // Avoidance Factor
+    double alignment = 1.5; // Alignment Factor
 
-    // Variables used for calculating movement
+    // Separation
+    double close_dx = 0;
+    double close_dy = 0;
+
+    // Alignment
+    double averageXVel = 0;
+    double averageYVel = 0;
     double numNeighbours = 0;
-    double averageX = 0;
-    double averageY = 0;
-    double averageAngle = 0;
-    double averageAngleTooClose = 0;
-    double numTooClose = 0;
+
+    // Cohesion
+    double averageXPos = 0;
+    double averageYPos = 0;
     
     // Looping through all the robots, numRobots given on instantiation of this positional model
     for(int i=0; i<robot->numRobots; i++) {
-        if(robot->robots[i].pos == robot->pos) continue; // excluding self
+        // Exclude self
+        if(robot->robots[i].pos == robot->pos) continue;
+
+        // Get the distance of the robot positional model from this robot's positional model
         double distance = CalculateDistance(robot->robots[i].GetPose(), robot);
-        if(distance <= visionRange) {
-            numNeighbours += 1;
-            averageX += robot->robots[i].GetPose().x;
-            averageX += robot->robots[i].GetPose().y;
-            averageAngle += robot->robots[i].GetPose().a;
-        }
+
+        // If the distance is within the avoidance range of the robot
         if(distance <= avoidanceDistance) {
-            numTooClose += 1;
-            averageAngleTooClose += robot->robots[i].GetPose().a;
+            // Separation
+            close_dx += robot->robots[i].xPos - robot->xPos;
+            close_dy += robot->robots[i].yPos - robot->yPos;
+        }
+
+        // If the distance is within the vision range of the robot
+        if(distance <= visionRange) {
+            // Alignment
+            averageXVel += robot->robots[i].xVel;
+            averageYVel += robot->robots[i].yVel;
+            numNeighbours += 1;
+
+            // Cohesion
+            averageXPos += robot->robots[i].xPos;
+            averageYPos += robot->robots[i].yPos;
         }
     }
+
+    // Updating velocity for separation
+    robot->xVel += close_dx * avoidance;
+    robot->yVel += close_dy * avoidance;
+
+    // Updating velocity for alignment
+
     if(numNeighbours > 0) {
-        averageX = averageX / numNeighbours;
-        averageY = averageY / numNeighbours;
-        averageAngle = averageAngle / numNeighbours;
-        averageAngleTooClose = averageAngleTooClose / numTooClose;
-        
-        // COHESION
-        Pose position = robot->pos->GetPose();
-        double vector[2];
-        vector[0] = position.x - averageX; // getting a vector point transformation to the center of mass for the neighbours
-        vector[1] = position.y - averageY;
-        double goalAngle = atan2(vector[0], vector[1]);
-        if (goalAngle - position.a > 0) { // If the goal angle is larger than the current angle turn positively
-            robot->turnVel = -10 * cohesion * (goalAngle - position.a); // scale by cohesion factor and difference of angles
-        }
-        else {
-            robot->turnVel = 10 * cohesion * (goalAngle - position.a);
-        }
-        
-        // ALIGNMENT
-        //robot->pos->SetPose(Pose(position.x, position.y, position.z, averageAngle));
-        double angleDiff = averageAngle - position.a; // angle difference in radians
-        // Angle diff being larger than 0 means average angle is larger than this robots angle so move anti-clockwise
-        if (angleDiff >= 0) goto point;
-        // Getting the magnitude of the difference if negative
-        angleDiff *= -1;
-        point: // Used for skipping negation when necessary
-        if (angleDiff <= 1) goto linear;
-        robot->turnVel = log(angleDiff) * turningFactor;
-        linear: // use linear maths instead of ln()
-        robot->turnVel = angleDiff * turningFactor;
-        if (angleDiff < 0) robot->turnVel *= -1;
-        // AVOIDANCE
+        // Calculating the averages for velocity
+        averageXVel = averageXVel / numNeighbours;
+        averageYVel = averageYVel / numNeighbours;
+
+        // Calculating the averages for position
+        averageXPos = averageXPos / numNeighbours;
+        averageYPos = averageYPos / numNeighbours;
     }
-    else {
-        robot->turnVel = 0; // if no neighbours then travel straight
-    }
-    robot->pos->SetSpeed(robot->xVel, robot->yVel, robot->turnVel);
+
+    // Alignment
+    robot->xVel += (robot->xVel - averageXVel) * alignment;
+    robot->yVel += (robot->yVel - averageYVel) * alignment;
+
+    // Cohesion
+    robot->xVel += (averageXPos - robot->xPos) * cohesion;
+    robot->yVel += (averageYPos - robot->yPos) * cohesion;
+
+    // Non-holonmic velocity values
+
+    double linearVel = 0;
+    double rotationalVel= 0;
+    
+    // Finding magnitude of linear velocity vector
+
+    linearVel = sqrt((robot->xVel)^2 + (robot->yVel)^2);
+
+    // Computing the rotational velocity
+
+    double newDirection = atan2(robot->yVel, robot->xVel);
+    double angleDiff = newDirection - robot->pos.a;
+
+    rotationalVel = angleDiff / (1/30);
+
+    // Setting values for non-holonomic system
+    robot->pos->SetSpeed(linearVel, 0, rotationalVel);
+    
     return 0; // run again
 }
+
 // Calculating the distance between the current robot and the given pose of another robot
 double SimpleRobot::CalculateDistance(Pose pose, SimpleRobot *robot) {
     Pose poseThis = robot->pos->GetPose();
@@ -151,6 +185,7 @@ double SimpleRobot::CalculateDistance(Pose pose, SimpleRobot *robot) {
     double distance = sqrt(abs((xDiff * xDiff) + (yDiff * yDiff)));
     return distance;
 }
+
 // Getter method to return the pose of the positional model
 Pose SimpleRobot::GetPose() {
     return this->pos->GetPose();
