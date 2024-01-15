@@ -2,4 +2,4 @@
 export DYLD_LIBRARY_PATH=/opt/homebrew/Cellar/fltk/HEAD-ecb3e40/lib;
 export STAGE_HEADER=/usr/local/include/Stage-4.3;
 export STAGEPATH=/usr/local/lib;
-echo "LINE TO BE REPLACED"
+# This line is to be replaced in generation of run.sh file
