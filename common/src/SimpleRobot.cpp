@@ -83,12 +83,12 @@ int SimpleRobot::PositionUpdate(Model *, SimpleRobot* robot) {
 
     // Vision
     double visionRange = 4; // The vision range for cohesion
-    double avoidanceDistance = 2; // The vision range for avoidance
+    double avoidanceDistance = 1; // The vision range for avoidance
 
     // Behaviour
-    double cohesion = 2; // Cohesion Factor
-    double avoidance = 100; // Avoidance Factor
-    double alignment = 20; // Alignment Factor
+    double cohesion = 0.0005; // Cohesion Factor
+    double avoidance = 0.05; // Avoidance Factor
+    double alignment = 0.05; // Alignment Factor
 
     // Separation
     double close_dx = 0;
@@ -102,6 +102,10 @@ int SimpleRobot::PositionUpdate(Model *, SimpleRobot* robot) {
     // Cohesion
     double averageXPos = 0;
     double averageYPos = 0;
+
+    // Non-holonmic velocity values
+    double linearVel = 0;
+    double rotationalVel= 0;
     
     // Looping through all the robots, numRobots given on instantiation of this positional model
     for(int i = 0; i < robot->numRobots; i++) {
@@ -114,8 +118,8 @@ int SimpleRobot::PositionUpdate(Model *, SimpleRobot* robot) {
         // If the distance is within the avoidance range of the robot
         if(distance <= avoidanceDistance) {
             // Separation
-            close_dx += robot->robots[i].xPos - robot->xPos;
-            close_dy += robot->robots[i].yPos - robot->yPos;
+            close_dx += robot->xPos - robot->robots[i].xPos;
+            close_dy += robot->yPos - robot->robots[i].yPos;
         }
 
         // If the distance is within the vision range of the robot
@@ -145,21 +149,16 @@ int SimpleRobot::PositionUpdate(Model *, SimpleRobot* robot) {
         // Calculating the averages for position
         averageXPos = averageXPos / numNeighbours;
         averageYPos = averageYPos / numNeighbours;
+
+        // Alignment
+        robot->xVel += (robot->xVel - averageXVel) * alignment;
+        robot->yVel += (robot->yVel - averageYVel) * alignment;
+
+        // Cohesion
+        robot->xVel += (averageXPos - robot->xPos) * cohesion;
+        robot->yVel += (averageYPos - robot->yPos) * cohesion;
     }
 
-    // Alignment
-    robot->xVel += (robot->xVel - averageXVel) * alignment;
-    robot->yVel += (robot->yVel - averageYVel) * alignment;
-
-    // Cohesion
-    robot->xVel += (averageXPos - robot->xPos) * cohesion;
-    robot->yVel += (averageYPos - robot->yPos) * cohesion;
-
-    // Non-holonmic velocity values
-
-    double linearVel = 0;
-    double rotationalVel= 0;
-    
     // Finding magnitude of linear velocity vector
 
     linearVel = sqrt(pow(2.0, (robot->xVel)) + pow(2.0, (robot->yVel)));
