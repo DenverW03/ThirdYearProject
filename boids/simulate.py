@@ -40,7 +40,7 @@ with open('run_template.sh','r',encoding='utf-8') as mainFile:
 buffer = './main ../common/world/myworld.world'
 for i in range(numRobots):
     buffer = buffer + ' ' + 'MySimpleRobot' + str(i + 1)
-data[4] = buffer
+data[5] = buffer
 # Write the new shell script
 with open('run.sh', 'w', encoding='utf-8') as mainFile:
     mainFile.writelines(data)
