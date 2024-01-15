@@ -9,3 +9,6 @@ common/src/*.o
 boids/main
 boids/main.cpp
 boids/run.sh
+
+# GENERATED WORLD FILE
+common/world/myworld.world
