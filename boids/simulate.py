@@ -11,7 +11,7 @@ file.close()
 numRobots = int(sys.argv[1])
 # Append some number of robots based on number to buffer string
 for i in range(numRobots):
-    fileRead = fileRead + '\r\npioneer2dx\r\n(\r\nname "MySimpleRobot' + str(i+1) + '"\r\npose [ -6.946 -6.947 0 45.000 ]\r\nsicklaser( pose [ 0 0 0 0 ] )\r\nlocalization "gps"\r\nlocalization_origin [ 0 0 0 0 ]\r\ntrail_length 400\r\n)'
+    fileRead = fileRead + '\r\ncustombot\r\n(\r\nname "MySimpleRobot' + str(i+1) + '"\r\npose [ -6.946 -6.947 0 45.000 ]\r\ncolor "red"\r\n)'
 # Write buffer string to file
 f = open("../common/world/myworld.world", "w")
 f.write(fileRead)

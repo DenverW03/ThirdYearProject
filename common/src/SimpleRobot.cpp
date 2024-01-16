@@ -66,7 +66,7 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
 
             // Decide on relative direction based on angle and add to cumulative count
             if(sensorAngle > robotAngle) cumLeft++;
-            else if(sensorAngle =< robotAngle) cumRight++;
+            else if(sensorAngle <= robotAngle) cumRight++;
         }
     }
 
