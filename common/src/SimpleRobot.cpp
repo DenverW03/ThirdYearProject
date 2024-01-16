@@ -42,26 +42,51 @@ SimpleRobot::SimpleRobot(ModelPosition *modelPos, Pose pose, SimpleRobot *robots
 
 // Read the ranger data
 int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
-    //const std::vector<meters_t> &scan = robot->laser->GetSensors()[0].ranges;
     const std::vector<ModelRanger::Sensor> &sensors = robot->laser->GetSensors();
+
+    // Declaring some cumulative variables for the relative horizontal direction of the obstacle
+    double cumRight = 0;
+    double cumLeft = 0;
+
     // Looping through all sensors
     for(int j=0; j<sensors.size(); j++) {
         const std::vector<meters_t> &scan = robot->laser->GetSensors()[j].ranges;
         uint32_t sampleCount = scan.size();
-        if(sampleCount < 1) return 0; // not enough samples is not a legitimate reading for these purposes
+        if(sampleCount < 1) continue;; // not enough samples is not a legitimate reading for these purposes
 
-        // Check for obstacles in the front
-        if (scan[0] < avoidanceDistance) {
-            // Calculate the angle to the obstacle for the current sensor
-            Pose robotPose = robot->pos->GetPose();
-            Pose laserPose = robot->laser->GetSensors()[j].pose;
-            double obstacleAngle = laserPose.a - robotPose.a;
+        // Check for obstacles in the front (multiply avoidance distance by 2 to extend time for avoiding obstacles)
+        if (scan[0] < (avoidanceDistance * 2)) {
 
-            // Update velocities for obstacle avoidance
-            robot->xVel += avoidanceFactor * cos(obstacleAngle);
-            robot->yVel += avoidanceFactor * sin(obstacleAngle);
+            std::cout << "Reading Detected\r\n";
+            printf("Reading: %f\r\n", scan[0]);
+
+            // Get the angles of the robot positional model and the sensor giving a reading
+            double robotAngle = robot->pos->GetPose().a;
+            double sensorAngle = robot->laser->GetSensors()[j].pose.a;
+
+            // Decide on relative direction based on angle and add to cumulative count
+            if(sensorAngle > robotAngle) cumLeft++;
+            else if(sensorAngle =< robotAngle) cumRight++;
         }
     }
+
+    if(!(cumRight && cumLeft == 0)){
+
+        printf("right: %f left: %f\r\n", cumRight, cumLeft);
+
+        // Edit the rotational velocity of the robot based on the main side that the obstruction is on
+
+        NHVelocities vels = CalculateNonHolonomic(robot->xVel, robot->yVel, robot);
+        
+        // In Stage4 angles are counter clockwise increasing
+        if(cumRight > cumLeft) {
+            robot->pos->SetTurnSpeed(-1 * fabs(vels.rotationalVel));
+        }
+        else {
+            robot->pos->SetTurnSpeed(1 * fabs(vels.rotationalVel));
+        }
+    }
+
     return 0;
 }
 
@@ -81,9 +106,8 @@ int SimpleRobot::PositionUpdate(Model *, SimpleRobot* robot) {
     double averageXPos = 0;
     double averageYPos = 0;
 
-    // Non-holonmic velocity values
-    double linearVel = 0;
-    double rotationalVel= 0;
+    // Non-holonmic velocity value struct
+    NHVelocities vels;
     
     // Looping through all the robots, numRobots given on instantiation of this positional model
     for(int i = 0; i < robot->numRobots; i++) {
@@ -137,21 +161,31 @@ int SimpleRobot::PositionUpdate(Model *, SimpleRobot* robot) {
         robot->yVel += (averageYPos - robot->yPos) * cohesionFactor;
     }
 
+    vels = CalculateNonHolonomic(robot->xVel, robot->yVel, robot);
+
+    // Setting values for non-holonomic system
+    robot->pos->SetSpeed(vels.linearVel, 0, vels.rotationalVel);
+
+    return 0; // run again
+}
+
+
+SimpleRobot::NHVelocities SimpleRobot::CalculateNonHolonomic(double xvel, double yvel, SimpleRobot *robot) {
+    // Declaring a struct to hold velocity values
+    NHVelocities vels;
+
     // Finding magnitude of linear velocity vector
 
-    linearVel = sqrt(pow((robot->xVel), 2.0) + pow((robot->yVel), 2.0));
+    vels.linearVel = sqrt(pow((xvel), 2.0) + pow((yvel), 2.0));
 
     // Computing the rotational velocity
 
-    double newDirection = atan2(robot->yVel, robot->xVel);
+    double newDirection = atan2(yvel, xvel);
     double angleDiff = newDirection - robot->GetPose().a;
 
-    rotationalVel = angleDiff / (1/60);
+    vels.rotationalVel = angleDiff / (1/60);
 
-    // Setting values for non-holonomic system
-    robot->pos->SetSpeed(linearVel, 0, rotationalVel);
-
-    return 0; // run again
+    return vels;
 }
 
 // Calculating the distance between the current robot and the given pose of another robot
@@ -159,6 +193,7 @@ double SimpleRobot::CalculateDistance(Pose pose, SimpleRobot *robot) {
     Pose poseThis = robot->pos->GetPose();
     double xDiff = (double)(poseThis.x - pose.x);
     double yDiff = (double)(poseThis.y - pose.y);
+    // Pythagoras theorem used to calculate the distance between two points
     double distance = sqrt(abs((xDiff * xDiff) + (yDiff * yDiff)));
     return distance;
 }
