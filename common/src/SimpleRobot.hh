@@ -6,7 +6,16 @@ using namespace Stg;
 
 namespace SimpleRBT {
     class SimpleRobot {
+
+    // Some class parameter definitions
+    #define visionRange 5
+    #define cohesionFactor 0.01
+    #define avoidanceDistance 1
+    #define avoidanceFactor 0.5
+    #define alignmentFactor 0.05
+    
     public:
+        // Variable declarations
         ModelPosition *pos;
         ModelRanger *laser;
         double xPos;
@@ -15,6 +24,7 @@ namespace SimpleRBT {
         double yVel;
         SimpleRobot* robots;
         int numRobots;
+
         // Function declarations
         SimpleRobot();
         SimpleRobot(ModelPosition *modelPos, Pose pose, SimpleRobot *robots, int numRobots);

@@ -50,45 +50,23 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
         uint32_t sampleCount = scan.size();
         if(sampleCount < 1) return 0; // not enough samples is not a legitimate reading for these purposes
 
-        // Setting up some parameters
-        bool obstruction = false;
-        double minFrontDistance = 1.0;
-        double prescaler = 1 / scan[0]; // if it turns to a super close object should turn faster
-        
-        // // Going through the recorded samples to detect obstacles (current is a single recording per sensor update)
-        // for(uint32_t i = 0; i < sampleCount; i++) {
-        //     if(scan[i] < minFrontDistance) {
-        //         obstruction = true;
-        //     }
-        //     // Avoiding an obstacle
-        //     if(obstruction) {
-        //         Pose pose = robot->pos->GetPose();
-        //         Pose laserPose = sensors[j].pose;
-        //         double revAngle = laserPose.a + PI; // Invert direction by adding PI
-        //         // Make sure the angle is within [0, 2*PI)
-        //         if (revAngle >= 2 * PI) {
-        //             revAngle -= 2 * PI;
-        //         }
-        //         robot->pos->SetPose(Pose(pose.x, pose.y, pose.z, revAngle));
-        //         obstruction = false; // resetting
-        //     }
-        // }
+        // Check for obstacles in the front
+        if (scan[0] < avoidanceDistance) {
+            // Calculate the angle to the obstacle for the current sensor
+            Pose robotPose = robot->pos->GetPose();
+            Pose laserPose = robot->laser->GetSensors()[j].pose;
+            double obstacleAngle = laserPose.a - robotPose.a;
+
+            // Update velocities for obstacle avoidance
+            robot->xVel += avoidanceFactor * cos(obstacleAngle);
+            robot->yVel += avoidanceFactor * sin(obstacleAngle);
+        }
     }
     return 0;
 }
 
 // Position update function for stage
 int SimpleRobot::PositionUpdate(Model *, SimpleRobot* robot) {
-    // SHOULD SWITCH THE BELOW VARIABLES INTO DEFINITONS REALLY (THEY AREN'T BEING USED AS VARIABLES ANYWAY)
-
-    // Vision
-    double visionRange = 5; // The vision range for cohesion
-    double avoidanceDistance = 1; // The vision range for avoidance
-
-    // Behaviour
-    double cohesion = 0.01; // Cohesion Factor
-    double avoidance = 0.5; // Avoidance Factor
-    double alignment = 0.05; // Alignment Factor
 
     // Separation
     double close_dx = 0;
@@ -136,8 +114,8 @@ int SimpleRobot::PositionUpdate(Model *, SimpleRobot* robot) {
     }
 
     // Updating velocity for separation
-    robot->xVel += close_dx * avoidance;
-    robot->yVel += close_dy * avoidance;
+    robot->xVel += close_dx * avoidanceFactor;
+    robot->yVel += close_dy * avoidanceFactor;
 
     // Updating velocity for alignment
 
@@ -151,12 +129,12 @@ int SimpleRobot::PositionUpdate(Model *, SimpleRobot* robot) {
         averageYPos = averageYPos / numNeighbours;
 
         // Alignment
-        robot->xVel += (robot->xVel - averageXVel) * alignment;
-        robot->yVel += (robot->yVel - averageYVel) * alignment;
+        robot->xVel += (robot->xVel - averageXVel) * alignmentFactor;
+        robot->yVel += (robot->yVel - averageYVel) * alignmentFactor;
 
         // Cohesion
-        robot->xVel += (averageXPos - robot->xPos) * cohesion;
-        robot->yVel += (averageYPos - robot->yPos) * cohesion;
+        robot->xVel += (averageXPos - robot->xPos) * cohesionFactor;
+        robot->yVel += (averageYPos - robot->yPos) * cohesionFactor;
     }
 
     // Finding magnitude of linear velocity vector

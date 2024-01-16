@@ -16,7 +16,7 @@ define p2dxsonar sensor
   fov 15
   # define the number of samples spread over the fov
   samples 1
-  obstacle_return 0
+  # obstacle_return 0
 )
 
 define p2dx_sonar ranger
