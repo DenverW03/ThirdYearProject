@@ -9,7 +9,7 @@ namespace SimpleRBT {
 
     // Some class parameter definitions
 
-    #define visionRange 5
+    #define visionRange 8
     #define cohesionFactor 0.01
     #define avoidanceDistance 1
     #define avoidanceFactor 0.5

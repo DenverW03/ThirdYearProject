@@ -26,8 +26,6 @@ SimpleRobot::SimpleRobot(ModelPosition *modelPos, Pose pose, SimpleRobot *robots
     std::uniform_real_distribution<double> distribution(-3.0, 3.0);
     this->xVel = distribution(generator); // Generate random initial speed from -3 - 3
     this->yVel = distribution(generator); // Even though this bot is non holonomic, treat as holonomic until running bounding algorithm
-
-    printf("\r\ngenerated xvel: %f\r\ngenerated yvel: %f\r\n", this->xVel, this->yVel);
     
     this->robots = robots; // Holds all the robots in an array
     this->numRobots = numRobots; // Holds the number of robots
