@@ -10,9 +10,9 @@ namespace SimpleRBT {
     // Some class parameter definitions
 
     #define visionRange 8
-    #define cohesionFactor 0.01
+    #define cohesionFactor 0.2
     #define avoidanceDistance 2
-    #define avoidanceFactor 0.5
+    #define avoidanceFactor 2
     #define alignmentFactor 0.05
 
     // Defining a struct for passing converted speed values
