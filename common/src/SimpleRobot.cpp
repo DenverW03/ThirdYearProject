@@ -1,9 +1,10 @@
 #include "SimpleRobot.hh"
 #include <stage.hh>
 #include <cmath>
+#include <random>
+
 using namespace Stg;
 using namespace SimpleRBT;
-#define PI 3.14159265358979323846 // defining a value for PI
 
 // Default constructor for init
 SimpleRobot::SimpleRobot(){
@@ -20,8 +21,13 @@ SimpleRobot::SimpleRobot(ModelPosition *modelPos, Pose pose, SimpleRobot *robots
     this->yPos = pose.y;
     
     // Robot Velocity Values
-    this->xVel = 1; // This velocity is the useful one for movement in this scenario
-    this->yVel = 1; // Even though this bot is non holonomic, treat as holonomic until running bounding algorithm
+    std::random_device rd;
+    std::mt19937 generator = std::mt19937(rd());
+    std::uniform_real_distribution<double> distribution(-3.0, 3.0);
+    this->xVel = distribution(generator); // Generate random initial speed from -3 - 3
+    this->yVel = distribution(generator); // Even though this bot is non holonomic, treat as holonomic until running bounding algorithm
+
+    printf("\r\ngenerated xvel: %f\r\ngenerated yvel: %f\r\n", this->xVel, this->yVel);
     
     this->robots = robots; // Holds all the robots in an array
     this->numRobots = numRobots; // Holds the number of robots
@@ -44,48 +50,48 @@ SimpleRobot::SimpleRobot(ModelPosition *modelPos, Pose pose, SimpleRobot *robots
 int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
     const std::vector<ModelRanger::Sensor> &sensors = robot->laser->GetSensors();
 
-    // Declaring some cumulative variables for the relative horizontal direction of the obstacle
-    double cumRight = 0;
-    double cumLeft = 0;
+    // // Declaring some cumulative variables for the relative horizontal direction of the obstacle
+    // double cumRight = 0;
+    // double cumLeft = 0;
 
-    // Looping through all sensors
-    for(int j=0; j<sensors.size(); j++) {
-        const std::vector<meters_t> &scan = robot->laser->GetSensors()[j].ranges;
-        uint32_t sampleCount = scan.size();
-        if(sampleCount < 1) continue;; // not enough samples is not a legitimate reading for these purposes
+    // // Looping through all sensors
+    // for(int j=0; j<sensors.size(); j++) {
+    //     const std::vector<meters_t> &scan = robot->laser->GetSensors()[j].ranges;
+    //     uint32_t sampleCount = scan.size();
+    //     if(sampleCount < 1) continue;; // not enough samples is not a legitimate reading for these purposes
 
-        // Check for obstacles in the front (multiply avoidance distance by 2 to extend time for avoiding obstacles)
-        if (scan[0] < (avoidanceDistance * 2)) {
+    //     // Check for obstacles in the front (multiply avoidance distance by 2 to extend time for avoiding obstacles)
+    //     if (scan[0] < (avoidanceDistance * 2)) {
 
-            // std::cout << "Reading Detected\r\n";
-            // printf("Reading: %f\r\n", scan[0]);
+    //         // std::cout << "Reading Detected\r\n";
+    //         // printf("Reading: %f\r\n", scan[0]);
 
-            // Get the angles of the robot positional model and the sensor giving a reading
-            double robotAngle = robot->pos->GetPose().a;
-            double sensorAngle = robot->laser->GetSensors()[j].pose.a;
+    //         // Get the angles of the robot positional model and the sensor giving a reading
+    //         double robotAngle = robot->pos->GetPose().a;
+    //         double sensorAngle = robot->laser->GetSensors()[j].pose.a;
 
-            // Decide on relative direction based on angle and add to cumulative count
-            if(sensorAngle > robotAngle) cumLeft++;
-            else if(sensorAngle <= robotAngle) cumRight++;
-        }
-    }
+    //         // Decide on relative direction based on angle and add to cumulative count
+    //         if(sensorAngle > robotAngle) cumLeft++;
+    //         else if(sensorAngle <= robotAngle) cumRight++;
+    //     }
+    // }
 
-    if(!(cumRight && cumLeft == 0)){
+    // if(!(cumRight && cumLeft == 0)){
 
-        // printf("right: %f left: %f\r\n", cumRight, cumLeft);
+    //     // printf("right: %f left: %f\r\n", cumRight, cumLeft);
 
-        // Edit the rotational velocity of the robot based on the main side that the obstruction is on
+    //     // Edit the rotational velocity of the robot based on the main side that the obstruction is on
 
-        NHVelocities vels = CalculateNonHolonomic(robot->xVel, robot->yVel, robot);
+    //     NHVelocities vels = CalculateNonHolonomic(robot->xVel, robot->yVel, robot);
         
-        // In Stage4 angles are counter clockwise increasing
-        if(cumRight > cumLeft) {
-            robot->pos->SetTurnSpeed(-1 * fabs(vels.rotationalVel));
-        }
-        else {
-            robot->pos->SetTurnSpeed(1 * fabs(vels.rotationalVel));
-        }
-    }
+    //     // In Stage4 angles are counter clockwise increasing
+    //     if(cumRight > cumLeft) {
+    //         robot->pos->SetTurnSpeed(-1 * fabs(vels.rotationalVel));
+    //     }
+    //     else {
+    //         robot->pos->SetTurnSpeed(1 * fabs(vels.rotationalVel));
+    //     }
+    // }
 
     return 0;
 }
