@@ -11,7 +11,7 @@ namespace SimpleRBT {
 
     #define visionRange 8
     #define cohesionFactor 0.01
-    #define avoidanceDistance 1
+    #define avoidanceDistance 2
     #define avoidanceFactor 0.5
     #define alignmentFactor 0.05
 
@@ -28,8 +28,6 @@ namespace SimpleRBT {
 
         ModelPosition *pos;
         ModelRanger *laser;
-        double xPos;
-        double yPos;
         double xVel;
         double yVel;
         SimpleRobot* robots;

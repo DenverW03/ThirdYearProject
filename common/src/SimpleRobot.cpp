@@ -16,10 +16,6 @@ SimpleRobot::SimpleRobot(ModelPosition *modelPos, Pose pose, SimpleRobot *robots
     this->pos = nullptr;
     this->laser = nullptr;
     
-    // Robot Position Values
-    this->xPos = pose.x;
-    this->yPos = pose.y;
-    
     // Robot Velocity Values
     std::random_device rd;
     std::mt19937 generator = std::mt19937(rd());
@@ -124,24 +120,25 @@ int SimpleRobot::PositionUpdate(Model *, SimpleRobot* robot) {
         // If the distance is within the avoidance range of the robot
         if(distance <= avoidanceDistance) {
             // Separation
-            close_dx += robot->xPos - robot->robots[i].xPos;
-            close_dy += robot->yPos - robot->robots[i].yPos;
+            close_dx += robot->GetPose().x - robot->robots[i].GetPose().x;
+            close_dy += robot->GetPose().y - robot->robots[i].GetPose().y;
         }
 
-        // If the distance is within the vision range of the robot
-        if(distance <= visionRange) {
+        // If the distance is within the vision range of the robot but outside avoidance range
+        else if(distance <= visionRange) {
             // Alignment
             averageXVel += robot->robots[i].xVel;
             averageYVel += robot->robots[i].yVel;
             numNeighbours += 1;
 
             // Cohesion
-            averageXPos += robot->robots[i].xPos;
-            averageYPos += robot->robots[i].yPos;
+            averageXPos += robot->robots[i].GetPose().x;
+            averageYPos += robot->robots[i].GetPose().y;
         }
     }
 
     // Updating velocity for separation
+
     robot->xVel += close_dx * avoidanceFactor;
     robot->yVel += close_dy * avoidanceFactor;
 
@@ -161,8 +158,8 @@ int SimpleRobot::PositionUpdate(Model *, SimpleRobot* robot) {
         robot->yVel += (robot->yVel - averageYVel) * alignmentFactor;
 
         // Cohesion
-        robot->xVel += (averageXPos - robot->xPos) * cohesionFactor;
-        robot->yVel += (averageYPos - robot->yPos) * cohesionFactor;
+        robot->xVel += (averageXPos - robot->GetPose().x) * cohesionFactor;
+        robot->yVel += (averageYPos - robot->GetPose().y) * cohesionFactor;
     }
 
     vels = CalculateNonHolonomic(robot->xVel, robot->yVel, robot);
