@@ -1,14 +1,58 @@
 # A custom positional model for a simulated robot
-define custombot position
+
+# Defining a custom sonar module to sense obstacles
+define customsonar sensor
+(
+    size [0.01 0.05 0.01]
+    range [0 4.0]
+    fov 15
+    samples 1
+)
+
+# The ranger device holds the above defined sonars
+define customranger ranger
+(
+    customsonar(pose [0 0 0 0])
+    customsonar(pose [0 0 0 45])
+    customsonar(pose [0 0 0 90])
+    customsonar(pose [0 0 0 135])
+    customsonar(pose [0 0 0 180])
+    customsonar(pose [0 0 0 -45])
+    customsonar(pose [0 0 0 -90])
+    customsonar(pose [0 0 0 -135])
+)
+
+# The lowest level positional model for the bot
+define custombot_base position
 (   
-    # Actual in world size of the model
+    # Some basic attributes
+    color "blue"
+    drive "diff"
+    gui_nose 1
+    obstacle_return 1
+    ranger_return 1
+
+    # Non-holonomic movement
+    drive "diff"
+
+    # actual size
     size [0.5 0.375 1]
 
-    # Center of rotation offset
-    origin [0.125 0 0 0]
+    # the pioneer's center of rotation is offset from its center of area
+    origin [0 0 0 0]
 
-    # Draws indicator for where robot is facing
+    # draw a nose on the robot so we can see which way it points
     gui_nose 1
+
+    # estimated mass in KG
+    mass 10.0
+)
+
+# Base attributes given shape
+define custombot custombot_base
+(
+    # Adding the sonar array contained in the ranger
+    customranger(pose [0 0 0 0])
 
     # Shape of the robot positional model
     block
@@ -21,28 +65,4 @@ define custombot position
 
         z [0 1]
     )
-
-    # Non-holonomic movement
-    drive "diff"
-
-    # Defining a custom sonar module to sense obstacles
-    define customsonar sensor
-    (
-        size [0.01 0.05 0.01] 
-        range [0 4.0]
-        fov 15
-        samples 1
-    )
-
-    # The ranger device holds the above defined sonars
-    define customranger ranger
-    (
-        customsonar(pose [0 0 0 0])
-        customsonar(pose [0 0.75 0 180])
-        customsonar(pose [1 0.75 0 90])
-        customsonar(pose [1 0 0 -90])
-    )
-
-    customsonar()
-    customranger()
 )

@@ -57,8 +57,8 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
         // Check for obstacles in the front (multiply avoidance distance by 2 to extend time for avoiding obstacles)
         if (scan[0] < (avoidanceDistance * 2)) {
 
-            std::cout << "Reading Detected\r\n";
-            printf("Reading: %f\r\n", scan[0]);
+            // std::cout << "Reading Detected\r\n";
+            // printf("Reading: %f\r\n", scan[0]);
 
             // Get the angles of the robot positional model and the sensor giving a reading
             double robotAngle = robot->pos->GetPose().a;
@@ -72,7 +72,7 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
 
     if(!(cumRight && cumLeft == 0)){
 
-        printf("right: %f left: %f\r\n", cumRight, cumLeft);
+        // printf("right: %f left: %f\r\n", cumRight, cumLeft);
 
         // Edit the rotational velocity of the robot based on the main side that the obstruction is on
 

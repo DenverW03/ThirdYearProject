@@ -11,7 +11,7 @@ file.close()
 numRobots = int(sys.argv[1])
 # Append some number of robots based on number to buffer string
 for i in range(numRobots):
-    fileRead = fileRead + '\r\ncustombot\r\n(\r\nname "MySimpleRobot' + str(i+1) + '"\r\npose [ -6.946 -6.947 0 45.000 ]\r\ncolor "red"\r\n)'
+    fileRead = fileRead + '\r\ncustombot\r\n(\r\nname "MySimpleRobot' + str(i+1) + '"\r\n)'
 # Write buffer string to file
 f = open("../common/world/myworld.world", "w")
 f.write(fileRead)
