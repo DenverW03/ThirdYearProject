@@ -40,52 +40,29 @@ SimpleRobot::SimpleRobot(ModelPosition *modelPos, Pose pose, SimpleRobot *robots
     this->pos->SetPose(pose);
 }
 
-// Read the ranger data
+// Sensor update callback
 int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
+    // Getting the array of sensors on the robot
     const std::vector<ModelRanger::Sensor> &sensors = robot->laser->GetSensors();
 
-    // // Declaring some cumulative variables for the relative horizontal direction of the obstacle
-    // double cumRight = 0;
-    // double cumLeft = 0;
+    printf("Number of sensors: %lu ", sensors.size());
 
-    // // Looping through all sensors
-    // for(int j=0; j<sensors.size(); j++) {
-    //     const std::vector<meters_t> &scan = robot->laser->GetSensors()[j].ranges;
-    //     uint32_t sampleCount = scan.size();
-    //     if(sampleCount < 1) continue;; // not enough samples is not a legitimate reading for these purposes
+    // Loop through all sensors
+    for(int j=0; j<sensors.size(); j++) {
+        // Getting the readings
+        const std::vector<meters_t> &scan = sensors[j].ranges;
+        uint32_t sampleCount = scan.size();
 
-    //     // Check for obstacles in the front (multiply avoidance distance by 2 to extend time for avoiding obstacles)
-    //     if (scan[0] < (avoidanceDistance * 2)) {
+        printf("Reading: %f\r\n", scan[0]);
 
-    //         // std::cout << "Reading Detected\r\n";
-    //         // printf("Reading: %f\r\n", scan[0]);
+        // If there is an object detected reading will be less than max range of sonar
+        if (scan[0] < avoidObstructionDistance) {
 
-    //         // Get the angles of the robot positional model and the sensor giving a reading
-    //         double robotAngle = robot->pos->GetPose().a;
-    //         double sensorAngle = robot->laser->GetSensors()[j].pose.a;
+            // Get angle of sensor on bot
 
-    //         // Decide on relative direction based on angle and add to cumulative count
-    //         if(sensorAngle > robotAngle) cumLeft++;
-    //         else if(sensorAngle <= robotAngle) cumRight++;
-    //     }
-    // }
-
-    // if(!(cumRight && cumLeft == 0)){
-
-    //     // printf("right: %f left: %f\r\n", cumRight, cumLeft);
-
-    //     // Edit the rotational velocity of the robot based on the main side that the obstruction is on
-
-    //     NHVelocities vels = CalculateNonHolonomic(robot->xVel, robot->yVel, robot);
-        
-    //     // In Stage4 angles are counter clockwise increasing
-    //     if(cumRight > cumLeft) {
-    //         robot->pos->SetTurnSpeed(-1 * fabs(vels.rotationalVel));
-    //     }
-    //     else {
-    //         robot->pos->SetTurnSpeed(1 * fabs(vels.rotationalVel));
-    //     }
-    // }
+            // Use trigonometry to deduce the position of the obstacle
+        }
+    }
 
     return 0;
 }
@@ -122,6 +99,7 @@ int SimpleRobot::PositionUpdate(Model *, SimpleRobot* robot) {
             // Separation
             close_dx += robot->GetPose().x - robot->robots[i].GetPose().x;
             close_dy += robot->GetPose().y - robot->robots[i].GetPose().y;
+            // continue;
         }
 
         // If the distance is within the vision range of the robot but outside avoidance range

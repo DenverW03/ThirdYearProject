@@ -5,21 +5,22 @@ define customsonar sensor
 (
     size [0.01 0.05 0.01]
     range [0 4.0]
-    fov 15
+    fov 21
     samples 1
+    # obstacle_return 0
 )
 
 # The ranger device holds the above defined sonars
 define customranger ranger
 (
     customsonar(pose [0 0 0 0])
-    customsonar(pose [0 0 0 45])
-    customsonar(pose [0 0 0 90])
-    customsonar(pose [0 0 0 135])
-    customsonar(pose [0 0 0 180])
-    customsonar(pose [0 0 0 -45])
-    customsonar(pose [0 0 0 -90])
-    customsonar(pose [0 0 0 -135])
+    # customsonar(pose [0 0 0 45])
+    # customsonar(pose [0 0 0 90])
+    # customsonar(pose [0 0 0 135])
+    # customsonar(pose [0 0 0 180])
+    # customsonar(pose [0 0 0 -45])
+    # customsonar(pose [0 0 0 -90])
+    # customsonar(pose [0 0 0 -135])
 )
 
 # The lowest level positional model for the bot

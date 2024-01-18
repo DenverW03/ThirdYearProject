@@ -12,3 +12,7 @@ boids/run.sh
 
 # GENERATED WORLD FILE
 common/world/myworld.world
+
+# UNUSED MODELS
+common/world/pioneer.inc
+common/world/sick.inc
