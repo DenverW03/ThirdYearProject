@@ -125,7 +125,7 @@ int SimpleRobot::PositionUpdate(Model *, SimpleRobot* robot) {
         }
 
         // If the distance is within the vision range of the robot but outside avoidance range
-        else if(distance <= visionRange) {
+        if(distance <= visionRange) {
             // Alignment
             averageXVel += robot->robots[i].xVel;
             averageYVel += robot->robots[i].yVel;
@@ -154,8 +154,8 @@ int SimpleRobot::PositionUpdate(Model *, SimpleRobot* robot) {
         averageYPos = averageYPos / numNeighbours;
 
         // Alignment
-        robot->xVel += (robot->xVel - averageXVel) * alignmentFactor;
-        robot->yVel += (robot->yVel - averageYVel) * alignmentFactor;
+        robot->xVel += (averageXVel - robot->xVel) * alignmentFactor;
+        robot->yVel += (averageYVel - robot->yVel) * alignmentFactor;
 
         // Cohesion
         robot->xVel += (averageXPos - robot->GetPose().x) * cohesionFactor;
