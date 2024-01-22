@@ -67,42 +67,49 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
 
             double hyp = scan[0];
 
-            // Use trigonometry to deduce the position of the obstacle in vector from bot, using abs value to decide direction in post
-
-            double opp = abs(hyp * sin(theta)); // y
-            double adj = abs(hyp * cos(theta)); // x
-
-            // Get position as vector from origin, use angle offsets to decide on direction
+            // Using a composite angle for real world sensor angle
 
             Pose pose = robot->GetPose();
             double botAngle = pose.a;
+            if (botAngle < 0) botAngle = M_PI + abs(botAngle);
+            double compositeAngle = botAngle + theta;
+            if (compositeAngle > 360) compositeAngle -= 360;
+
+            // Use trigonometry to deduce the position of the obstacle in vector from bot, using abs value to decide direction in post
+
+            double opp = hyp * sin(compositeAngle); // y
+            double adj = hyp * cos(compositeAngle); // x
 
             // Obstacle position calculations
 
-            double xpos = 0;
-            double ypos = 0;
+            double xpos = pose.x + adj;
+            double ypos = pose.y + opp;
 
-            if (theta > 0 && theta <= M_PI / 2) {
-                xpos = pose.x + adj;
-                ypos = pose.y + opp;
-            }
-            else if (theta > M_PI / 2 && theta <= M_PI) {
-                xpos = pose.x - adj;
-                ypos = pose.y + opp;
-            }
-            else if (theta > M_PI && theta <= (3/4) * M_PI) {
-                xpos = pose.x - adj;
-                ypos = pose.y - opp;
-            }
-            else if (theta > (3/4) * M_PI && theta <= 2 * M_PI) {
-                xpos = pose.x + adj;
-                ypos = pose.y - opp;
-            }
+            // double xpos = 0;
+            // double ypos = 0;
+
+            // if (compositeAngle > 0 && compositeAngle <= M_PI / 2) {
+            //     xpos = pose.x + adj;
+            //     ypos = pose.y + opp;
+            // }
+            // else if (compositeAngle > M_PI / 2 && compositeAngle <= M_PI) {
+            //     xpos = pose.x - adj;
+            //     ypos = pose.y + opp;
+            // }
+            // else if (compositeAngle > M_PI && compositeAngle <= (3/4) * M_PI) {
+            //     xpos = pose.x - adj;
+            //     ypos = pose.y - opp;
+            // }
+            // else if (compositeAngle > (3/4) * M_PI && compositeAngle <= 2 * M_PI) {
+            //     xpos = pose.x + adj;
+            //     ypos = pose.y - opp;
+            // }
+
+            printf("Obstacle Relative: %f, %f Angle: %f Distance: %f\r\n", adj, opp, compositeAngle * (180 / M_PI), hyp);
 
             close_dx += pose.x - xpos;
             close_dy += pose.y - ypos;
 
-            printf("Obstacle Relative: %f, %f Angle: %f\r\n", adj, opp, theta);
             printf("Real Position: %f, %f\r\n", xpos, ypos);
         }
     }
