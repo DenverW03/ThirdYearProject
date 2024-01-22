@@ -85,26 +85,6 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
             double xpos = pose.x + adj;
             double ypos = pose.y + opp;
 
-            // double xpos = 0;
-            // double ypos = 0;
-
-            // if (compositeAngle > 0 && compositeAngle <= M_PI / 2) {
-            //     xpos = pose.x + adj;
-            //     ypos = pose.y + opp;
-            // }
-            // else if (compositeAngle > M_PI / 2 && compositeAngle <= M_PI) {
-            //     xpos = pose.x - adj;
-            //     ypos = pose.y + opp;
-            // }
-            // else if (compositeAngle > M_PI && compositeAngle <= (3/4) * M_PI) {
-            //     xpos = pose.x - adj;
-            //     ypos = pose.y - opp;
-            // }
-            // else if (compositeAngle > (3/4) * M_PI && compositeAngle <= 2 * M_PI) {
-            //     xpos = pose.x + adj;
-            //     ypos = pose.y - opp;
-            // }
-
             printf("Obstacle Relative: %f, %f Angle: %f Distance: %f\r\n", adj, opp, compositeAngle * (180 / M_PI), hyp);
 
             close_dx += pose.x - xpos;
