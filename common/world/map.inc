@@ -32,6 +32,9 @@ define zone model
   gui_move 0
   gui_outline 0
 
-  obstacle_return 1 # sensible to collision and range sensors
-  ranger_return 1  # visible to range sensors
+  # sensible to collision and range sensors
+  obstacle_return 1
+  
+  # visible to range sensors
+  ranger_return 1
 )

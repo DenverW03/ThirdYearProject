@@ -45,7 +45,10 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
     // Getting the array of sensors on the robot
     const std::vector<ModelRanger::Sensor> &sensors = robot->laser->GetSensors();
 
-    printf("Number of sensors: %lu ", sensors.size());
+    // Variables to hold obstacle detection count
+
+    double close_dx = 0;
+    double close_dy = 0;
 
     // Loop through all sensors
     for(int j=0; j<sensors.size(); j++) {
@@ -53,16 +56,60 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
         const std::vector<meters_t> &scan = sensors[j].ranges;
         uint32_t sampleCount = scan.size();
 
-        printf("Reading: %f\r\n", scan[0]);
-
         // If there is an object detected reading will be less than max range of sonar
         if (scan[0] < avoidObstructionDistance) {
+            // Get angle of sensor on bot (if negative just add absolute value to pi to make calculations easier)
 
-            // Get angle of sensor on bot
+            double theta = sensors[j].pose.a;
+            if (theta < 0) theta = M_PI + abs(theta);
 
-            // Use trigonometry to deduce the position of the obstacle
+            // Get obstacle distance (hypotenuse)
+
+            double hyp = scan[0];
+
+            // Use trigonometry to deduce the position of the obstacle in vector from bot, using abs value to decide direction in post
+
+            double opp = abs(hyp * sin(theta));
+            double adj = abs(hyp * cos(theta));
+
+            // Get position as vector from origin, use angle offsets to decide on direction
+
+            Pose pose = robot->GetPose();
+            double botAngle = pose.a;
+            if (botAngle < 0) botAngle = M_PI + abs(botAngle);
+            double compositeAngle = botAngle + theta;
+
+            // Obstacle position calculations
+
+            double xpos = 0;
+            double ypos = 0;
+
+            if (compositeAngle > 360) compositeAngle -= 360;
+
+            if (compositeAngle > 0 && compositeAngle <= 90) {
+                xpos = pose.x + adj;
+                ypos = pose.y + opp;
+            }
+            else if(compositeAngle > 90 && compositeAngle <= 180) {
+                xpos = pose.x - adj;
+                ypos = pose.y + opp;
+            }
+            else if(compositeAngle > 180 && compositeAngle <= 270) {
+                xpos = pose.x - adj;
+                ypos = pose.y - opp;
+            }
+            else if(compositeAngle > 270 && compositeAngle <= 360) {
+                xpos = pose.x + adj;
+                ypos = pose.y - opp;
+            }
+
+            close_dx += robot->GetPose().x - xpos;
+            close_dy += robot->GetPose().y - ypos;
         }
     }
+
+    robot->xVel += close_dx * avoidanceFactor;
+    robot->yVel += close_dy * avoidanceFactor;
 
     return 0;
 }
@@ -99,7 +146,6 @@ int SimpleRobot::PositionUpdate(Model *, SimpleRobot* robot) {
             // Separation
             close_dx += robot->GetPose().x - robot->robots[i].GetPose().x;
             close_dy += robot->GetPose().y - robot->robots[i].GetPose().y;
-            // continue;
         }
 
         // If the distance is within the vision range of the robot but outside avoidance range

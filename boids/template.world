@@ -1,5 +1,7 @@
 include "map.inc"
 include "custombot.inc"
+include "pioneer.inc"
+include "sick.inc"
 
 speedup 1 # multiple of realtime that stage should run at initially
 quit_time 3600 # amount of time the simulation should run before quitting (in seconds)

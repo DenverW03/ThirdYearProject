@@ -24,22 +24,22 @@ define p2dx_sonar ranger
  # obstacle_return 0
  # 16 transducers spread about the robot as follows
  p2dxsonar( pose [ 0 0 0 0 ] ) # testing with a single sensor
- p2dxsonar( pose [ 0.075 0.130 0 90 ] )
- p2dxsonar( pose [ 0.115 0.115 0 50 ] )
- p2dxsonar( pose [ 0.150 0.080 0 30 ] )
- p2dxsonar( pose [ 0.170 0.025 0 10 ] )
- p2dxsonar( pose [ 0.170 -0.025 0 -10 ] )
- p2dxsonar( pose [ 0.150 -0.080 0 -30 ] )
- p2dxsonar( pose [ 0.115 -0.115 0 -50 ] )
- p2dxsonar( pose [ 0.075 -0.130 0 -90 ] )
- p2dxsonar( pose [ -0.155 -0.130 0 -90 ] )
- p2dxsonar( pose [ -0.195 -0.115 0 -130 ] )
- p2dxsonar( pose [ -0.230 -0.080 0 -150 ] )
- p2dxsonar( pose [ -0.250 -0.025 0 -170 ] )
- p2dxsonar( pose [ -0.250 0.025 0 170 ] )
- p2dxsonar( pose [ -0.230 0.080 0 150 ] )
- p2dxsonar( pose [ -0.195 0.115 0 130 ] )
- p2dxsonar( pose [ -0.155 0.130 0 90 ]	 )
+ # p2dxsonar( pose [ 0.075 0.130 0 90 ] )
+ # p2dxsonar( pose [ 0.115 0.115 0 50 ] )
+ # p2dxsonar( pose [ 0.150 0.080 0 30 ] )
+ # p2dxsonar( pose [ 0.170 0.025 0 10 ] )
+ # p2dxsonar( pose [ 0.170 -0.025 0 -10 ] )
+ # p2dxsonar( pose [ 0.150 -0.080 0 -30 ] )
+ # p2dxsonar( pose [ 0.115 -0.115 0 -50 ] )
+ # p2dxsonar( pose [ 0.075 -0.130 0 -90 ] )
+ # p2dxsonar( pose [ -0.155 -0.130 0 -90 ] )
+ # p2dxsonar( pose [ -0.195 -0.115 0 -130 ] )
+ # p2dxsonar( pose [ -0.230 -0.080 0 -150 ] )
+ # p2dxsonar( pose [ -0.250 -0.025 0 -170 ] )
+ # p2dxsonar( pose [ -0.250 0.025 0 170 ] )
+ # p2dxsonar( pose [ -0.230 0.080 0 150 ] )
+ # p2dxsonar( pose [ -0.195 0.115 0 130 ] )
+ # p2dxsonar( pose [ -0.155 0.130 0 90 ]	 )
 )
 
 define p2dx_sonar_front ranger
@@ -111,7 +111,7 @@ define pioneer_base position
   color "red"			# Default color.
   drive "diff"		 	# Differential steering model.
   gui_nose 1                  	# Draw a nose on the robot so we can see which way it points
-  obstacle_return 0           	# Can hit things. (mainly other robots)
+  obstacle_return 1           	# Can hit things. (mainly other robots)
   ranger_return 1            	  # reflects sonar beams
   blob_return 1               	# Seen by blobfinders  
   fiducial_return 1           	# Seen as "1" fiducial finders
