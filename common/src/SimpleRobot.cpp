@@ -84,32 +84,35 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
             double xpos = 0;
             double ypos = 0;
 
-            if (compositeAngle > 360) compositeAngle -= 360;
+            if (compositeAngle > M_PI * 2) compositeAngle -= M_PI * 2;
 
-            if (compositeAngle > 0 && compositeAngle <= 90) {
+            if (theta > 0 && theta <= M_PI / 2) {
                 xpos = pose.x + adj;
                 ypos = pose.y + opp;
             }
-            else if(compositeAngle > 90 && compositeAngle <= 180) {
+            else if(theta > M_PI / 2 && theta <= M_PI) {
                 xpos = pose.x - adj;
                 ypos = pose.y + opp;
             }
-            else if(compositeAngle > 180 && compositeAngle <= 270) {
+            else if(theta > M_PI && theta <= (3/4) * M_PI) {
                 xpos = pose.x - adj;
                 ypos = pose.y - opp;
             }
-            else if(compositeAngle > 270 && compositeAngle <= 360) {
+            else if(theta > (3/4) * M_PI && theta <= 2 * M_PI) {
                 xpos = pose.x + adj;
                 ypos = pose.y - opp;
             }
 
             close_dx += robot->GetPose().x - xpos;
             close_dy += robot->GetPose().y - ypos;
+
+            printf("Obstacle Relative: %f, %f Angle: %f\r\n", adj, opp, theta);
+            printf("Real Position: %f, %f Angle: %f\r\n", xpos, ypos);
         }
     }
 
-    robot->xVel += close_dx * avoidanceFactor;
-    robot->yVel += close_dy * avoidanceFactor;
+    robot->xVel += close_dx * avoidObstructionFactor;
+    robot->yVel += close_dy * avoidObstructionFactor;
 
     return 0;
 }
