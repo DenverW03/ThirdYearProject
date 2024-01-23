@@ -17,7 +17,7 @@ namespace SimpleRBT {
 
     // Obstruction avoidance parameters, the distance is the same as the range for the sonar
     #define avoidObstructionDistance 2
-    #define avoidObstructionFactor 0.05
+    #define avoidObstructionFactor 0.1
 
     // Defining a struct for passing converted speed values
 

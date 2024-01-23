@@ -96,8 +96,8 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
 
     printf("close_dx: %f, close_dy: %f\r\n", close_dx, close_dy);
 
-    robot->xVel += close_dx * avoidObstructionFactor;
-    robot->yVel += close_dy * avoidObstructionFactor;
+    robot->xVel -= close_dx * avoidObstructionFactor;
+    robot->yVel -= close_dy * avoidObstructionFactor;
 
     return 0;
 }
