@@ -85,14 +85,16 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
             double xpos = pose.x + adj;
             double ypos = pose.y + opp;
 
-            printf("Obstacle Relative: %f, %f Angle: %f Distance: %f\r\n", adj, opp, compositeAngle * (180 / M_PI), hyp);
+            // printf("Obstacle Relative: %f, %f Angle: %f Distance: %f\r\n", adj, opp, compositeAngle * (180 / M_PI), hyp);
 
-            close_dx += pose.x - xpos;
-            close_dy += pose.y - ypos;
+            close_dx -= pose.x - xpos;
+            close_dy -= pose.y - ypos;
 
-            printf("Real Position: %f, %f\r\n", xpos, ypos);
+            // printf("Real Position: %f, %f\r\n", xpos, ypos);
         }
     }
+
+    printf("close_dx: %f, close_dy: %f\r\n", close_dx, close_dy);
 
     robot->xVel += close_dx * avoidObstructionFactor;
     robot->yVel += close_dy * avoidObstructionFactor;
