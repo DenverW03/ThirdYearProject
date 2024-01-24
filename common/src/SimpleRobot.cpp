@@ -50,6 +50,8 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
     double close_dx = 0;
     double close_dy = 0;
 
+    printf("Number of sensors: %lu\r\n", sensors.size());
+
     // Loop through all sensors
     for(int j=0; j<sensors.size(); j++) {
         // Getting the readings
