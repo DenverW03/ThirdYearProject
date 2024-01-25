@@ -25,7 +25,7 @@ define floorplan model
 define zone model
 (
   color	"orange"
-  size [ 4 4 0.01 ]
+  size [4 4 0.01]
 
   gui_nose 0
   gui_grid 0
