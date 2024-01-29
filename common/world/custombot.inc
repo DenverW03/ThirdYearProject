@@ -86,13 +86,13 @@ define custombot_base_final custombot_base_no_sonar
 
     # The camera array
     OV7670(pose [0 0 0 0])
-    OV7670(pose [0 0 0 45])
-    OV7670(pose [0 0 0 90])
-    OV7670(pose [0 0 0 135])
-    OV7670(pose [0 0 0 180])
-    OV7670(pose [0 0 0 -45])
-    OV7670(pose [0 0 0 -90])
-    OV7670(pose [0 0 0 -135])
+    # OV7670(pose [0 0 0 45])
+    # OV7670(pose [0 0 0 90])
+    # OV7670(pose [0 0 0 135])
+    # OV7670(pose [0 0 0 180])
+    # OV7670(pose [0 0 0 -45])
+    # OV7670(pose [0 0 0 -90])
+    # OV7670(pose [0 0 0 -135])
 )
 
 # Final model, finished
