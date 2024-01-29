@@ -10,10 +10,25 @@ define HC-SR04 sensor
     # obstacle_return 1
 )
 
+# Stats for blobfinder based off OV7670 Camera Module (as if color detection was being run)
+define OV7670 blobfinder
+(
+    size [0.01 0.05 0.01]
+    range 4.0
+    fov 21
+    pan 0.0
+
+    # The colors that the blobfinder can detect
+    colors_count 2
+    colors ["black" "blue"]
+    
+    # The camera resolution
+    image [640 480]
+)
+
 # A collection of HC-SR04 sensors
 define sonar_array ranger
 (
-  # Sonar sensor array on bot
     HC-SR04(pose [0 0 0 0])
     HC-SR04(pose [0 0 0 45])
     HC-SR04(pose [0 0 0 90])
@@ -67,7 +82,17 @@ define custombot_base_final custombot_base_no_sonar
 (
     # use the sonar array defined above with a small vertical offset to
     # drop the sensors into the robot body
-    sonar_array( pose [0 0 -0.03 0] )
+    sonar_array(pose [0 0 -0.03 0])
+
+    # The camera array
+    OV7670(pose [0 0 0 0])
+    OV7670(pose [0 0 0 45])
+    OV7670(pose [0 0 0 90])
+    OV7670(pose [0 0 0 135])
+    OV7670(pose [0 0 0 180])
+    OV7670(pose [0 0 0 -45])
+    OV7670(pose [0 0 0 -90])
+    OV7670(pose [0 0 0 -135])
 )
 
 # Final model, finished

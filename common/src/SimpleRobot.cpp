@@ -14,7 +14,7 @@ SimpleRobot::SimpleRobot(){
 // Constructor for the class with appropriate setup
 SimpleRobot::SimpleRobot(ModelPosition *modelPos, Pose pose, SimpleRobot *robots, int numRobots) {
     this->pos = nullptr;
-    this->laser = nullptr;
+    this->sonar = nullptr;
     
     // Robot Velocity Values
     std::random_device rd;
@@ -29,12 +29,15 @@ SimpleRobot::SimpleRobot(ModelPosition *modelPos, Pose pose, SimpleRobot *robots
     // Setting up positional model and callbacks
     this->pos = modelPos;
     this->pos->AddCallback(Model::CB_UPDATE, model_callback_t(PositionUpdate), this);
-    this->laser = (ModelRanger *) (this->pos->GetChild("ranger:0"));
-    this->laser->AddCallback(Model::CB_UPDATE, model_callback_t(SensorUpdate), this);
+    this->sonar = (ModelRanger *) (this->pos->GetChild("ranger:0"));
+    this->sonar->AddCallback(Model::CB_UPDATE, model_callback_t(SensorUpdate), this);
+    this->camera = (ModelBlobfinder *) (this->pos->GetChild("blobfinder:0"));
+    this->camera->AddCallback(Model::CB_UPDATE, model_callback_t(SensorUpdate), this);
     
     // Subscribing to callback updates
     this->pos->Subscribe();
-    this->laser->Subscribe();
+    this->sonar->Subscribe();
+    this->camera->Subscribe();
     
     // Set the model initial position
     this->pos->SetPose(pose);
@@ -43,7 +46,10 @@ SimpleRobot::SimpleRobot(ModelPosition *modelPos, Pose pose, SimpleRobot *robots
 // Sensor update callback
 int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
     // Getting the array of sensors on the robot
-    const std::vector<ModelRanger::Sensor> &sensors = robot->laser->GetSensors();
+    const std::vector<ModelRanger::Sensor> &sensors = robot->sonar->GetSensors();
+
+    // Getting the array of blobfinders on the robot
+    // Then need to figure out how to take readings from them
 
     // Variables to hold obstacle detection count
 
