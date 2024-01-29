@@ -52,12 +52,14 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
     // Getting the fist blobfinder on the robot
 
     const std::vector<ModelBlobfinder::Blob> &blobfinder = robot->camera->GetBlobs();
+
+    std::cout << "Length of blob array: " << blobfinder.size() << "\r\n";
     
     // Then need to figure out how to take readings from them
 
-    for (const auto& blob : blobfinder) {
+    for (const ModelBlobfinder::Blob blob : blobfinder) {
         std::cout << "Blob Color: ";
-        blob.color.Print("");
+        std:: cout << blob.color.r;
         std::cout << std::endl;
     }
 

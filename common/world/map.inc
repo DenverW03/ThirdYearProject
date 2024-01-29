@@ -4,7 +4,7 @@
 
 define floorplan model
 (
-  color "gray30"
+  color "black"
 
   # Bounding box
   boundary 1
@@ -20,6 +20,7 @@ define floorplan model
   fiducial_return 1
   ranger_return 1
   obstacle_return 1
+  blob_return 1
 )
 
 define zone model
@@ -37,4 +38,7 @@ define zone model
   
   # visible to range sensors
   ranger_return 1
+
+  # visible to blobfinders
+  blob_return 1
 )
