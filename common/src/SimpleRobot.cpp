@@ -57,10 +57,16 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
     
     // Then need to figure out how to take readings from them
 
+    // Range based for loop necessary as often it will not contain any readings, so presumptions such as blobfinder[0] cause seg faults
     for (const ModelBlobfinder::Blob blob : blobfinder) {
-        std::cout << "Blob Color: ";
-        std:: cout << blob.color.r;
-        std::cout << std::endl;
+        int r = blob.color.r * 255;
+        int g = blob.color.g * 255;
+        int b = blob.color.b * 255;
+        int a = blob.color.a * 255;
+
+        int full = (r << 24) | (g << 16) | (b << 8) | a;
+
+        printf("Color Hex: %08x\r\n", full);
     }
 
     // printf("Length: %lu", blobfinder.size());
