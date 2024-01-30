@@ -82,28 +82,8 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
         }
     }
 
-    // printf("Length: %lu", blobfinder.size());
-
-    // const Color color = blobfinder[0].color;
-
-    // if(blobfinder[0].color == Color("black")) printf("The color is red\r\n");
-
-    // int r = color.r * 255;
-    // int g = color.g * 255;
-    // int b = color.b * 255;
-    // int a = color.a * 255;
-
-    // int full = (r << 24) | (g << 16) | (b << 8) | a;
-
-    // printf("The color: ");
-    // std::cout << full;
-
-    // // Variables to hold obstacle detection count
-
     double close_dx = 0;
     double close_dy = 0;
-
-    // printf("Number of sensors: %lu\r\n", sensors.size());
 
     // Loop through all sensors
     for(int j=0; j<sensors.size(); j++) {
