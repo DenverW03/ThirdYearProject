@@ -196,84 +196,9 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
     return 0;
 }
 
-// Position update function for stage
+// Position update function for stage (necessary for the bot to actually move)
 int SimpleRobot::PositionUpdate(Model *, SimpleRobot* robot) {
-
-    // // Separation
-    // double close_dx = 0;
-    // double close_dy = 0;
-
-    // // Alignment
-    // double averageXVel = 0;
-    // double averageYVel = 0;
-    // double numNeighbours = 0;
-
-    // // Cohesion
-    // double averageXPos = 0;
-    // double averageYPos = 0;
-
-    // // Non-holonmic velocity value struct
-    // NHVelocities vels;
-    
-    // Looping through all the robots, numRobots given on instantiation of this positional model
-    // for(int i = 0; i < robot->numRobots; i++) {
-    //     // Exclude self
-    //     if(robot->robots[i].pos == robot->pos) continue;
-
-    //     // Get the distance of the robot positional model from this robot's positional model
-    //     double distance = CalculateDistance(robot->robots[i].GetPose(), robot);
-
-    //     // If the distance is within the avoidance range of the robot
-    //     if(distance <= avoidanceDistance) {
-    //         // Separation
-    //         close_dx += robot->GetPose().x - robot->robots[i].GetPose().x;
-    //         close_dy += robot->GetPose().y - robot->robots[i].GetPose().y;
-    //     }
-
-    //     // If the distance is within the vision range of the robot but outside avoidance range
-    //     if(distance <= visionRange) {
-    //         // Alignment
-    //         averageXVel += robot->robots[i].xVel;
-    //         averageYVel += robot->robots[i].yVel;
-    //         numNeighbours += 1;
-
-    //         // Cohesion
-    //         averageXPos += robot->robots[i].GetPose().x;
-    //         averageYPos += robot->robots[i].GetPose().y;
-    //     }
-    // }
-
-    // // Updating velocity for separation
-
-    // robot->xVel += close_dx * avoidanceFactor;
-    // robot->yVel += close_dy * avoidanceFactor;
-
-    // // Updating velocity for alignment
-
-    // if(numNeighbours > 0) {
-    //     // Calculating the averages for velocity
-    //     averageXVel = averageXVel / numNeighbours;
-    //     averageYVel = averageYVel / numNeighbours;
-
-    //     // Calculating the averages for position
-    //     averageXPos = averageXPos / numNeighbours;
-    //     averageYPos = averageYPos / numNeighbours;
-
-    //     // Alignment
-    //     robot->xVel += (averageXVel - robot->xVel) * alignmentFactor;
-    //     robot->yVel += (averageYVel - robot->yVel) * alignmentFactor;
-
-    //     // Cohesion
-    //     robot->xVel += (averageXPos - robot->GetPose().x) * cohesionFactor;
-    //     robot->yVel += (averageYPos - robot->GetPose().y) * cohesionFactor;
-    // }
-
-    // vels = CalculateNonHolonomic(robot->xVel, robot->yVel, robot);
-
-    // // Setting values for non-holonomic system
-    // robot->pos->SetSpeed(vels.linearVel, 0, vels.rotationalVel);
-
-    // return 0; // run again
+    return 0;
 }
 
 
