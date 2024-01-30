@@ -147,7 +147,7 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
 
                     // If the distance is within the vision range of the robot but outside avoidance range
                     if(distance <= visionRange) {
-                        // // Alignment
+                        // Alignment
                         // averageXVel += robot->robots[i].xVel;
                         // averageYVel += robot->robots[i].yVel;
                         
