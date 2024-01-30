@@ -69,12 +69,16 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
 
         int full = (r << 24) | (g << 16) | (b << 8) | a;
 
+        double distance = blob.range;
+
         switch(full) {
             case black:
                 printf("Obstacle found\r\n");
+                printf("Distance: %f\r\n", distance);
                 break;
             case blue:
                 printf("Fellow robot found\r\n");
+                printf("Distance: %f\r\n", distance);
                 break;
             default:
                 printf("Invalid colour\r\n");
@@ -82,54 +86,54 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
         }
     }
 
-    double close_dx = 0;
-    double close_dy = 0;
+    // double close_dx = 0;
+    // double close_dy = 0;
 
-    // Loop through all sensors
-    for(int j=0; j<sensors.size(); j++) {
-        // Getting the readings
-        const std::vector<meters_t> &scan = sensors[j].ranges;
-        uint32_t sampleCount = scan.size();
+    // // Loop through all sensors
+    // for(int j=0; j<sensors.size(); j++) {
+    //     // Getting the readings
+    //     const std::vector<meters_t> &scan = sensors[j].ranges;
+    //     uint32_t sampleCount = scan.size();
 
-        // If there is an object detected reading will be less than max range of sonar
-        if (scan[0] < avoidObstructionDistance) {
-            // Get angle of sensor on bot (if negative just add absolute value to pi to make calculations easier)
+    //     // If there is an object detected reading will be less than max range of sonar
+    //     if (scan[0] < avoidObstructionDistance) {
+    //         // Get angle of sensor on bot (if negative just add absolute value to pi to make calculations easier)
 
-            double theta = sensors[j].pose.a;
-            if (theta < 0) theta = M_PI + abs(theta);
+    //         double theta = sensors[j].pose.a;
+    //         if (theta < 0) theta = M_PI + abs(theta);
 
-            // Get obstacle distance (hypotenuse)
+    //         // Get obstacle distance (hypotenuse)
 
-            double hyp = scan[0];
+    //         double hyp = scan[0];
 
-            // Using a composite angle for real world sensor angle
+    //         // Using a composite angle for real world sensor angle
 
-            Pose pose = robot->GetPose();
-            double botAngle = pose.a;
-            if (botAngle < 0) botAngle = M_PI + abs(botAngle);
-            double compositeAngle = botAngle + theta;
-            if (compositeAngle > 360) compositeAngle -= 360;
+    //         Pose pose = robot->GetPose();
+    //         double botAngle = pose.a;
+    //         if (botAngle < 0) botAngle = M_PI + abs(botAngle);
+    //         double compositeAngle = botAngle + theta;
+    //         if (compositeAngle > 360) compositeAngle -= 360;
 
-            // Use trigonometry to deduce the position of the obstacle in vector from bot, using abs value to decide direction in post
+    //         // Use trigonometry to deduce the position of the obstacle in vector from bot, using abs value to decide direction in post
 
-            double opp = hyp * sin(compositeAngle); // y
-            double adj = hyp * cos(compositeAngle); // x
+    //         double opp = hyp * sin(compositeAngle); // y
+    //         double adj = hyp * cos(compositeAngle); // x
 
-            // Obstacle position calculations
+    //         // Obstacle position calculations
 
-            double xpos = pose.x + adj;
-            double ypos = pose.y + opp;
+    //         double xpos = pose.x + adj;
+    //         double ypos = pose.y + opp;
 
-            // printf("Obstacle Relative: %f, %f Angle: %f Distance: %f\r\n", adj, opp, compositeAngle * (180 / M_PI), hyp);
+    //         // printf("Obstacle Relative: %f, %f Angle: %f Distance: %f\r\n", adj, opp, compositeAngle * (180 / M_PI), hyp);
 
-            close_dx -= pose.x - xpos;
-            close_dy -= pose.y - ypos;
+    //         close_dx -= pose.x - xpos;
+    //         close_dy -= pose.y - ypos;
 
-            // printf("Real Position: %f, %f\r\n", xpos, ypos);
-        }
-    }
+    //         // printf("Real Position: %f, %f\r\n", xpos, ypos);
+    //     }
+    // }
 
-    printf("close_dx: %f, close_dy: %f\r\n", close_dx, close_dy);
+    // printf("close_dx: %f, close_dy: %f\r\n", close_dx, close_dy);
 
     robot->xVel -= close_dx * avoidObstructionFactor;
     robot->yVel -= close_dy * avoidObstructionFactor;
