@@ -15,7 +15,9 @@ SimpleRobot::SimpleRobot(){
 SimpleRobot::SimpleRobot(ModelPosition *modelPos, Pose pose, SimpleRobot *robots, int numRobots) {
     this->pos = nullptr;
     this->sonar = nullptr;
-    this->camera = nullptr;
+
+    // Setting the space for the camera array using C++ convention rather than malloc
+    this->camera = new ModelBlobfinder *[8];
     
     // Robot Velocity Values
     std::random_device rd;
@@ -32,13 +34,16 @@ SimpleRobot::SimpleRobot(ModelPosition *modelPos, Pose pose, SimpleRobot *robots
     this->pos->AddCallback(Model::CB_UPDATE, model_callback_t(PositionUpdate), this);
     this->sonar = (ModelRanger *) (this->pos->GetChild("ranger:0"));
     this->sonar->AddCallback(Model::CB_UPDATE, model_callback_t(SensorUpdate), this);
-    this->camera = (ModelBlobfinder *) (this->pos->GetChild("blobfinder:0"));
-    this->camera->AddCallback(Model::CB_UPDATE, model_callback_t(SensorUpdate), this);
+
+    for(int i = 0; i<1; i++) {
+        this->camera[i] = (ModelBlobfinder *) (this->pos->GetChild("blobfinder:" + std::to_string(i)));
+        this->camera[i]->AddCallback(Model::CB_UPDATE, model_callback_t(SensorUpdate), this); // SHOULD ADD EXTRA PARAM FOR INDEX camera[i] for example
+        this->camera[i]->Subscribe();
+    }
     
     // Subscribing to callback updates
     this->pos->Subscribe();
     this->sonar->Subscribe();
-    this->camera->Subscribe();
     
     // Set the model initial position
     this->pos->SetPose(pose);
@@ -51,9 +56,7 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
 
     // Getting the fist blobfinder on the robot
 
-    const std::vector<ModelBlobfinder::Blob> &blobfinder = robot->camera->GetBlobs();
-
-    std::cout << "Length of blob array: " << blobfinder.size() << "\r\n";
+    const std::vector<ModelBlobfinder::Blob> &blobfinder = robot->camera[0]->GetBlobs();
     
     // Then need to figure out how to take readings from them
 
@@ -66,7 +69,17 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
 
         int full = (r << 24) | (g << 16) | (b << 8) | a;
 
-        printf("Color Hex: %08x\r\n", full);
+        switch(full) {
+            case black:
+                printf("Obstacle found\r\n");
+                break;
+            case blue:
+                printf("Fellow robot found\r\n");
+                break;
+            default:
+                printf("Invalid colour\r\n");
+                break;
+        }
     }
 
     // printf("Length: %lu", blobfinder.size());

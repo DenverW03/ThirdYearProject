@@ -19,6 +19,10 @@ namespace SimpleRBT {
     #define avoidObstructionDistance 2
     #define avoidObstructionFactor 0.1
 
+    // Some definitions for colors
+    #define black 0x000000ff
+    #define blue 0x0000ffff
+
     // Defining a struct for passing converted speed values
 
     typedef struct{
@@ -32,7 +36,7 @@ namespace SimpleRBT {
 
         ModelPosition *pos;
         ModelRanger *sonar;
-        ModelBlobfinder *camera;
+        ModelBlobfinder **camera;
         double xVel;
         double yVel;
         SimpleRobot* robots;
