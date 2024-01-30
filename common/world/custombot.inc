@@ -1,6 +1,6 @@
 # A custom bot with sonar and color detection
 
-# Stats based off the HC-SR04 sonar module
+# Stats based off the HC-SR04 sonar module NO LONGER USED
 define HC-SR04 sensor
 (
     size [0.01 0.05 0.01] 
@@ -10,7 +10,7 @@ define HC-SR04 sensor
     # obstacle_return 1
 )
 
-# Stats for blobfinder based off OV7670 Camera Module (as if color detection was being run)
+# Stats for blobfinder based off OV7670 Camera Module (as if color detection was being run on the frames)
 define OV7670 blobfinder
 (
     size [0.01 0.05 0.01]
@@ -26,7 +26,7 @@ define OV7670 blobfinder
     image [640 480]
 )
 
-# A collection of HC-SR04 sensors
+# A collection of HC-SR04 sensors NO LONGER USED
 define sonar_array ranger
 (
     HC-SR04(pose [0 0 0 0])
@@ -82,7 +82,8 @@ define custombot_base_final custombot_base_no_sonar
 (
     # use the sonar array defined above with a small vertical offset to
     # drop the sensors into the robot body
-    sonar_array(pose [0 0 -0.03 0])
+
+    # sonar_array(pose [0 0 -0.03 0]) NO LONGER USED
 
     # The camera array
     OV7670(pose [0 0 0 0])

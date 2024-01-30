@@ -35,8 +35,7 @@ namespace SimpleRBT {
         // Variable declarations
 
         ModelPosition *pos;
-        ModelRanger *sonar;
-        ModelBlobfinder **camera;
+        ModelBlobfinder **cameras;
         double xVel;
         double yVel;
         SimpleRobot* robots;
