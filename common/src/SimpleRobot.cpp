@@ -154,7 +154,7 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
                     }
 
                     // If the distance is within the vision range of the robot but outside avoidance range
-                    else if(distance <= visionRange) {
+                    if(distance <= visionRange) {
                         // Alignment
                         // averageXVel += robot->robots[i].xVel;
                         // averageYVel += robot->robots[i].yVel;
@@ -175,8 +175,8 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
     // Avoidance
 
     // For other bots
-    robot->xVel -= closeDx * avoidanceFactor;
-    robot->yVel -= closeDx * avoidanceFactor;
+    robot->xVel += closeDx * avoidanceFactor;
+    robot->yVel += closeDx * avoidanceFactor;
 
     // For obstacles
     robot->xVel -= closeDxObs * avoidObstructionFactor;
@@ -202,6 +202,7 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
         robot->yVel += (averageYPos - robot->GetPose().y) * cohesionFactor;
     }
 
+    // Calculating the non-holonomic values for velocity
     vels = CalculateNonHolonomic(robot->xVel, robot->yVel, robot);
 
     // Setting values for non-holonomic system

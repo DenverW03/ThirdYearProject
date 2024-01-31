@@ -8,8 +8,8 @@ namespace SimpleRBT {
     class SimpleRobot {
 
     // Some class parameter definitions
-    #define visionRange 6
-    #define cohesionFactor 0.0005
+    #define visionRange 8
+    #define cohesionFactor 0.005
     #define avoidanceDistance 2
     #define avoidanceFactor 0.05
     #define alignmentFactor 0.05

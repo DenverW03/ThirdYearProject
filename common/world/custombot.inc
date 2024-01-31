@@ -14,7 +14,7 @@ define HC-SR04 sensor
 define OV7670 blobfinder
 (
     size [0.01 0.05 0.01]
-    range 12.0
+    range 10.0
     fov 21
     pan 0.0
 
@@ -22,8 +22,8 @@ define OV7670 blobfinder
     colors_count 2
     colors ["black" "blue"]
     
-    # The camera resolution
-    image [640 480]
+    # The camera resolution, 1/10th true scale for optimization
+    image [64 48]
 )
 
 # A collection of HC-SR04 sensors NO LONGER USED
