@@ -14,7 +14,7 @@ define HC-SR04 sensor
 define OV7670 blobfinder
 (
     size [0.01 0.05 0.01]
-    range 4.0
+    range 12.0
     fov 21
     pan 0.0
 

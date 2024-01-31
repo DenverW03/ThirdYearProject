@@ -8,7 +8,6 @@ namespace SimpleRBT {
     class SimpleRobot {
 
     // Some class parameter definitions
-
     #define visionRange 6
     #define cohesionFactor 0.0005
     #define avoidanceDistance 2
@@ -22,6 +21,9 @@ namespace SimpleRBT {
     // Some definitions for colors
     #define black 0x000000ff
     #define blue 0x0000ffff
+
+    // The number of cameras used
+    #define camCount 1
 
     // Defining a struct for passing converted speed values
 

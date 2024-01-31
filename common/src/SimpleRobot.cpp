@@ -32,7 +32,7 @@ SimpleRobot::SimpleRobot(ModelPosition *modelPos, Pose pose, SimpleRobot *robots
     this->pos = modelPos;
     this->pos->AddCallback(Model::CB_UPDATE, model_callback_t(PositionUpdate), this);
 
-    for(int i = 0; i<8; i++) {
+    for(int i = 0; i<camCount; i++) {
         this->cameras[i] = (ModelBlobfinder *) (this->pos->GetChild("blobfinder:" + std::to_string(i)));
         this->cameras[i]->AddCallback(Model::CB_UPDATE, model_callback_t(SensorUpdate), this); // SHOULD ADD EXTRA PARAM FOR INDEX camera[i] for example
         this->cameras[i]->Subscribe();
@@ -70,7 +70,7 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
     double angles[8] = {0, 45, 90, 135, 180, -45, -90, -135};
 
     // Range based for loop necessary as often it will not contain any readings, so presumptions such as blobfinder[0] cause seg faults
-    for (int i=0; i<8; i++) {
+    for (int i=0; i<camCount; i++) {
         // Getting the fist blobfinder on the robot
 
         const std::vector<ModelBlobfinder::Blob> &blobfinder = robot->cameras[i]->GetBlobs();
@@ -85,15 +85,15 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
 
             double distance = blob.range;
 
-            // Avoidance for obstacles
+            // Case for handling obstacles and case for handling other bots
             switch(full) {
                 case black:
                     // Need distance to fall lower than the obstacle avoidance distance
                     if (distance < avoidObstructionDistance) {
-                        // Get angle of sensor on bot (if negative just add absolute value to pi to make calculations easier)
+                        // Get angle of sensor on bot (if negative just add (pi - absolute value) to pi to get positive angle representation)
 
                         double theta = angles[i];
-                        if (theta < 0) theta = M_PI + abs(theta);
+                        if (theta < 0) theta = (2 * M_PI) - abs(theta);
 
                         // Get obstacle distance (hypotenuse)
 
@@ -103,9 +103,9 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
 
                         Pose pose = robot->GetPose();
                         double botAngle = pose.a;
-                        if (botAngle < 0) botAngle = M_PI + abs(botAngle);
+                        if (botAngle < 0) botAngle = (2 * M_PI) - abs(botAngle);
                         double compositeAngle = botAngle + theta;
-                        if (compositeAngle > 360) compositeAngle -= 360;
+                        if (compositeAngle > (2 * M_PI)) compositeAngle -= (2 * M_PI);
 
                         // Use trigonometry to deduce the position of the obstacle in vector from bot, using abs value to decide direction in post
 
@@ -117,7 +117,8 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
                         double xpos = pose.x + adj;
                         double ypos = pose.y + opp;
 
-                        // printf("Obstacle Relative: %f, %f Angle: %f Distance: %f\r\n", adj, opp, compositeAngle * (180 / M_PI), hyp);
+                        printf("Obstacle Relative: %f, %f Angle: %f Distance: %f\r\n", adj, opp, compositeAngle * (180 / M_PI), hyp);
+                        printf("Obstacle Real: %f, %f\r\n", xpos, ypos);
 
                         close_dx -= pose.x - xpos;
                         close_dy -= pose.y - ypos;
@@ -126,17 +127,20 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
                 case blue:
                     // Calculating position of detected bot (same as calculating obstacle position), COMMENTED IN CASE ABOVE ^^
                     double theta = angles[i];
-                    if (theta < 0) theta = M_PI + abs(theta);
+                    if (theta < 0) theta = (2 * M_PI) - abs(theta);
                     double hyp = distance;
                     Pose pose = robot->GetPose();
                     double botAngle = pose.a;
-                    if (botAngle < 0) botAngle = M_PI + abs(botAngle);
+                    if (botAngle < 0) botAngle = (2 * M_PI) - abs(botAngle);
                     double compositeAngle = botAngle + theta;
-                    if (compositeAngle > 360) compositeAngle -= 360;
+                    if (compositeAngle > (2 * M_PI)) compositeAngle -= (2 * M_PI);
                     double opp = hyp * sin(compositeAngle); // y
                     double adj = hyp * cos(compositeAngle); // x
                     double xpos = pose.x + adj;
                     double ypos = pose.y + opp;
+
+                    printf("Bot Relative: %f, %f Angle: %f Distance: %f\r\n", adj, opp, compositeAngle * (180 / M_PI), hyp);
+                    printf("Bot Real: %f, %f\r\n", xpos, ypos);
 
                     // If the distance is within the avoidance range of the robot
                     if(distance <= avoidanceDistance) {
@@ -163,7 +167,7 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
         }
     }
 
-    printf("close_dx: %f, close_dy: %f\r\n", close_dx, close_dy);
+    // printf("close_dx: %f, close_dy: %f\r\n", close_dx, close_dy);
 
     robot->xVel -= close_dx * avoidObstructionFactor;
     robot->yVel -= close_dy * avoidObstructionFactor;
