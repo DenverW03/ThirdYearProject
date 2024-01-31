@@ -49,9 +49,13 @@ SimpleRobot::SimpleRobot(ModelPosition *modelPos, Pose pose, SimpleRobot *robots
 int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
     // Getting the array of sensors on the robot
 
+    // Obstacle avoidances
+    double closeDxObs = 0;
+    double closeDyObs = 0;
+
     // Separation
-    double close_dx = 0;
-    double close_dy = 0;
+    double closeDx = 0;
+    double closeDy = 0;
 
     // // Alignment
     // double averageXVel = 0;
@@ -87,44 +91,43 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
 
             // Case for handling obstacles and case for handling other bots
             switch(full) {
-                case black:
-                    // Need distance to fall lower than the obstacle avoidance distance
-                    if (distance < avoidObstructionDistance) {
-                        // Get angle of sensor on bot (if negative just add (pi - absolute value) to pi to get positive angle representation)
+                case black: {
+                    // Need distance to fall equal to or lower than the obstacle avoidance distance
+                    if (distance > avoidObstructionDistance) break;
 
-                        double theta = angles[i];
-                        if (theta < 0) theta = (2 * M_PI) - abs(theta);
+                    // Get angle of sensor on bot (if negative just add (pi - absolute value) to pi to get positive angle representation)
+                    double theta = angles[i];
+                    if (theta < 0) theta = (2 * M_PI) - abs(theta);
 
-                        // Get obstacle distance (hypotenuse)
+                    // Get obstacle distance (hypotenuse)
+                    double hyp = distance;
 
-                        double hyp = distance;
+                    // Using a composite angle for real world sensor angle
+                    Pose pose = robot->GetPose();
+                    double botAngle = pose.a;
+                    if (botAngle < 0) botAngle = (2 * M_PI) - abs(botAngle);
+                    double compositeAngle = botAngle + theta;
+                    if (compositeAngle > (2 * M_PI)) compositeAngle -= (2 * M_PI);
 
-                        // Using a composite angle for real world sensor angle
+                    // Use trigonometry to deduce the position of the obstacle in vector from bot, using abs value to decide direction in post
+                    double opp = hyp * sin(compositeAngle); // y
+                    double adj = hyp * cos(compositeAngle); // x
 
-                        Pose pose = robot->GetPose();
-                        double botAngle = pose.a;
-                        if (botAngle < 0) botAngle = (2 * M_PI) - abs(botAngle);
-                        double compositeAngle = botAngle + theta;
-                        if (compositeAngle > (2 * M_PI)) compositeAngle -= (2 * M_PI);
+                    // Obstacle position calculations
+                    double xpos = pose.x + adj;
+                    double ypos = pose.y + opp;
 
-                        // Use trigonometry to deduce the position of the obstacle in vector from bot, using abs value to decide direction in post
+                    // printf("Obstacle Relative: %f, %f Angle: %f Distance: %f\r\n", adj, opp, compositeAngle * (180 / M_PI), hyp);
+                    // printf("Obstacle Real: %f, %f\r\n", xpos, ypos);
 
-                        double opp = hyp * sin(compositeAngle); // y
-                        double adj = hyp * cos(compositeAngle); // x
-
-                        // Obstacle position calculations
-
-                        double xpos = pose.x + adj;
-                        double ypos = pose.y + opp;
-
-                        printf("Obstacle Relative: %f, %f Angle: %f Distance: %f\r\n", adj, opp, compositeAngle * (180 / M_PI), hyp);
-                        printf("Obstacle Real: %f, %f\r\n", xpos, ypos);
-
-                        close_dx -= pose.x - xpos;
-                        close_dy -= pose.y - ypos;
-                    }
+                    closeDxObs -= pose.x - xpos;
+                    closeDyObs -= pose.y - ypos;
                     break;
-                case blue:
+                }
+                case blue: {
+                    // Guard clause to avoid wasting compute
+                    if(distance > visionRange) break;
+
                     // Calculating position of detected bot (same as calculating obstacle position), COMMENTED IN CASE ABOVE ^^
                     double theta = angles[i];
                     if (theta < 0) theta = (2 * M_PI) - abs(theta);
@@ -139,22 +142,23 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
                     double xpos = pose.x + adj;
                     double ypos = pose.y + opp;
 
-                    printf("Bot Relative: %f, %f Angle: %f Distance: %f\r\n", adj, opp, compositeAngle * (180 / M_PI), hyp);
-                    printf("Bot Real: %f, %f\r\n", xpos, ypos);
+                    // printf("Bot Relative: %f, %f Angle: %f Distance: %f\r\n", adj, opp, compositeAngle * (180 / M_PI), hyp);
+                    // printf("Bot Real: %f, %f\r\n", xpos, ypos);
 
                     // If the distance is within the avoidance range of the robot
+
+                    // Separation (prior guard clause already confirmed bot to be within avoidance distance)
                     if(distance <= avoidanceDistance) {
-                        // Separation
-                        close_dx += robot->GetPose().x - xpos;
-                        close_dy += robot->GetPose().y - ypos;
+                        closeDx += robot->GetPose().x - xpos;
+                        closeDy += robot->GetPose().y - ypos;
                     }
 
                     // If the distance is within the vision range of the robot but outside avoidance range
-                    if(distance <= visionRange) {
+                    else if(distance <= visionRange) {
                         // Alignment
                         // averageXVel += robot->robots[i].xVel;
                         // averageYVel += robot->robots[i].yVel;
-                        
+
                         numNeighbours += 1;
 
                         // Cohesion
@@ -163,14 +167,20 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
                     }
 
                     break;
+                }
             }
         }
     }
 
-    // printf("close_dx: %f, close_dy: %f\r\n", close_dx, close_dy);
+    // Avoidance
 
-    robot->xVel -= close_dx * avoidObstructionFactor;
-    robot->yVel -= close_dy * avoidObstructionFactor;
+    // For other bots
+    robot->xVel -= closeDx * avoidanceFactor;
+    robot->yVel -= closeDx * avoidanceFactor;
+
+    // For obstacles
+    robot->xVel -= closeDxObs * avoidObstructionFactor;
+    robot->yVel -= closeDxObs * avoidObstructionFactor;
 
     // Updating velocity for alignment
 
