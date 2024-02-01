@@ -21,7 +21,7 @@ floorplan
   name "floor"
   size [32.000 32.000 0.800]
   pose [0 0 0 0]
-  bitmap "../../common/world/bitmaps/cave.png"
+  bitmap "../../common/world/bitmaps/empty.png"
 )
 
 # Robot data is appended here
