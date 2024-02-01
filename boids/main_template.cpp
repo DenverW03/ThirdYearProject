@@ -1,5 +1,5 @@
 #include <stage.hh>
-#include "../common/src/SimpleRobot.hh"
+#include "./bot/SimpleRobot.hh"
 using namespace Stg;
 using namespace SimpleRBT;
 
