@@ -6,7 +6,6 @@
 
 # OBJECT FILES
 boids/*.o
-common/src/*.o
 
 # GENERATED FILES
 boids/main
@@ -14,8 +13,4 @@ boids/main.cpp
 boids/run.sh
 
 # GENERATED WORLD FILE
-common/world/myworld.world
-
-# UNUSED MODELS
-common/world/pioneer.inc
-common/world/sick.inc
+boids/world/generated.world

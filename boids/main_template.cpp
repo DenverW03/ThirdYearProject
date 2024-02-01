@@ -7,14 +7,13 @@ SimpleRobot *robots = (SimpleRobot *) malloc(10 * sizeof(SimpleRobot)); // Array
 
 int main(int argc, char* argv[]) {
     Init(&argc, &argv); // Initialising the stage library
-    WorldGui world(635, 666, "Boids Simulation");
+    WorldGui world(635, 666, "Simulation");
     world.Load(argv[1]);
     // After this comment the necessary robot spawns are added
     
     world.Start();
     while(!world.TestQuit()) {
         if(!world.UpdateAll()) { // When UpdateAll() returns false, simulation continues
-        //robot->pos->GoTo( 3.0 * flippyFlip, -7.0 * flippyFlip, 2.0 );
         world.Run();
         };
     }

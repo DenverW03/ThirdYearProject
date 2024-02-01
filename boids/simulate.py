@@ -2,7 +2,7 @@ import subprocess
 import sys
 
 # Import template world file
-file = open("./template.world")
+file = open("./world/template.world")
 # Read file to string buffer
 fileRead = file.read()
 file.close()
@@ -13,7 +13,7 @@ numRobots = int(sys.argv[1])
 for i in range(numRobots):
     fileRead = fileRead + '\r\ncustombot\r\n(\r\nname "MySimpleRobot' + str(i+1) + '"\r\n)'
 # Write buffer string to file
-f = open("../common/world/myworld.world", "w")
+f = open("./world/generated.world", "w")
 f.write(fileRead)
 f.close()
 
@@ -37,7 +37,7 @@ data = ""
 with open('run_template.sh','r',encoding='utf-8') as mainFile:
     data = mainFile.readlines()
 # Edit line 13 to add robot spawning lines
-buffer = './main ../common/world/myworld.world'
+buffer = './main ./world/generated.world'
 for i in range(numRobots):
     buffer = buffer + ' ' + 'MySimpleRobot' + str(i + 1)
 data[5] = buffer

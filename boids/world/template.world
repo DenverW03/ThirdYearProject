@@ -1,5 +1,5 @@
-include "map.inc"
-include "custombot.inc"
+include "../../common/world/map.inc"
+include "../../common/bot/custombot.inc"
 
 speedup 1 # multiple of realtime that stage should run at initially
 quit_time 3600 # amount of time the simulation should run before quitting (in seconds)
@@ -21,7 +21,7 @@ floorplan
   name "cave"
   size [32.000 32.000 0.800]
   pose [0 0 0 0]
-  bitmap "bitmaps/empty.png"
+  bitmap "../../common/world/bitmaps/empty.png"
 )
 
 # Robot data is appended here
