@@ -184,6 +184,8 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
 
     printf("Bots - closeDx: %f closeDy: %f\r\n", closeDx, closeDy);
     printf("Obstacles - closeDx: %f closeDy: %f\r\n", closeDxObs, closeDyObs);
+    printf("Fake velocity: %f %f\r\n", robot->xVel, robot->yVel);
+    printf("Real velocity: %f %f\r\n", robot->pos->GetVelocity().x, robot->pos->GetVelocity().a);
 
     // Updating velocity for alignment
 
