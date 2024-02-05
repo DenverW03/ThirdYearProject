@@ -185,7 +185,7 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
     printf("Bots - closeDx: %f closeDy: %f\r\n", closeDx, closeDy);
     printf("Obstacles - closeDx: %f closeDy: %f\r\n", closeDxObs, closeDyObs);
     printf("Fake velocity: %f %f\r\n", robot->xVel, robot->yVel);
-    printf("Real velocity: %f %f\r\n", robot->pos->GetVelocity().x, robot->pos->GetVelocity().a);
+    printf("Real velocity: Linear %f Rotational %f\r\n", robot->pos->GetVelocity().x, robot->pos->GetVelocity().a);
 
     // Updating velocity for alignment
 
@@ -213,6 +213,17 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
     // Setting values for non-holonomic system
     robot->pos->SetSpeed(vels.linearVel, 0, vels.rotationalVel);
 
+    // Setting the stored velocity to the real simulated value
+
+    HVelocities vels2 = CalculateHolonomic(robot->pos->GetVelocity().x, robot->pos->GetVelocity().a, robot);
+    double xVelReal = vels2.xvel;
+    double yVelReal = vels2.yvel;
+
+    printf("Calc Real: %f %f\r\n", xVelReal, yVelReal);
+
+    // robot->xVel = xVelReal;
+    // robot->yVel = yVelReal;
+
     return 0;
 }
 
@@ -221,6 +232,25 @@ int SimpleRobot::PositionUpdate(Model *, SimpleRobot* robot) {
     return 0;
 }
 
+SimpleRobot::HVelocities SimpleRobot::CalculateHolonomic(double linearvel, double turnvel, SimpleRobot *robot) {
+    // Declaring a struct to hold velocity values
+    HVelocities vels;
+
+    // Calculating the angle difference
+
+    double angleDiff = turnvel * (1/60);
+
+    // Calculating the new direction
+
+    double newDirection = angleDiff + robot->GetPose().a;
+
+    // Using trig to convert from polar velocity to cartesian
+
+    vels.xvel = linearvel * cos(newDirection);
+    vels.yvel = linearvel * sin(newDirection);
+
+    return vels;
+}
 
 SimpleRobot::NHVelocities SimpleRobot::CalculateNonHolonomic(double xvel, double yvel, SimpleRobot *robot) {
     // Declaring a struct to hold velocity values
@@ -245,7 +275,9 @@ double SimpleRobot::CalculateDistance(Pose pose, SimpleRobot *robot) {
     Pose poseThis = robot->pos->GetPose();
     double xDiff = (double)(poseThis.x - pose.x);
     double yDiff = (double)(poseThis.y - pose.y);
+
     // Pythagoras theorem used to calculate the distance between two points
+
     double distance = sqrt(abs((xDiff * xDiff) + (yDiff * yDiff)));
     return distance;
 }

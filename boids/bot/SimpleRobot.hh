@@ -31,6 +31,11 @@ namespace SimpleRBT {
         double linearVel;
         double rotationalVel;
     } NHVelocities;
+
+    typedef struct{
+        double xvel;
+        double yvel;
+    } HVelocities;
     
     public:
 
@@ -55,6 +60,7 @@ namespace SimpleRBT {
         static int PositionUpdate(Model *, SimpleRobot *robot);
         Pose GetPose();
         static double CalculateDistance(Pose pose, SimpleRobot *robot);
+        static HVelocities CalculateHolonomic(double xvel, double turnvel, SimpleRobot *robot);
         static NHVelocities CalculateNonHolonomic(double xvel, double yvel, SimpleRobot *robot);
     };
 }
