@@ -16,7 +16,7 @@ SimpleRobot::SimpleRobot(ModelPosition *modelPos, Pose pose, SimpleRobot *robots
     this->pos = nullptr;
 
     // Setting the space for the camera array using C++ convention rather than malloc
-    this->cameras = new ModelBlobfinder *[8];
+    this->cameras = new ModelBlobfinder * [camCount];
     
     // Robot Velocity Values
     std::random_device rd;
@@ -71,7 +71,7 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
     NHVelocities vels;
 
     // Array holding the angles
-    double angles[8] = {0, 45, 90, 135, 180, -45, -90, -135};
+    double angles[camCount] = {0, 22.5, 45, 67.5, 90, 112.5, 135, 157.5, 180, -22.5, -45, -67.5, -90, -112.5, -135, -157.5};
 
     // Range based for loop necessary as often it will not contain any readings, so presumptions such as blobfinder[0] cause seg faults
     for (int i=0; i<camCount; i++) {

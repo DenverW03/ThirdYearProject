@@ -45,5 +45,11 @@ data[5] = buffer
 with open('run.sh', 'w', encoding='utf-8') as mainFile:
     mainFile.writelines(data)
 
-# Run the shell script to run simulation
-subprocess.call(["sh","run.sh"])
+try:
+    # Run the shell script to run simulation
+    subprocess.call(["sh","run.sh"])
+# Ignoring keyboard interrupts when ending simulation because they are annoying :)
+except KeyboardInterrupt:
+    sys.exit(0)
+except Exception as e:
+    print("An error occurred:", e)

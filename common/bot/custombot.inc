@@ -56,7 +56,7 @@ define custombot_base position
 
     # [ xmin xmax ymin ymax zmin zmax amin amax ]				
     velocity_bounds [-0.5 0.5 0 0 0 0 -90.0 90.0]
-    acceleration_bounds [-0.5 0.5 0 0 0 0 -90 90.0]
+    acceleration_bounds [-0.5 0.5 0 0 0 0 -90.0 90.0]
 )
 
 # Base without sonar
@@ -87,13 +87,21 @@ define custombot_base_final custombot_base_no_sonar
 
     # The camera array
     OV7670(pose [0 0 0 0])
+    OV7670(pose [0 0 0 22.5])
     OV7670(pose [0 0 0 45])
+    OV7670(pose [0 0 0 67.5])
     OV7670(pose [0 0 0 90])
+    OV7670(pose [0 0 0 112.5])
     OV7670(pose [0 0 0 135])
+    OV7670(pose [0 0 0 157.5])
     OV7670(pose [0 0 0 180])
+    OV7670(pose [0 0 0 -22.5])
     OV7670(pose [0 0 0 -45])
+    OV7670(pose [0 0 0 -67.5])
     OV7670(pose [0 0 0 -90])
+    OV7670(pose [0 0 0 -112.5])
     OV7670(pose [0 0 0 -135])
+    OV7670(pose [0 0 0 -157.5])
 )
 
 # Final model, finished
