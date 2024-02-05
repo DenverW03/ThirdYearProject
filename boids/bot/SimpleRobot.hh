@@ -11,7 +11,7 @@ namespace SimpleRBT {
     #define visionRange 8
     #define cohesionFactor 0.0005
     #define avoidanceDistance 2
-    #define avoidanceFactor 0.05
+    #define avoidanceFactor 0.01
     #define alignmentFactor 0.05
 
     // Obstruction avoidance parameters, the distance is the same as the range for the sonar
@@ -42,6 +42,10 @@ namespace SimpleRBT {
         double yVel;
         SimpleRobot* robots;
         int numRobots;
+
+        // Angles of the cameras places on the bot
+
+        double angles[16] = {0, 22.5, 45, 67.5, 90, 112.5, 135, 157.5, 180, -22.5, -45, -67.5, -90, -112.5, -135, -157.5};
 
         // Function declarations
 

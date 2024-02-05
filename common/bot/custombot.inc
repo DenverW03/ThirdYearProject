@@ -55,8 +55,8 @@ define custombot_base position
     localization_origin [0 0 0 0]
 
     # [ xmin xmax ymin ymax zmin zmax amin amax ]				
-    velocity_bounds [-0.5 0.5 0 0 0 0 -90.0 90.0]
-    acceleration_bounds [-0.5 0.5 0 0 0 0 -90.0 90.0]
+    # velocity_bounds [-0.5 0.5 0 0 0 0 -90.0 90.0]
+    # acceleration_bounds [-0.5 0.5 0 0 0 0 -90.0 90.0]
 )
 
 # Base without sonar

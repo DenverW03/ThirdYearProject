@@ -70,9 +70,6 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
     // Non-holonmic velocity value struct
     NHVelocities vels;
 
-    // Array holding the angles
-    double angles[16] = {0, 22.5, 45, 67.5, 90, 112.5, 135, 157.5, 180, -22.5, -45, -67.5, -90, -112.5, -135, -157.5};
-
     // Range based for loop necessary as often it will not contain any readings, so presumptions such as blobfinder[0] cause seg faults
     for (int i=0; i<camCount; i++) {
         // Getting the fist blobfinder on the robot
@@ -98,7 +95,7 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
                     // NEED TO ENSURE THE CORRECT DEG OR RAD FOR EACH ANGLE, I THOUGHT THAT THESE WERE I RAD BUT THEY ARE IN FACT IN DEGREES
 
                     // Get angle of sensor on bot (if negative just add (pi - absolute value) to pi to get positive angle representation)
-                    double theta = angles[i] * (M_PI / 180);
+                    double theta = robot->angles[i] * (M_PI / 180);
                     if (theta < 0) theta = (2 * M_PI) - abs(theta);
 
                     // Get obstacle distance (hypotenuse)
@@ -132,7 +129,7 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
                     if(distance > visionRange) break;
 
                     // Calculating position of detected bot (same as calculating obstacle position), COMMENTED IN CASE ABOVE ^^
-                    double theta = angles[i] * (M_PI / 180);
+                    double theta = robot->angles[i] * (M_PI / 180);
                     if (theta < 0) theta = (2 * M_PI) - abs(theta);
                     double hyp = distance;
                     Pose pose = robot->GetPose();
@@ -184,6 +181,9 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
     // For obstacles
     robot->xVel -= closeDxObs * avoidObstructionFactor;
     robot->yVel -= closeDxObs * avoidObstructionFactor;
+
+    printf("Bots - closeDx: %f closeDy: %f\r\n", closeDx, closeDy);
+    printf("Obstacles - closeDx: %f closeDy: %f\r\n", closeDxObs, closeDyObs);
 
     // Updating velocity for alignment
 
