@@ -71,7 +71,7 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
     NHVelocities vels;
 
     // Array holding the angles
-    double angles[camCount] = {0, 22.5, 45, 67.5, 90, 112.5, 135, 157.5, 180, -22.5, -45, -67.5, -90, -112.5, -135, -157.5};
+    double angles[16] = {0, 22.5, 45, 67.5, 90, 112.5, 135, 157.5, 180, -22.5, -45, -67.5, -90, -112.5, -135, -157.5};
 
     // Range based for loop necessary as often it will not contain any readings, so presumptions such as blobfinder[0] cause seg faults
     for (int i=0; i<camCount; i++) {
@@ -95,8 +95,10 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
                     // Need distance to fall equal to or lower than the obstacle avoidance distance
                     if (distance > avoidObstructionDistance) break;
 
+                    // NEED TO ENSURE THE CORRECT DEG OR RAD FOR EACH ANGLE, I THOUGHT THAT THESE WERE I RAD BUT THEY ARE IN FACT IN DEGREES
+
                     // Get angle of sensor on bot (if negative just add (pi - absolute value) to pi to get positive angle representation)
-                    double theta = angles[i];
+                    double theta = angles[i] * (M_PI / 180);
                     if (theta < 0) theta = (2 * M_PI) - abs(theta);
 
                     // Get obstacle distance (hypotenuse)
@@ -117,7 +119,8 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
                     double xpos = pose.x + adj;
                     double ypos = pose.y + opp;
 
-                    // printf("Obstacle Relative: %f, %f Angle: %f Distance: %f\r\n", adj, opp, compositeAngle * (180 / M_PI), hyp);
+                    // printf("Camera Angle: %f Bot Angle: %f\r\n", theta, botAngle);
+                    // printf("Obstacle Relative: %f, %f Angle: %f Distance: %f\r\n", adj, opp, compositeAngle, hyp);
                     // printf("Obstacle Real: %f, %f\r\n", xpos, ypos);
 
                     closeDxObs -= pose.x - xpos;
@@ -129,7 +132,7 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
                     if(distance > visionRange) break;
 
                     // Calculating position of detected bot (same as calculating obstacle position), COMMENTED IN CASE ABOVE ^^
-                    double theta = angles[i];
+                    double theta = angles[i] * (M_PI / 180);
                     if (theta < 0) theta = (2 * M_PI) - abs(theta);
                     double hyp = distance;
                     Pose pose = robot->GetPose();

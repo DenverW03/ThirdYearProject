@@ -9,9 +9,9 @@ namespace SimpleRBT {
 
     // Some class parameter definitions
     #define visionRange 8
-    #define cohesionFactor 0.005
+    #define cohesionFactor 0.0005
     #define avoidanceDistance 2
-    #define avoidanceFactor 0.01
+    #define avoidanceFactor 0.05
     #define alignmentFactor 0.05
 
     // Obstruction avoidance parameters, the distance is the same as the range for the sonar
@@ -22,7 +22,7 @@ namespace SimpleRBT {
     #define black 0x000000ff
     #define blue 0x0000ffff
 
-    // The number of cameras used
+    // The number of cameras used up to 16 for current model, vary number for testing
     #define camCount 16
 
     // Defining a struct for passing converted speed values
