@@ -43,6 +43,8 @@ SimpleRobot::SimpleRobot(ModelPosition *modelPos, Pose pose, SimpleRobot *robots
     
     // Set the model initial position
     this->pos->SetPose(pose);
+    NHVelocities nonHolonomic = CalculateNonHolonomic(this->xVel, this->yVel, this);
+    this->pos->SetSpeed(nonHolonomic.linearVel, 0, nonHolonomic.rotationalVel);
 }
 
 // Sensor update callback
@@ -117,8 +119,8 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
                     // printf("Obstacle Relative: %f, %f Angle: %f Distance: %f\r\n", adj, opp, compositeAngle, hyp);
                     // printf("Obstacle Real: %f, %f\r\n", xpos, ypos);
 
-                    closeDxObs += pose.x - xpos;
-                    closeDyObs += pose.y - ypos;
+                    closeDxObs -= pose.x - xpos;
+                    closeDyObs -= pose.y - ypos;
                     break;
                 }
                 case blue: {
@@ -175,8 +177,8 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
     robot->yVel += closeDy * avoidanceFactor;
 
     // For obstacles
-    robot->xVel += closeDxObs * avoidObstructionFactor;
-    robot->yVel += closeDyObs * avoidObstructionFactor;
+    robot->xVel -= closeDxObs * avoidObstructionFactor;
+    robot->yVel -= closeDyObs * avoidObstructionFactor;
 
     // Updating velocity for alignment
 
@@ -199,7 +201,7 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
     }
 
     // Setting the new velocity of the robot
-    
+
     NHVelocities nonHolonomic = CalculateNonHolonomic(robot->xVel, robot->yVel, robot);
     robot->pos->SetSpeed(nonHolonomic.linearVel, 0, nonHolonomic.rotationalVel);
 
@@ -240,11 +242,12 @@ SimpleRobot::HVelocities SimpleRobot::CalculateHolonomic(double linearvel, doubl
 
     // Calculating the angle difference
 
-    double angleDiff = turnvel * (1.0/60.0);
+    // double angleDiff = turnvel * (1.0/60.0);
 
     // Calculating the new direction
 
-    double newDirection = angleDiff + robot->GetPose().a;
+    // double newDirection = angleDiff + robot->GetPose().a;
+    double newDirection = robot->GetPose().a;
 
     // Using trig to convert from polar velocity to cartesian
 
