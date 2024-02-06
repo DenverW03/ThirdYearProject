@@ -23,7 +23,7 @@ namespace SimpleRBT {
     #define blue 0x0000ffff
 
     // The number of cameras used up to 16 for current model, vary number for testing
-    #define camCount 16
+    #define camCount 1
 
     // Defining a struct for passing converted speed values
 
@@ -36,6 +36,12 @@ namespace SimpleRBT {
         double xvel;
         double yvel;
     } HVelocities;
+
+    typedef struct{
+        SimpleRobot *robot;
+        ModelBlobfinder *bf;
+        int num;
+    } SensorInputData;
     
     public:
 
@@ -56,7 +62,7 @@ namespace SimpleRBT {
 
         SimpleRobot();
         SimpleRobot(ModelPosition *modelPos, Pose pose, SimpleRobot *robots, int numRobots);
-        static int SensorUpdate(Model *, SimpleRobot *robot);
+        static int SensorUpdate(Model *, SensorInputData *data);
         static int PositionUpdate(Model *, SimpleRobot *robot);
         Pose GetPose();
         static double CalculateDistance(Pose pose, SimpleRobot *robot);

@@ -34,7 +34,15 @@ SimpleRobot::SimpleRobot(ModelPosition *modelPos, Pose pose, SimpleRobot *robots
 
     for(int i = 0; i<camCount; i++) {
         this->cameras[i] = (ModelBlobfinder *) (this->pos->GetChild("blobfinder:" + std::to_string(i)));
-        this->cameras[i]->AddCallback(Model::CB_UPDATE, model_callback_t(SensorUpdate), this); // SHOULD ADD EXTRA PARAM FOR INDEX camera[i] for example
+
+        // Using a struct to pass extra data to stage AddCallback() function
+        SensorInputData* data = (SensorInputData *) malloc(sizeof(SensorInputData));;
+        data->robot = this;
+        data->bf = cameras[i];
+        data->num = 12;
+        void* dataPtr = static_cast<void*>(data);
+
+        this->cameras[i]->AddCallback(Model::CB_UPDATE, model_callback_t(SensorUpdate), dataPtr); // SHOULD ADD EXTRA PARAM FOR INDEX camera[i] for example
         this->cameras[i]->Subscribe();
     }
     
@@ -48,8 +56,13 @@ SimpleRobot::SimpleRobot(ModelPosition *modelPos, Pose pose, SimpleRobot *robots
 }
 
 // Sensor update callback
-int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
-    // Getting the array of sensors on the robot
+int SimpleRobot::SensorUpdate(Model *, SensorInputData* data) {
+    SimpleRobot* robot = data->robot;
+    ModelBlobfinder* blobfinder = data->bf;
+    printf("Num: %d\r\n", data->num);
+
+    // Getting the blobs found in the blobfinder model
+    const std::vector<ModelBlobfinder::Blob> &blobs = blobfinder->GetBlobs();
 
     // Obstacle avoidances
     double closeDxObs = 0;
@@ -70,12 +83,12 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
     double averageYPos = 0;
 
     // Range based for loop necessary as often it will not contain any readings, so presumptions such as blobfinder[0] cause seg faults
-    for (int i=0; i<camCount; i++) {
+    // for (int i=0; i<camCount; i++) {
         // Getting the fist blobfinder on the robot
 
-        const std::vector<ModelBlobfinder::Blob> &blobfinder = robot->cameras[i]->GetBlobs();
+        // const std::vector<ModelBlobfinder::Blob> &blobfinder = robot->cameras[i]->GetBlobs();
 
-        for(const ModelBlobfinder::Blob blob : blobfinder){
+        for(const ModelBlobfinder::Blob blob : blobs){
             int r = blob.color.r * 255;
             int g = blob.color.g * 255;
             int b = blob.color.b * 255;
@@ -94,7 +107,7 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
                     // NEED TO ENSURE THE CORRECT DEG OR RAD FOR EACH ANGLE, I THOUGHT THAT THESE WERE I RAD BUT THEY ARE IN FACT IN DEGREES
 
                     // Get angle of sensor on bot (if negative just add (pi - absolute value) to pi to get positive angle representation)
-                    double theta = robot->angles[i] * (M_PI / 180);
+                    double theta = robot->angles[0] * (M_PI / 180);
                     if (theta < 0) theta = (2 * M_PI) - abs(theta);
 
                     // Get obstacle distance (hypotenuse)
@@ -128,7 +141,7 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
                     if(distance > visionRange) break;
 
                     // Calculating position of detected bot (same as calculating obstacle position), COMMENTED IN CASE ABOVE ^^
-                    double theta = robot->angles[i] * (M_PI / 180);
+                    double theta = robot->angles[0] * (M_PI / 180);
                     if (theta < 0) theta = (2 * M_PI) - abs(theta);
                     double hyp = distance;
                     Pose pose = robot->GetPose();
@@ -169,7 +182,7 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
                 }
             }
         }
-    }
+    // }
     // Avoidance
 
     // For other bots
