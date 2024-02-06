@@ -171,21 +171,20 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
             }
         }
     }
-
     // Avoidance
 
     // For other bots
     robot->xVel += closeDx * avoidanceFactor;
-    robot->yVel += closeDx * avoidanceFactor;
+    robot->yVel += closeDy * avoidanceFactor;
 
     // For obstacles
     robot->xVel -= closeDxObs * avoidObstructionFactor;
-    robot->yVel -= closeDxObs * avoidObstructionFactor;
+    robot->yVel -= closeDyObs * avoidObstructionFactor;
 
-    printf("Bots - closeDx: %f closeDy: %f\r\n", closeDx, closeDy);
-    printf("Obstacles - closeDx: %f closeDy: %f\r\n", closeDxObs, closeDyObs);
-    printf("Fake velocity: %f %f\r\n", robot->xVel, robot->yVel);
-    printf("Real velocity: Linear %f Rotational %f\r\n", robot->pos->GetVelocity().x, robot->pos->GetVelocity().a);
+    // printf("Bots - closeDx: %f closeDy: %f\r\n", closeDx, closeDy);
+    // printf("Obstacles - closeDx: %f closeDy: %f\r\n", closeDxObs, closeDyObs);
+    // printf("Fake velocity: %f %f\r\n", robot->xVel, robot->yVel);
+    // printf("Real velocity: Linear %f Rotational %f\r\n", robot->pos->GetVelocity().x, robot->pos->GetVelocity().a);
 
     // Updating velocity for alignment
 
@@ -213,16 +212,18 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
     // Setting values for non-holonomic system
     robot->pos->SetSpeed(vels.linearVel, 0, vels.rotationalVel);
 
+    // robot->xVel = xVelReal;
+    // robot->yVel = yVelReal;
+
     // Setting the stored velocity to the real simulated value
 
     HVelocities vels2 = CalculateHolonomic(robot->pos->GetVelocity().x, robot->pos->GetVelocity().a, robot);
-    double xVelReal = vels2.xvel;
-    double yVelReal = vels2.yvel;
+    // robot->xVel = vels2.xvel;
+    // robot->yVel = vels2.yvel;
 
-    printf("Calc Real: %f %f\r\n", xVelReal, yVelReal);
-
-    // robot->xVel = xVelReal;
-    // robot->yVel = yVelReal;
+    printf("Calc Polar: %f %f\r\n", vels.linearVel, vels.rotationalVel);
+    printf("Calc Cartesian: %f %f\r\n", vels2.xvel, vels2.yvel);
+    
 
     return 0;
 }
@@ -238,7 +239,7 @@ SimpleRobot::HVelocities SimpleRobot::CalculateHolonomic(double linearvel, doubl
 
     // Calculating the angle difference
 
-    double angleDiff = turnvel * (1/60);
+    double angleDiff = turnvel * (1.0/60.0);
 
     // Calculating the new direction
 
@@ -265,7 +266,7 @@ SimpleRobot::NHVelocities SimpleRobot::CalculateNonHolonomic(double xvel, double
     double newDirection = atan2(yvel, xvel);
     double angleDiff = newDirection - robot->GetPose().a;
 
-    vels.rotationalVel = angleDiff / (1/60);
+    vels.rotationalVel = angleDiff / (1.0/60.0);
 
     return vels;
 }
