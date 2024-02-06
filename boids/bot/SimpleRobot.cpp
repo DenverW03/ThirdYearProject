@@ -67,9 +67,6 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
     double averageXPos = 0;
     double averageYPos = 0;
 
-    // Non-holonmic velocity value struct
-    NHVelocities vels;
-
     // Range based for loop necessary as often it will not contain any readings, so presumptions such as blobfinder[0] cause seg faults
     for (int i=0; i<camCount; i++) {
         // Getting the fist blobfinder on the robot
@@ -120,8 +117,8 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
                     // printf("Obstacle Relative: %f, %f Angle: %f Distance: %f\r\n", adj, opp, compositeAngle, hyp);
                     // printf("Obstacle Real: %f, %f\r\n", xpos, ypos);
 
-                    closeDxObs -= pose.x - xpos;
-                    closeDyObs -= pose.y - ypos;
+                    closeDxObs += pose.x - xpos;
+                    closeDyObs += pose.y - ypos;
                     break;
                 }
                 case blue: {
@@ -178,13 +175,8 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
     robot->yVel += closeDy * avoidanceFactor;
 
     // For obstacles
-    robot->xVel -= closeDxObs * avoidObstructionFactor;
-    robot->yVel -= closeDyObs * avoidObstructionFactor;
-
-    // printf("Bots - closeDx: %f closeDy: %f\r\n", closeDx, closeDy);
-    // printf("Obstacles - closeDx: %f closeDy: %f\r\n", closeDxObs, closeDyObs);
-    // printf("Fake velocity: %f %f\r\n", robot->xVel, robot->yVel);
-    // printf("Real velocity: Linear %f Rotational %f\r\n", robot->pos->GetVelocity().x, robot->pos->GetVelocity().a);
+    robot->xVel += closeDxObs * avoidObstructionFactor;
+    robot->yVel += closeDyObs * avoidObstructionFactor;
 
     // Updating velocity for alignment
 
@@ -206,24 +198,33 @@ int SimpleRobot::SensorUpdate(Model *, SimpleRobot* robot) {
         robot->yVel += (averageYPos - robot->GetPose().y) * cohesionFactor;
     }
 
-    // Calculating the non-holonomic values for velocity
-    vels = CalculateNonHolonomic(robot->xVel, robot->yVel, robot);
-
-    // Setting values for non-holonomic system
-    robot->pos->SetSpeed(vels.linearVel, 0, vels.rotationalVel);
-
-    // robot->xVel = xVelReal;
-    // robot->yVel = yVelReal;
+    // Setting the new velocity of the robot
+    
+    NHVelocities nonHolonomic = CalculateNonHolonomic(robot->xVel, robot->yVel, robot);
+    robot->pos->SetSpeed(nonHolonomic.linearVel, 0, nonHolonomic.rotationalVel);
 
     // Setting the stored velocity to the real simulated value
 
     HVelocities vels2 = CalculateHolonomic(robot->pos->GetVelocity().x, robot->pos->GetVelocity().a, robot);
+
+    std::cout << "--------------------------------\r\n";
+    printf("Obstacles - closeDx: %f closeDy: %f\r\n", closeDxObs, closeDyObs);
+    std::cout << "--------------------------------\r\n";
+    // printf("Calc Polar: %f %f\r\n", vels.linearVel, vels.rotationalVel);
+    printf("Real Polar: %f %f\r\n", robot->pos->GetVelocity().x, robot->pos->GetVelocity().a);
+    printf("Calc Cartesian: %f %f\r\n", vels2.xvel, vels2.yvel);
+    printf("Class velocity: %f %f\r\n", robot->xVel, robot->yVel);
+    std::cout << "--------------------------------\r\n";
+
     // robot->xVel = vels2.xvel;
     // robot->yVel = vels2.yvel;
+    // printf("Amended class velocity: %f %f\r\n", robot->xVel, robot->yVel);
 
-    printf("Calc Polar: %f %f\r\n", vels.linearVel, vels.rotationalVel);
-    printf("Calc Cartesian: %f %f\r\n", vels2.xvel, vels2.yvel);
-    
+    // std::cout << "--------------------------------\r\n";
+
+    // printf("Bots - closeDx: %f closeDy: %f\r\n", closeDx, closeDy);
+    // printf("Obstacles - closeDx: %f closeDy: %f\r\n", closeDxObs, closeDyObs);
+    // printf("Real velocity: Linear %f Rotational %f\r\n", robot->pos->GetVelocity().x, robot->pos->GetVelocity().a);
 
     return 0;
 }

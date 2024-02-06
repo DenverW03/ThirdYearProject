@@ -23,7 +23,7 @@ namespace SimpleRBT {
     #define blue 0x0000ffff
 
     // The number of cameras used up to 16 for current model, vary number for testing
-    #define camCount 16
+    #define camCount 1
 
     // Defining a struct for passing converted speed values
 
