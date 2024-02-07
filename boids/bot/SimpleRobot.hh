@@ -42,6 +42,16 @@ namespace SimpleRBT {
         ModelBlobfinder *bf;
         int num;
     } SensorInputData;
+
+    typedef struct{
+        double closeDx;
+        double closeDy;
+        double closeDxObs;
+        double closeDyObs;
+        double averageXPos;
+        double averageYPos;
+        int numNeighbours;
+    } BoidData;
     
     public:
 
@@ -53,6 +63,7 @@ namespace SimpleRBT {
         double yVel;
         SimpleRobot* robots;
         int numRobots;
+        BoidData boidData;
 
         // Angles of the cameras places on the bot
 

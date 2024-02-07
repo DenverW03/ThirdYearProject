@@ -28,6 +28,15 @@ SimpleRobot::SimpleRobot(ModelPosition *modelPos, Pose pose, SimpleRobot *robots
     this->robots = robots; // Holds all the robots in an array
     this->numRobots = numRobots; // Holds the number of robots
 
+    // Initialising the boid data values to zero
+    this->boidData.closeDx = 0;
+    this->boidData.closeDy = 0;
+    this->boidData.closeDxObs = 0;
+    this->boidData.closeDyObs = 0;
+    this->boidData.averageXPos = 0;
+    this->boidData.averageYPos = 0;
+    this->boidData.numNeighbours = 0;
+
     // Setting up positional model and callbacks
     this->pos = modelPos;
     this->pos->AddCallback(Model::CB_UPDATE, model_callback_t(PositionUpdate), this);
@@ -134,8 +143,8 @@ int SimpleRobot::SensorUpdate(Model *, SensorInputData* data) {
                     // printf("Obstacle Relative: %f, %f Angle: %f Distance: %f\r\n", adj, opp, compositeAngle, hyp);
                     // printf("Obstacle Real: %f, %f\r\n", xpos, ypos);
 
-                    closeDxObs -= pose.x - xpos;
-                    closeDyObs -= pose.y - ypos;
+                    robot->boidData.closeDxObs -= pose.x - xpos;
+                    robot->boidData.closeDyObs -= pose.y - ypos;
                     break;
                 }
                 case blue: {
@@ -163,8 +172,8 @@ int SimpleRobot::SensorUpdate(Model *, SensorInputData* data) {
 
                     // Separation (prior guard clause already confirmed bot to be within avoidance distance)
                     if(distance <= avoidanceDistance) {
-                        closeDx += robot->GetPose().x - xpos;
-                        closeDy += robot->GetPose().y - ypos;
+                        robot->boidData.closeDx += robot->GetPose().x - xpos;
+                        robot->boidData.closeDy += robot->GetPose().y - ypos;
                     }
 
                     // If the distance is within the vision range of the robot but outside avoidance range
@@ -173,11 +182,11 @@ int SimpleRobot::SensorUpdate(Model *, SensorInputData* data) {
                         // averageXVel += robot->robots[i].xVel;
                         // averageYVel += robot->robots[i].yVel;
 
-                        numNeighbours += 1;
+                        robot->boidData.numNeighbours += 1;
 
                         // Cohesion
-                        averageXPos += xpos;
-                        averageYPos += ypos;
+                        robot->boidData.averageXPos += xpos;
+                        robot->boidData.averageYPos += ypos;
                     }
 
                     break;
@@ -185,47 +194,48 @@ int SimpleRobot::SensorUpdate(Model *, SensorInputData* data) {
             }
         }
     // }
+
+    return 0;
+}
+
+// Position update function for stage (necessary for the bot to actually move)
+int SimpleRobot::PositionUpdate(Model *, SimpleRobot* robot) {
     // Avoidance
 
     // For other bots
-    robot->xVel += closeDx * avoidanceFactor;
-    robot->yVel += closeDy * avoidanceFactor;
+    robot->xVel += robot->boidData.closeDx * avoidanceFactor;
+    robot->yVel += robot->boidData.closeDy * avoidanceFactor;
 
     // For obstacles
-    robot->xVel -= closeDxObs * avoidObstructionFactor;
-    robot->yVel -= closeDyObs * avoidObstructionFactor;
+    robot->xVel -= robot->boidData.closeDxObs * avoidObstructionFactor;
+    robot->yVel -= robot->boidData.closeDyObs * avoidObstructionFactor;
 
-    // Updating velocity for alignment
+    // Cohesion and Alignment
 
-    if(numNeighbours > 0) {
+    if(robot->boidData.numNeighbours > 0) {
         // // Calculating the averages for velocity
         // averageXVel = averageXVel / numNeighbours;
         // averageYVel = averageYVel / numNeighbours;
 
         // Calculating the averages for position
-        averageXPos = averageXPos / numNeighbours;
-        averageYPos = averageYPos / numNeighbours;
+        robot->boidData.averageXPos = robot->boidData.averageXPos / robot->boidData.numNeighbours;
+        robot->boidData.averageYPos = robot->boidData.averageYPos / robot->boidData.numNeighbours;
 
         // // Alignment
         // robot->xVel += (averageXVel - robot->xVel) * alignmentFactor;
         // robot->yVel += (averageYVel - robot->yVel) * alignmentFactor;
 
         // Cohesion
-        robot->xVel += (averageXPos - robot->GetPose().x) * cohesionFactor;
-        robot->yVel += (averageYPos - robot->GetPose().y) * cohesionFactor;
+        robot->xVel += (robot->boidData.averageXPos - robot->GetPose().x) * cohesionFactor;
+        robot->yVel += (robot->boidData.averageYPos - robot->GetPose().y) * cohesionFactor;
     }
 
-    // Setting the new velocity of the robot
-
-    // NHVelocities nonHolonomic = CalculateNonHolonomic(robot->xVel, robot->yVel, robot);
-    // robot->pos->SetSpeed(nonHolonomic.linearVel, 0, nonHolonomic.rotationalVel);
-
-    // Setting the stored velocity to the real simulated value
+    // Diagnostic printing
 
     HVelocities vels2 = CalculateHolonomic(robot->pos->GetVelocity().x, robot->pos->GetVelocity().a, robot);
 
     std::cout << "--------------------------------\r\n";
-    printf("Obstacles - closeDx: %f closeDy: %f\r\n", closeDxObs, closeDyObs);
+    printf("Obstacles - closeDx: %f closeDy: %f\r\n", robot->boidData.closeDxObs, robot->boidData.closeDyObs);
     std::cout << "--------------------------------\r\n";
     // printf("Calc Polar: %f %f\r\n", vels.linearVel, vels.rotationalVel);
     printf("Real Polar: %f %f\r\n", robot->pos->GetVelocity().x, robot->pos->GetVelocity().a);
@@ -233,23 +243,18 @@ int SimpleRobot::SensorUpdate(Model *, SensorInputData* data) {
     printf("Class velocity: %f %f\r\n", robot->xVel, robot->yVel);
     std::cout << "--------------------------------\r\n";
 
-    // robot->xVel = vels2.xvel;
-    // robot->yVel = vels2.yvel;
-    // printf("Amended class velocity: %f %f\r\n", robot->xVel, robot->yVel);
 
-    // std::cout << "--------------------------------\r\n";
-
-    // printf("Bots - closeDx: %f closeDy: %f\r\n", closeDx, closeDy);
-    // printf("Obstacles - closeDx: %f closeDy: %f\r\n", closeDxObs, closeDyObs);
-    // printf("Real velocity: Linear %f Rotational %f\r\n", robot->pos->GetVelocity().x, robot->pos->GetVelocity().a);
-
-    return 0;
-}
-
-// Position update function for stage (necessary for the bot to actually move)
-int SimpleRobot::PositionUpdate(Model *, SimpleRobot* robot) {
     NHVelocities nonHolonomic = CalculateNonHolonomic(robot->xVel, robot->yVel, robot);
     robot->pos->SetSpeed(nonHolonomic.linearVel, 0, nonHolonomic.rotationalVel);
+
+    // Resetting the boid data values
+    robot->boidData.closeDx = 0;
+    robot->boidData.closeDy = 0;
+    robot->boidData.closeDxObs = 0;
+    robot->boidData.closeDyObs = 0;
+    robot->boidData.averageXPos = 0;
+    robot->boidData.averageYPos = 0;
+    robot->boidData.numNeighbours = 0;
 
     printf("position update called\r\n");
     return 0;
