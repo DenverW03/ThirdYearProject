@@ -21,4 +21,5 @@ Note: C++11 required, it is enforced in the compilation script, some features no
 
 - common: contains common files used between all of the different algorithms
 - boids: this directory contains the lowest level boids algorithm
+- boids_follow: this directory contains the boids algorithm that follows the VIP agent
 - proposal: contains the proposal pdf for the dissertation
