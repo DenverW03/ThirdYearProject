@@ -11,7 +11,7 @@ namespace SimpleRBT {
     #define visionRange 8
     #define cohesionFactor 0.0005
     #define avoidanceDistance 2
-    #define avoidanceFactor 0.01
+    #define avoidanceFactor 0.1
     #define alignmentFactor 0.05
 
     // Obstruction avoidance parameters, the distance is the same as the range for the sonar
