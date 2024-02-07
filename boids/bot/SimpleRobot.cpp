@@ -68,33 +68,11 @@ SimpleRobot::SimpleRobot(ModelPosition *modelPos, Pose pose, SimpleRobot *robots
 int SimpleRobot::SensorUpdate(Model *, SensorInputData* data) {
     SimpleRobot* robot = data->robot;
     ModelBlobfinder* blobfinder = data->bf;
-    // printf("ID: %d\r\n", data->num);
 
     // Getting the blobs found in the blobfinder model
     const std::vector<ModelBlobfinder::Blob> &blobs = blobfinder->GetBlobs();
 
-    // printf("number of blobs: %d\r\n", blobs.size());
-
-    // Obstacle avoidances
-    double closeDxObs = 0;
-    double closeDyObs = 0;
-
-    // Separation
-    double closeDx = 0;
-    double closeDy = 0;
-
-    // // Alignment
-    // double averageXVel = 0;
-    // double averageYVel = 0;
-
-    double numNeighbours = 0;
-
-    // Cohesion
-    double averageXPos = 0;
-    double averageYPos = 0;
-
     // Running the boids value generation algorithm for every blob
-
     for(const ModelBlobfinder::Blob blob : blobs){
         int r = blob.color.r * 255;
         int g = blob.color.g * 255;
@@ -167,7 +145,7 @@ int SimpleRobot::SensorUpdate(Model *, SensorInputData* data) {
 
                 // If the distance is within the vision range of the robot but outside avoidance range
                 if(distance <= visionRange) {
-                    // Alignment
+                    // // Alignment
                     // averageXVel += robot->robots[i].xVel;
                     // averageYVel += robot->robots[i].yVel;
 
@@ -222,14 +200,14 @@ int SimpleRobot::PositionUpdate(Model *, SimpleRobot* robot) {
 
     HVelocities vels2 = CalculateHolonomic(robot->pos->GetVelocity().x, robot->pos->GetVelocity().a, robot);
 
-    std::cout << "--------------------------------\r\n";
-    printf("Obstacles - closeDx: %f closeDy: %f\r\n", robot->boidData.closeDxObs, robot->boidData.closeDyObs);
-    std::cout << "--------------------------------\r\n";
-    // printf("Calc Polar: %f %f\r\n", vels.linearVel, vels.rotationalVel);
-    printf("Real Polar: %f %f\r\n", robot->pos->GetVelocity().x, robot->pos->GetVelocity().a);
-    printf("Calc Cartesian: %f %f\r\n", vels2.xvel, vels2.yvel);
-    printf("Class velocity: %f %f\r\n", robot->xVel, robot->yVel);
-    std::cout << "--------------------------------\r\n";
+    // std::cout << "--------------------------------\r\n";
+    // printf("Obstacles - closeDx: %f closeDy: %f\r\n", robot->boidData.closeDxObs, robot->boidData.closeDyObs);
+    // std::cout << "--------------------------------\r\n";
+    // // printf("Calc Polar: %f %f\r\n", vels.linearVel, vels.rotationalVel);
+    // printf("Real Polar: %f %f\r\n", robot->pos->GetVelocity().x, robot->pos->GetVelocity().a);
+    // printf("Calc Cartesian: %f %f\r\n", vels2.xvel, vels2.yvel);
+    // printf("Class velocity: %f %f\r\n", robot->xVel, robot->yVel);
+    // std::cout << "--------------------------------\r\n";
 
 
     NHVelocities nonHolonomic = CalculateNonHolonomic(robot->xVel, robot->yVel, robot);
@@ -244,6 +222,8 @@ int SimpleRobot::PositionUpdate(Model *, SimpleRobot* robot) {
     robot->boidData.averageYPos = 0;
     robot->boidData.numNeighbours = 0;
 
+
+    // Setting stored velocity to the real velocity so it doesn't grow too large in magnitude
     robot->xVel = vels2.xvel;
     robot->yVel = vels2.yvel;
 
