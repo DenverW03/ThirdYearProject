@@ -68,12 +68,12 @@ SimpleRobot::SimpleRobot(ModelPosition *modelPos, Pose pose, SimpleRobot *robots
 int SimpleRobot::SensorUpdate(Model *, SensorInputData* data) {
     SimpleRobot* robot = data->robot;
     ModelBlobfinder* blobfinder = data->bf;
-    printf("ID: %d\r\n", data->num);
+    // printf("ID: %d\r\n", data->num);
 
     // Getting the blobs found in the blobfinder model
     const std::vector<ModelBlobfinder::Blob> &blobs = blobfinder->GetBlobs();
 
-    printf("number of blobs: %d\r\n", blobs.size());
+    // printf("number of blobs: %d\r\n", blobs.size());
 
     // Obstacle avoidances
     double closeDxObs = 0;
@@ -93,107 +93,95 @@ int SimpleRobot::SensorUpdate(Model *, SensorInputData* data) {
     double averageXPos = 0;
     double averageYPos = 0;
 
-    // Range based for loop necessary as often it will not contain any readings, so presumptions such as blobfinder[0] cause seg faults
-    // for (int i=0; i<camCount; i++) {
-        // Getting the fist blobfinder on the robot
+    // Running the boids value generation algorithm for every blob
 
-        // const std::vector<ModelBlobfinder::Blob> &blobfinder = robot->cameras[i]->GetBlobs();
+    for(const ModelBlobfinder::Blob blob : blobs){
+        int r = blob.color.r * 255;
+        int g = blob.color.g * 255;
+        int b = blob.color.b * 255;
+        int a = blob.color.a * 255;
 
-        for(const ModelBlobfinder::Blob blob : blobs){
-            int r = blob.color.r * 255;
-            int g = blob.color.g * 255;
-            int b = blob.color.b * 255;
-            int a = blob.color.a * 255;
+        int full = (r << 24) | (g << 16) | (b << 8) | a;
 
-            int full = (r << 24) | (g << 16) | (b << 8) | a;
+        double distance = blob.range;
 
-            double distance = blob.range;
+        // Case for handling obstacles and case for handling other bots
+        switch(full) {
+            case black: {
+                // Need distance to fall equal to or lower than the obstacle avoidance distance
+                if (distance > avoidObstructionDistance) break;
 
-            // Case for handling obstacles and case for handling other bots
-            switch(full) {
-                case black: {
-                    // Need distance to fall equal to or lower than the obstacle avoidance distance
-                    if (distance > avoidObstructionDistance) break;
+                // NEED TO ENSURE THE CORRECT DEG OR RAD FOR EACH ANGLE, I THOUGHT THAT THESE WERE I RAD BUT THEY ARE IN FACT IN DEGREES
 
-                    // NEED TO ENSURE THE CORRECT DEG OR RAD FOR EACH ANGLE, I THOUGHT THAT THESE WERE I RAD BUT THEY ARE IN FACT IN DEGREES
+                // Get angle of sensor on bot (if negative just add (pi - absolute value) to pi to get positive angle representation)
+                double theta = robot->angles[data->num] * (M_PI / 180);
+                if (theta < 0) theta = (2 * M_PI) - abs(theta);
 
-                    // Get angle of sensor on bot (if negative just add (pi - absolute value) to pi to get positive angle representation)
-                    double theta = robot->angles[0] * (M_PI / 180);
-                    if (theta < 0) theta = (2 * M_PI) - abs(theta);
+                // Get obstacle distance (hypotenuse)
+                double hyp = distance;
 
-                    // Get obstacle distance (hypotenuse)
-                    double hyp = distance;
+                // Using a composite angle for real world sensor angle
+                Pose pose = robot->GetPose();
+                double botAngle = pose.a;
+                if (botAngle < 0) botAngle = (2 * M_PI) - abs(botAngle);
+                double compositeAngle = botAngle + theta;
+                if (compositeAngle > (2 * M_PI)) compositeAngle -= (2 * M_PI);
 
-                    // Using a composite angle for real world sensor angle
-                    Pose pose = robot->GetPose();
-                    double botAngle = pose.a;
-                    if (botAngle < 0) botAngle = (2 * M_PI) - abs(botAngle);
-                    double compositeAngle = botAngle + theta;
-                    if (compositeAngle > (2 * M_PI)) compositeAngle -= (2 * M_PI);
+                // Use trigonometry to deduce the position of the obstacle in vector from bot, using abs value to decide direction in post
+                double opp = hyp * sin(compositeAngle); // y
+                double adj = hyp * cos(compositeAngle); // x
 
-                    // Use trigonometry to deduce the position of the obstacle in vector from bot, using abs value to decide direction in post
-                    double opp = hyp * sin(compositeAngle); // y
-                    double adj = hyp * cos(compositeAngle); // x
+                // Obstacle position calculations
+                double xpos = pose.x + adj;
+                double ypos = pose.y + opp;
 
-                    // Obstacle position calculations
-                    double xpos = pose.x + adj;
-                    double ypos = pose.y + opp;
+                robot->boidData.closeDxObs -= pose.x - xpos;
+                robot->boidData.closeDyObs -= pose.y - ypos;
+                break;
+            }
+            case blue: {
+                // Guard clause to avoid wasting compute
+                if(distance > visionRange) break;
 
-                    // printf("Camera Angle: %f Bot Angle: %f\r\n", theta, botAngle);
-                    // printf("Obstacle Relative: %f, %f Angle: %f Distance: %f\r\n", adj, opp, compositeAngle, hyp);
-                    // printf("Obstacle Real: %f, %f\r\n", xpos, ypos);
+                // Calculating position of detected bot (same as calculating obstacle position), COMMENTED IN CASE ABOVE ^^
+                double theta = robot->angles[data->num] * (M_PI / 180);
+                if (theta < 0) theta = (2 * M_PI) - abs(theta);
+                double hyp = distance;
+                Pose pose = robot->GetPose();
+                double botAngle = pose.a;
+                if (botAngle < 0) botAngle = (2 * M_PI) - abs(botAngle);
+                double compositeAngle = botAngle + theta;
+                if (compositeAngle > (2 * M_PI)) compositeAngle -= (2 * M_PI);
+                double opp = hyp * sin(compositeAngle); // y
+                double adj = hyp * cos(compositeAngle); // x
+                double xpos = pose.x + adj;
+                double ypos = pose.y + opp;
 
-                    robot->boidData.closeDxObs -= pose.x - xpos;
-                    robot->boidData.closeDyObs -= pose.y - ypos;
-                    break;
+                // If the distance is within the avoidance range of the robot
+
+                // Separation (prior guard clause already confirmed bot to be within avoidance distance)
+                if(distance <= avoidanceDistance) {
+                    robot->boidData.closeDx += robot->GetPose().x - xpos;
+                    robot->boidData.closeDy += robot->GetPose().y - ypos;
                 }
-                case blue: {
-                    // Guard clause to avoid wasting compute
-                    if(distance > visionRange) break;
 
-                    // Calculating position of detected bot (same as calculating obstacle position), COMMENTED IN CASE ABOVE ^^
-                    double theta = robot->angles[0] * (M_PI / 180);
-                    if (theta < 0) theta = (2 * M_PI) - abs(theta);
-                    double hyp = distance;
-                    Pose pose = robot->GetPose();
-                    double botAngle = pose.a;
-                    if (botAngle < 0) botAngle = (2 * M_PI) - abs(botAngle);
-                    double compositeAngle = botAngle + theta;
-                    if (compositeAngle > (2 * M_PI)) compositeAngle -= (2 * M_PI);
-                    double opp = hyp * sin(compositeAngle); // y
-                    double adj = hyp * cos(compositeAngle); // x
-                    double xpos = pose.x + adj;
-                    double ypos = pose.y + opp;
+                // If the distance is within the vision range of the robot but outside avoidance range
+                if(distance <= visionRange) {
+                    // Alignment
+                    // averageXVel += robot->robots[i].xVel;
+                    // averageYVel += robot->robots[i].yVel;
 
-                    // printf("Bot Relative: %f, %f Angle: %f Distance: %f\r\n", adj, opp, compositeAngle * (180 / M_PI), hyp);
-                    // printf("Bot Real: %f, %f\r\n", xpos, ypos);
+                    robot->boidData.numNeighbours += 1;
 
-                    // If the distance is within the avoidance range of the robot
-
-                    // Separation (prior guard clause already confirmed bot to be within avoidance distance)
-                    if(distance <= avoidanceDistance) {
-                        robot->boidData.closeDx += robot->GetPose().x - xpos;
-                        robot->boidData.closeDy += robot->GetPose().y - ypos;
-                    }
-
-                    // If the distance is within the vision range of the robot but outside avoidance range
-                    if(distance <= visionRange) {
-                        // Alignment
-                        // averageXVel += robot->robots[i].xVel;
-                        // averageYVel += robot->robots[i].yVel;
-
-                        robot->boidData.numNeighbours += 1;
-
-                        // Cohesion
-                        robot->boidData.averageXPos += xpos;
-                        robot->boidData.averageYPos += ypos;
-                    }
-
-                    break;
+                    // Cohesion
+                    robot->boidData.averageXPos += xpos;
+                    robot->boidData.averageYPos += ypos;
                 }
+
+                break;
             }
         }
-    // }
+    }
 
     return 0;
 }
@@ -256,7 +244,10 @@ int SimpleRobot::PositionUpdate(Model *, SimpleRobot* robot) {
     robot->boidData.averageYPos = 0;
     robot->boidData.numNeighbours = 0;
 
-    printf("position update called\r\n");
+    robot->xVel = vels2.xvel;
+    robot->yVel = vels2.yvel;
+
+
     return 0;
 }
 
