@@ -39,7 +39,7 @@ SimpleRobot::SimpleRobot(ModelPosition *modelPos, Pose pose, SimpleRobot *robots
         SensorInputData* data = (SensorInputData *) malloc(sizeof(SensorInputData));;
         data->robot = this;
         data->bf = cameras[i];
-        data->num = 12;
+        data->num = i;
         void* dataPtr = static_cast<void*>(data);
 
         this->cameras[i]->AddCallback(Model::CB_UPDATE, model_callback_t(SensorUpdate), dataPtr); // SHOULD ADD EXTRA PARAM FOR INDEX camera[i] for example
@@ -59,10 +59,12 @@ SimpleRobot::SimpleRobot(ModelPosition *modelPos, Pose pose, SimpleRobot *robots
 int SimpleRobot::SensorUpdate(Model *, SensorInputData* data) {
     SimpleRobot* robot = data->robot;
     ModelBlobfinder* blobfinder = data->bf;
-    printf("Num: %d\r\n", data->num);
+    printf("ID: %d\r\n", data->num);
 
     // Getting the blobs found in the blobfinder model
     const std::vector<ModelBlobfinder::Blob> &blobs = blobfinder->GetBlobs();
+
+    printf("number of blobs: %d\r\n", blobs.size());
 
     // Obstacle avoidances
     double closeDxObs = 0;
@@ -215,8 +217,8 @@ int SimpleRobot::SensorUpdate(Model *, SensorInputData* data) {
 
     // Setting the new velocity of the robot
 
-    NHVelocities nonHolonomic = CalculateNonHolonomic(robot->xVel, robot->yVel, robot);
-    robot->pos->SetSpeed(nonHolonomic.linearVel, 0, nonHolonomic.rotationalVel);
+    // NHVelocities nonHolonomic = CalculateNonHolonomic(robot->xVel, robot->yVel, robot);
+    // robot->pos->SetSpeed(nonHolonomic.linearVel, 0, nonHolonomic.rotationalVel);
 
     // Setting the stored velocity to the real simulated value
 
@@ -246,6 +248,10 @@ int SimpleRobot::SensorUpdate(Model *, SensorInputData* data) {
 
 // Position update function for stage (necessary for the bot to actually move)
 int SimpleRobot::PositionUpdate(Model *, SimpleRobot* robot) {
+    NHVelocities nonHolonomic = CalculateNonHolonomic(robot->xVel, robot->yVel, robot);
+    robot->pos->SetSpeed(nonHolonomic.linearVel, 0, nonHolonomic.rotationalVel);
+
+    printf("position update called\r\n");
     return 0;
 }
 
