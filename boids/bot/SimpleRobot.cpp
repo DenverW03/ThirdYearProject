@@ -86,61 +86,30 @@ int SimpleRobot::SensorUpdate(Model *, SensorInputData* data) {
         // Case for handling obstacles and case for handling other bots
         switch(full) {
             case black: {
-                // Need distance to fall equal to or lower than the obstacle avoidance distance
+                // // Need distance to fall equal to or lower than the obstacle avoidance distance
                 if (distance > avoidObstructionDistance) break;
 
-                // NEED TO ENSURE THE CORRECT DEG OR RAD FOR EACH ANGLE, I THOUGHT THAT THESE WERE I RAD BUT THEY ARE IN FACT IN DEGREES
-
-                // Get angle of sensor on bot (if negative just add (pi - absolute value) to pi to get positive angle representation)
-                double theta = robot->angles[data->num] * (M_PI / 180);
-                if (theta < 0) theta = (2 * M_PI) - abs(theta);
-
-                // Get obstacle distance (hypotenuse)
-                double hyp = distance;
-
-                // Using a composite angle for real world sensor angle
+                // Add this blob to the close stacks
                 Pose pose = robot->GetPose();
-                double botAngle = pose.a;
-                if (botAngle < 0) botAngle = (2 * M_PI) - abs(botAngle);
-                double compositeAngle = botAngle + theta;
-                if (compositeAngle > (2 * M_PI)) compositeAngle -= (2 * M_PI);
-
-                // Use trigonometry to deduce the position of the obstacle in vector from bot, using abs value to decide direction in post
-                double opp = hyp * sin(compositeAngle); // y
-                double adj = hyp * cos(compositeAngle); // x
-
-                // Obstacle position calculations
-                double xpos = pose.x + adj;
-                double ypos = pose.y + opp;
-
-                robot->boidData.closeDxObs -= pose.x - xpos;
-                robot->boidData.closeDyObs -= pose.y - ypos;
+                auto position = CalculatePosition(robot->angles[data->num], pose, distance);
+                robot->boidData.closeDxObs -= pose.x - position.first;
+                robot->boidData.closeDyObs -= pose.y - position.second;
                 break;
             }
             case blue: {
                 // Guard clause to avoid wasting compute
                 if(distance > visionRange) break;
-
-                // Calculating position of detected bot (same as calculating obstacle position), COMMENTED IN CASE ABOVE ^^
-                double theta = robot->angles[data->num] * (M_PI / 180);
-                if (theta < 0) theta = (2 * M_PI) - abs(theta);
-                double hyp = distance;
+                
+                // Get the blob real world position
                 Pose pose = robot->GetPose();
-                double botAngle = pose.a;
-                if (botAngle < 0) botAngle = (2 * M_PI) - abs(botAngle);
-                double compositeAngle = botAngle + theta;
-                if (compositeAngle > (2 * M_PI)) compositeAngle -= (2 * M_PI);
-                double opp = hyp * sin(compositeAngle); // y
-                double adj = hyp * cos(compositeAngle); // x
-                double xpos = pose.x + adj;
-                double ypos = pose.y + opp;
+                auto position = CalculatePosition(robot->angles[data->num], pose, distance);
 
                 // If the distance is within the avoidance range of the robot
 
                 // Separation (prior guard clause already confirmed bot to be within avoidance distance)
                 if(distance <= avoidanceDistance) {
-                    robot->boidData.closeDx += robot->GetPose().x - xpos;
-                    robot->boidData.closeDy += robot->GetPose().y - ypos;
+                    robot->boidData.closeDx += robot->GetPose().x - position.first;
+                    robot->boidData.closeDy += robot->GetPose().y - position.second;
                 }
 
                 // If the distance is within the vision range of the robot but outside avoidance range
@@ -152,8 +121,8 @@ int SimpleRobot::SensorUpdate(Model *, SensorInputData* data) {
                     robot->boidData.numNeighbours += 1;
 
                     // Cohesion
-                    robot->boidData.averageXPos += xpos;
-                    robot->boidData.averageYPos += ypos;
+                    robot->boidData.averageXPos += position.first;
+                    robot->boidData.averageYPos += position.second;
                 }
 
                 break;
@@ -162,6 +131,32 @@ int SimpleRobot::SensorUpdate(Model *, SensorInputData* data) {
     }
 
     return 0;
+}
+
+std::pair<double, double> SimpleRobot::CalculatePosition(double a, Pose pose, double distance) {
+    // Get angle of sensor on bot (if negative just add (pi - absolute value) to pi to get positive angle representation)
+    double theta = a * (M_PI / 180);
+    if (theta < 0) theta = (2 * M_PI) - abs(theta);
+
+    // Get obstacle distance (hypotenuse)
+    double hyp = distance;
+
+    // Using a composite angle for real world sensor angle
+    // Pose pose = robot->GetPose();
+    double botAngle = pose.a;
+    if (botAngle < 0) botAngle = (2 * M_PI) - abs(botAngle);
+    double compositeAngle = botAngle + theta;
+    if (compositeAngle > (2 * M_PI)) compositeAngle -= (2 * M_PI);
+
+    // Use trigonometry to deduce the position of the obstacle in vector from bot, using abs value to decide direction in post
+    double opp = hyp * sin(compositeAngle); // y
+    double adj = hyp * cos(compositeAngle); // x
+
+    // Obstacle position calculations
+    double xpos = pose.x + adj;
+    double ypos = pose.y + opp;
+
+    return std::make_pair(xpos, ypos);
 }
 
 // Position update function for stage (necessary for the bot to actually move)

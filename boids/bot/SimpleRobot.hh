@@ -27,23 +27,23 @@ namespace SimpleRBT {
 
     // Defining a struct for passing converted speed values
 
-    typedef struct{
+    typedef struct {
         double linearVel;
         double rotationalVel;
     } NHVelocities;
 
-    typedef struct{
+    typedef struct {
         double xvel;
         double yvel;
     } HVelocities;
 
-    typedef struct{
+    typedef struct {
         SimpleRobot *robot;
         ModelBlobfinder *bf;
         int num;
     } SensorInputData;
 
-    typedef struct{
+    typedef struct {
         double closeDx;
         double closeDy;
         double closeDxObs;
@@ -75,10 +75,11 @@ namespace SimpleRBT {
         SimpleRobot(ModelPosition *modelPos, Pose pose, SimpleRobot *robots, int numRobots);
         static int SensorUpdate(Model *, SensorInputData *data);
         static int PositionUpdate(Model *, SimpleRobot *robot);
-        Pose GetPose();
+        static std::pair<double, double> CalculatePosition(double a, Pose pose, double distance);
         static double CalculateDistance(Pose pose, SimpleRobot *robot);
         static HVelocities CalculateHolonomic(double xvel, double turnvel, SimpleRobot *robot);
         static NHVelocities CalculateNonHolonomic(double xvel, double yvel, SimpleRobot *robot);
+        Pose GetPose();
     };
 }
 
