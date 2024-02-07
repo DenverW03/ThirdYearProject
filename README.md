@@ -16,3 +16,9 @@ This project uses stage as a library, through the libstage plugin for C++
 - C++ for main logic
 
 Note: C++11 required, it is enforced in the compilation script, some features not available in previous C++ versions are used.
+
+## Directories
+
+- common: contains common files used between all of the different algorithms
+- boids: this directory contains the lowest level boids algorithm
+- proposal: contains the proposal pdf for the dissertation
