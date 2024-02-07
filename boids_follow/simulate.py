@@ -13,11 +13,11 @@ file.close()
 numRobots = int(sys.argv[1])
 
 # Adding the VIP agent
-fileRead = fileRead + '\r\nvipbot\r\n(\r\nname "MyConvoyRobot"\r\n)'
+fileRead = fileRead + '\r\nvipbot\r\n(\r\nname "VipRobot"\r\n)'
 
 # Append some number of robots based on number to buffer string
 for i in range(numRobots):
-    fileRead = fileRead + '\r\ncustombot\r\n(\r\nname "MyConvoyRobot' + str(i+1) + '"\r\n)'
+    fileRead = fileRead + '\r\ncustombot\r\n(\r\nname "ConvoyRobot' + str(i+1) + '"\r\n)'
 
 # Write buffer string to file
 f = open("./world/generated.world", "w")
@@ -37,7 +37,7 @@ data[12] = "    VipRBT::VipRobot vip = VipRBT::VipRobot((ModelPosition *)world.G
 
 # Edit line 13 to add robot spawning lines
 for i in range(numRobots):
-    data[12] = data[12] + '    robots[' + str(i) + '] = ConvoyRobot((ModelPosition *)world.GetModel(argv[' + str(i + 2) + ']), Pose::Random(-12, 12, -12, 12));\r\n'
+    data[12] = data[12] + '    robots[' + str(i) + '] = ConvoyRobot((ModelPosition *)world.GetModel(argv[' + str(i + 3) + ']), Pose::Random(-12, 12, -12, 12));\r\n'
 
 # Write new file structure to main
 with open('main.cpp', 'w', encoding='utf-8') as mainFile:
@@ -55,9 +55,9 @@ with open('run_template.sh','r',encoding='utf-8') as mainFile:
     data = mainFile.readlines()
 
 # Edit line 13 to add robot spawning lines
-buffer = './main ./world/generated.world'
+buffer = './main ./world/generated.world VipRobot'
 for i in range(numRobots):
-    buffer = buffer + ' ' + 'MyConvoyRobot' + str(i + 1)
+    buffer = buffer + ' ' + 'ConvoyRobot' + str(i + 1)
 data[5] = buffer
 
 # Write the new shell script

@@ -7,6 +7,8 @@ using namespace Stg;
 namespace VipRBT {
     class VipRobot {  
     public:
+        ModelPosition *pos;
+
         VipRobot();
         VipRobot(ModelPosition *modelPos, Pose pose);
         static int PositionUpdate(Model *, VipRobot *robot);
