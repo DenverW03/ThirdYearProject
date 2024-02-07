@@ -12,7 +12,7 @@ SimpleRobot::SimpleRobot(){
 };
 
 // Constructor for the class with appropriate setup
-SimpleRobot::SimpleRobot(ModelPosition *modelPos, Pose pose, SimpleRobot *robots, int numRobots) {
+SimpleRobot::SimpleRobot(ModelPosition *modelPos, Pose pose) {
     this->pos = nullptr;
 
     // Setting the space for the camera array using C++ convention rather than malloc
@@ -24,9 +24,6 @@ SimpleRobot::SimpleRobot(ModelPosition *modelPos, Pose pose, SimpleRobot *robots
     std::uniform_real_distribution<double> distribution(-3.0, 3.0);
     this->xVel = distribution(generator); // Generate random initial speed from -3 - 3
     this->yVel = distribution(generator); // Even though this bot is non holonomic, treat as holonomic until running bounding algorithm
-    
-    this->robots = robots; // Holds all the robots in an array
-    this->numRobots = numRobots; // Holds the number of robots
 
     // Initialising the boid data values to zero
     this->boidData.closeDx = 0;

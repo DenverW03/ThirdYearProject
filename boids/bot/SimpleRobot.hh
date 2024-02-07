@@ -61,8 +61,6 @@ namespace SimpleRBT {
         ModelBlobfinder **cameras;
         double xVel;
         double yVel;
-        SimpleRobot* robots;
-        int numRobots;
         BoidData boidData;
 
         // Angles of the cameras places on the bot
@@ -72,7 +70,7 @@ namespace SimpleRBT {
         // Function declarations
 
         SimpleRobot();
-        SimpleRobot(ModelPosition *modelPos, Pose pose, SimpleRobot *robots, int numRobots);
+        SimpleRobot(ModelPosition *modelPos, Pose pose);
         static int SensorUpdate(Model *, SensorInputData *data);
         static int PositionUpdate(Model *, SimpleRobot *robot);
         static std::pair<double, double> CalculatePosition(double a, Pose pose, double distance);
