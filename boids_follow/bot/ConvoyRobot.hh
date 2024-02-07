@@ -62,8 +62,6 @@ namespace ConvoyRBT {
         ModelBlobfinder **cameras;
         double xVel;
         double yVel;
-        ConvoyRobot* robots;
-        int numRobots;
         BoidData boidData;
 
         // Angles of the cameras places on the bot
@@ -73,7 +71,7 @@ namespace ConvoyRBT {
         // Function declarations
 
         ConvoyRobot();
-        ConvoyRobot(ModelPosition *modelPos, Pose pose, ConvoyRobot *robots, int numRobots);
+        ConvoyRobot(ModelPosition *modelPos, Pose pose);
         static int SensorUpdate(Model *, SensorInputData *data);
         static int PositionUpdate(Model *, ConvoyRobot *robot);
         static std::pair<double, double> CalculatePosition(double a, Pose pose, double distance);
