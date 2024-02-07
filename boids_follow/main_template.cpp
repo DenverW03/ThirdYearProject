@@ -1,9 +1,9 @@
 #include <stage.hh>
 #include "./bot/ConvoyRobot.hh"
+#include "../common/bot/VipRobot.hh"
 using namespace Stg;
 using namespace ConvoyRBT;
 
-ConvoyRobot *robots = (ConvoyRobot *) malloc(10 * sizeof(ConvoyRobot)); // Array length 10 to hold some robots during testing
 
 int main(int argc, char* argv[]) {
     Init(&argc, &argv); // Initialising the stage library
