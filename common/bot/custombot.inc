@@ -53,19 +53,14 @@ define custombot_base position
 
     localization "gps"         	  
     localization_origin [0 0 0 0]
-
-    # [ xmin xmax ymin ymax zmin zmax amin amax ]				
-    # velocity_bounds [-0.5 0.5 0 0 0 0 -90.0 90.0]
-    # acceleration_bounds [-0.5 0.5 0 0 0 0 -90.0 90.0]
 )
 
 # Base without sonar
 define custombot_base_no_sonar custombot_base
 (
     # actual size
-    size [0.44 0.38 0.22] # sizes from MobileRobots' web site
+    size [0.44 0.38 0.22]
 
-    # the pioneer's center of rotation is offset from its center of area
     origin [-0.04 0 0 0]
 
     # draw a nose on the robot so we can see which way it points
@@ -73,6 +68,7 @@ define custombot_base_no_sonar custombot_base
 
     # estimated mass in KG
     mass 10.0 
+
     # differential steering model
     drive "diff"
  )
@@ -80,11 +76,6 @@ define custombot_base_no_sonar custombot_base
 # Base with sonar
 define custombot_base_final custombot_base_no_sonar
 (
-    # use the sonar array defined above with a small vertical offset to
-    # drop the sensors into the robot body
-
-    # sonar_array(pose [0 0 -0.03 0]) NO LONGER USED
-
     # The camera array
     OV7670(pose [0 0 0 0])
     OV7670(pose [0 0 0 22.5])

@@ -21,6 +21,7 @@ namespace ConvoyRBT {
     // Some definitions for colors
     #define black 0x000000ff
     #define blue 0x0000ffff
+    #define red 0xff0000ff
 
     // The number of cameras used up to 16 for current model, vary number for testing
     #define camCount 16
