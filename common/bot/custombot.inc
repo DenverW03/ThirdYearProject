@@ -19,8 +19,8 @@ define OV7670 blobfinder
     pan 0.0
 
     # The colors that the blobfinder can detect
-    colors_count 2
-    colors ["black" "blue"]
+    colors_count 3
+    colors ["black" "blue" "red"]
     
     # The camera resolution, 1/10th true scale for optimization
     image [64 48]

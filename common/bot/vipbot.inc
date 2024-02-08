@@ -25,7 +25,7 @@ define vipbot_base_final vipbot_base
 
     gui_nose 1
 
-    mass 10.0 
+    mass 20.0 
 
     drive "diff"
 )

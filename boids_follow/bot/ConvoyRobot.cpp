@@ -76,14 +76,14 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
         int b = blob.color.b * 255;
         int a = blob.color.a * 255;
 
-        int full = (r << 24) | (g << 16) | (b << 8) | a;
+        unsigned int full = (r << 24) | (g << 16) | (b << 8) | a; // unsigned to hold full 32 bit colour
 
         double distance = blob.range;
 
         // Case for handling obstacles and case for handling other bots
         switch(full) {
-            case black: {
-                // // Need distance to fall equal to or lower than the obstacle avoidance distance
+            case black: { // OBSTACLES
+                // Need distance to fall equal to or lower than the obstacle avoidance distance
                 if (distance > avoidObstructionDistance) break;
 
                 // Add this blob to the close stacks
@@ -93,7 +93,7 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
                 robot->boidData.closeDyObs -= pose.y - position.second;
                 break;
             }
-            case blue: {
+            case blue: { // OTHER CONVOY BOTS
                 // Guard clause to avoid wasting compute
                 if(distance > visionRange) break;
                 
@@ -111,7 +111,7 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
 
                 // If the distance is within the vision range of the robot but outside avoidance range
                 if(distance <= visionRange) {
-                    // // Alignment
+                    // Alignment
                     // averageXVel += robot->robots[i].xVel;
                     // averageYVel += robot->robots[i].yVel;
 
@@ -121,12 +121,31 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
                     robot->boidData.averageXPos += position.first;
                     robot->boidData.averageYPos += position.second;
                 }
+                break;
+            }
+            case red: { // THE VIPs
+                // For red VIP going to have the same vision range as for fellow convoy bots
+                if(distance > visionRange) break;
+
+                Pose pose = robot->GetPose();
+                auto position = CalculatePosition(robot->angles[data->num], pose, distance);
+
+                if(distance <= vipMinDistance) {
+                    robot->boidData.closeDxObs -= pose.x - position.first;
+                    robot->boidData.closeDyObs -= pose.y - position.second;
+                }
+
+                else if(distance <= vipMaxDistance) {
+                    robot->boidData.closeDxObs += pose.x - position.first;
+                    robot->boidData.closeDyObs += pose.y - position.second;
+                    // robot->boidData.averageXPos += position.first * vipCohesionMultiplier;
+                    // robot->boidData.averageYPos += position.second * vipCohesionMultiplier;
+                }
 
                 break;
             }
         }
     }
-
     return 0;
 }
 
