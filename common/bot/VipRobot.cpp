@@ -21,18 +21,25 @@ VipRobot::VipRobot(ModelPosition *modelPos, Pose pose) {
 
     this->pos->SetPose(pose);
 
+    this->pos->GoTo(Pose(8, 8, 0, 0));
 }
 
-// // Sensor update callback
-// int VipRobot::SensorUpdate(Model *, VipRobot* robot) {
-
-//     return 0;
-// }
-
-// Position update function for stage (necessary for the bot to actually move)
+// Position update callback
 int VipRobot::PositionUpdate(Model *, VipRobot* robot) {
+    Pose pose = robot->pos->GetPose();
 
-    robot->pos->GoTo(Pose(8, 8, 0, 0));
+    if(round(pose.x) == -8 && round(pose.y) == 8) {
+        robot->pos->GoTo(Pose(8, 8, 0, 0));
+    }
+    else if(round(pose.x) == 8 && round(pose.y) == 8) {
+        robot->pos->GoTo(Pose(8, -8, 0, 0));
+    }
+    if(round(pose.x) == 8 && round(pose.y) == -8) {
+        robot->pos->GoTo(Pose(-8, -8, 0, 0));
+    }
+    if(round(pose.x) == -8 && round(pose.y) == -8) {
+        robot->pos->GoTo(Pose(-8, 8, 0, 0));
+    }
 
     return 0;
 }
