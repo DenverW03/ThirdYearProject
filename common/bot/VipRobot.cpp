@@ -17,6 +17,7 @@ VipRobot::VipRobot(ModelPosition *modelPos, Pose pose) {
     // Adding the bot to the world
     this->pos = modelPos;
     this->pos->AddCallback(Model::CB_UPDATE, model_callback_t(PositionUpdate), this);
+    this->pos->Subscribe();
 
     this->pos->SetPose(pose);
 

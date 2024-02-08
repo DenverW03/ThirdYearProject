@@ -17,9 +17,9 @@ define vipbot_base position
 )
 
 # Physical attributes
-define vipbot_base_final custombot_base
+define vipbot_base_final vipbot_base
 (
-    size [0.44 0.38 0.22]
+    size [0.88 0.76 0.22]
 
     origin [-0.04 0 0 0]
 
@@ -31,7 +31,7 @@ define vipbot_base_final custombot_base
 )
 
 # Final model, defines shape
-define vipbot custombot_base_final
+define vipbot vipbot_base_final
 (
     block
     (
