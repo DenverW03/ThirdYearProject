@@ -124,6 +124,9 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
                 break;
             }
             case red: { // THE VIPs
+
+                /* ONCE THIS HAS ALIGNMENT, IT SHOULD BE PRETTY GOOD FOR STAYING COHERENT AROUND VIP */
+
                 // For red VIP going to have the same vision range as for fellow convoy bots
                 if(distance > visionRange) break;
 
