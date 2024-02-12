@@ -15,6 +15,8 @@ ConvoyRobot::ConvoyRobot(){
 ConvoyRobot::ConvoyRobot(ModelPosition *modelPos, Pose pose) {
     this->pos = nullptr;
 
+    this->stack = (struct VipVelocityNode*)malloc(sizeof(struct VipVelocityNode));
+
     // Setting the space for the camera array using C++ convention rather than malloc
     this->cameras = new ModelBlobfinder * [camCount];
     
@@ -137,12 +139,7 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
 
                 // Alignment
 
-                if(robot->vipVector.empty()) {
-                    robot->vipVector.push_back(position);
-                }
-                else if(robot->vipVector.size() == 1) {
-                    robot->vipVector.push_back(position);
-                }
+                push(position.first, position.second, robot);
 
                 // Min distance to VIP
                 if(distance <= vipMinDistance) {
@@ -207,9 +204,9 @@ std::pair<double, double> ConvoyRobot::CalculatePosition(double a, Pose pose, do
 // Position update function for stage (necessary for the bot to actually move)
 int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
     // Alignment with VIP
-    if(robot->vipVector.size() == 2) {
-        double dx = robot->vipVector[1].first - robot->vipVector[0].first;
-        double dy = robot->vipVector[1].second - robot->vipVector[0].second;
+    if (robot->stack->second != nullptr){
+        double dx = robot->stack->xvel - robot->stack->second->yvel;
+        double dy = robot->stack->yvel - robot->stack->second->yvel;
 
         robot->xVel += dx * vipAlignmentMultiplier;
         robot->yVel += dy * vipAlignmentMultiplier;
@@ -271,9 +268,6 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
     robot->boidData.averageYVel = 0;
     robot->boidData.numNeighbours = 0;
 
-    robot->vipVector.clear();
-
-
     // Setting stored velocity to the real velocity so it doesn't grow too large in magnitude
     robot->xVel = vels2.xvel;
     robot->yVel = vels2.yvel;
@@ -331,6 +325,30 @@ double ConvoyRobot::CalculateDistance(Pose pose, ConvoyRobot *robot) {
 
     double distance = sqrt(abs((xDiff * xDiff) + (yDiff * yDiff)));
     return distance;
+}
+
+// Push function to push to the stack and handle keeping only 2 data structures present
+void ConvoyRobot::push(double xvel, double yvel, ConvoyRobot *robot) {
+    // Removing the reference from the head to make head into second
+    robot->stack->second = nullptr;
+
+    // Creating the new head
+    struct VipVelocityNode* newhead = newNode(xvel, yvel);
+
+    // Setting old head as second to new head
+    newhead->second = robot->stack;
+
+    // Setting class reference to equal to newhead
+    robot->stack = newhead;
+}
+
+// Created a new node for the stack with the given velocity data
+struct ConvoyRobot::VipVelocityNode* ConvoyRobot::newNode(double xvel, double yvel) {
+    struct VipVelocityNode* newNode = (struct VipVelocityNode*)malloc(sizeof(struct VipVelocityNode));
+    newNode->xvel = xvel;
+    newNode->yvel = yvel;
+    newNode->second = nullptr;
+    return newNode;
 }
 
 // Getter method to return the pose of the positional model

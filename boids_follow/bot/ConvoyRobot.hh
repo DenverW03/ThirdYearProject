@@ -9,10 +9,9 @@ namespace ConvoyRBT {
 
     // Some class parameter definitions
     #define visionRange 8
-    #define cohesionFactor 0.005
+    #define cohesionFactor 0.0005
     #define avoidanceDistance 2
     #define avoidanceFactor 0.1
-    #define alignmentFactor 0.05
 
     // Obstruction avoidance parameters, the distance is the same as the range for the sonar
     #define avoidObstructionDistance 3
@@ -23,7 +22,7 @@ namespace ConvoyRBT {
     #define vipMaxDistance 6
     #define vipCohesionMultiplier 0.005
     #define vipSeparationMultiplier 0.1
-    #define vipAlignmentMultiplier 0.05
+    #define vipAlignmentMultiplier 0.01
 
     // Some definitions for colors
     #define black 0x000000ff
@@ -56,12 +55,20 @@ namespace ConvoyRBT {
         double closeDy;
         double closeDxObs;
         double closeDyObs;
+        double closeDxVip;
+        double closeDyVip;
         double averageXPos;
         double averageYPos;
         double averageXVel;
         double averageYVel;
         int numNeighbours;
     } BoidData;
+
+    struct VipVelocityNode {
+        double xvel;
+        double yvel;
+        struct VipVelocityNode *second;
+    };
     
     public:
 
@@ -72,7 +79,7 @@ namespace ConvoyRBT {
         double xVel;
         double yVel;
         BoidData boidData;
-        std::vector<std::pair<double,double>> vipVector;
+        struct VipVelocityNode *stack;
 
         // Angles of the cameras places on the bot
 
@@ -86,6 +93,8 @@ namespace ConvoyRBT {
         static int PositionUpdate(Model *, ConvoyRobot *robot);
         static std::pair<double, double> CalculatePosition(double a, Pose pose, double distance);
         static double CalculateDistance(Pose pose, ConvoyRobot *robot);
+        static void push(double xvel, double yvel, ConvoyRobot *robot);
+        static struct VipVelocityNode* newNode(double xvel, double yvel);
         static HVelocities CalculateHolonomic(double xvel, double turnvel, ConvoyRobot *robot);
         static NHVelocities CalculateNonHolonomic(double xvel, double yvel, ConvoyRobot *robot);
         Pose GetPose();
