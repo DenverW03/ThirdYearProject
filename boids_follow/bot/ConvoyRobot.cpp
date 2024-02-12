@@ -84,6 +84,10 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
 
         double distance = blob.range;
 
+        // Using these varibales so that when sight of VIP lost velocity is not still affected
+        double vipEffectX = 0;
+        double vipEffectY = 0;
+
         // Case for handling obstacles and case for handling other bots
         switch(full) {
             case black: { // OBSTACLES
@@ -137,40 +141,41 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
                 Pose pose = robot->GetPose();
                 auto position = CalculatePosition(robot->angles[data->num], pose, distance);
 
-                // Alignment
-
-                push(position.first, position.second, robot);
+                // Alignment, updating the vip Velocities
+                vipEffectX = position.first;
+                vipEffectY = position.second;
 
                 // Min distance to VIP
-                if(distance <= vipMinDistance) {
-                    robot->boidData.closeDx += (pose.x - position.first) * vipSeparationMultiplier;
-                    robot->boidData.closeDy += (pose.y - position.second) * vipSeparationMultiplier;
-                }
+                // if(distance <= vipMinDistance) {
+                //     robot->boidData.closeDx += (pose.x - position.first) * vipSeparationMultiplier;
+                //     robot->boidData.closeDy += (pose.y - position.second) * vipSeparationMultiplier;
+                // }
 
-                // Max distance from VIP
-                if(distance <= vipMaxDistance) {
-                    // robot->boidData.closeDx += pose.x - position.first;
-                    // robot->boidData.closeDy += pose.y - position.second;
+                // // Max distance from VIP
+                // if(distance <= vipMaxDistance) {
+                //     // robot->boidData.closeDx += pose.x - position.first;
+                //     // robot->boidData.closeDy += pose.y - position.second;
 
-                    robot->boidData.numNeighbours += (1 * vipCohesionMultiplier);
+                //     robot->boidData.numNeighbours += (1 * vipCohesionMultiplier);
 
-                    robot->boidData.averageXPos += position.first * vipCohesionMultiplier;
-                    robot->boidData.averageYPos += position.second * vipCohesionMultiplier;
+                //     robot->boidData.averageXPos += position.first * vipCohesionMultiplier;
+                //     robot->boidData.averageYPos += position.second * vipCohesionMultiplier;
 
 
-                }
+                // }
                 
-                // Trying to keep the convoy in bounds
-                if(distance > vipMaxDistance) {
+                // // Trying to keep the convoy in bounds
+                // if(distance > vipMaxDistance) {
 
-                    robot->boidData.closeDx -= (pose.x - position.first) * vipCohesionMultiplier;
-                    robot->boidData.closeDy -= (pose.y - position.second) * vipCohesionMultiplier;
+                //     robot->boidData.closeDx -= (pose.x - position.first) * vipCohesionMultiplier;
+                //     robot->boidData.closeDy -= (pose.y - position.second) * vipCohesionMultiplier;
 
-                }
+                // }
 
                 break;
             }
         }
+        push(vipEffectX, vipEffectY, robot);
     }
     return 0;
 }
