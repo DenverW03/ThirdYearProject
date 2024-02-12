@@ -21,7 +21,7 @@ namespace ConvoyRBT {
     #define vipMinDistance 3
     #define vipMaxDistance 6
     #define vipCohesionMultiplier 0.005
-    #define vipSeparationMultiplier 0.1
+    #define vipSeparationMultiplier 0.5
     #define vipAlignmentMultiplier 0.01
 
     // Some definitions for colors

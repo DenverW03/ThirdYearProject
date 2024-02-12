@@ -32,6 +32,8 @@ ConvoyRobot::ConvoyRobot(ModelPosition *modelPos, Pose pose) {
     this->boidData.closeDy = 0;
     this->boidData.closeDxObs = 0;
     this->boidData.closeDyObs = 0;
+    this->boidData.closeDxVip = 0;
+    this->boidData.closeDyVip = 0;
     this->boidData.averageXPos = 0;
     this->boidData.averageYPos = 0;
     this->boidData.averageXVel = 0;
@@ -145,31 +147,36 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
                 vipEffectX = position.first;
                 vipEffectY = position.second;
 
+                if(distance < vipMinDistance) {
+                    robot->boidData.closeDxVip -= pose.x - position.first;
+                    robot->boidData.closeDxVip -= pose.y - position.second;
+                }
+
                 // Min distance to VIP
                 // if(distance <= vipMinDistance) {
                 //     robot->boidData.closeDx += (pose.x - position.first) * vipSeparationMultiplier;
                 //     robot->boidData.closeDy += (pose.y - position.second) * vipSeparationMultiplier;
                 // }
-
+                //
                 // // Max distance from VIP
                 // if(distance <= vipMaxDistance) {
                 //     // robot->boidData.closeDx += pose.x - position.first;
                 //     // robot->boidData.closeDy += pose.y - position.second;
-
+                //
                 //     robot->boidData.numNeighbours += (1 * vipCohesionMultiplier);
-
+                //
                 //     robot->boidData.averageXPos += position.first * vipCohesionMultiplier;
                 //     robot->boidData.averageYPos += position.second * vipCohesionMultiplier;
-
-
+                //
+                //
                 // }
-                
+                //
                 // // Trying to keep the convoy in bounds
                 // if(distance > vipMaxDistance) {
-
+                //
                 //     robot->boidData.closeDx -= (pose.x - position.first) * vipCohesionMultiplier;
                 //     robot->boidData.closeDy -= (pose.y - position.second) * vipCohesionMultiplier;
-
+                //
                 // }
 
                 break;
@@ -209,13 +216,13 @@ std::pair<double, double> ConvoyRobot::CalculatePosition(double a, Pose pose, do
 // Position update function for stage (necessary for the bot to actually move)
 int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
     // Alignment with VIP
-    if (robot->stack->second != nullptr){
-        double dx = robot->stack->xvel - robot->stack->second->yvel;
-        double dy = robot->stack->yvel - robot->stack->second->yvel;
+    // if (robot->stack->second != nullptr){
+    //     double dx = robot->stack->xvel - robot->stack->second->yvel;
+    //     double dy = robot->stack->yvel - robot->stack->second->yvel;
 
-        robot->xVel += dx * vipAlignmentMultiplier;
-        robot->yVel += dy * vipAlignmentMultiplier;
-    }
+    //     robot->xVel += dx * vipAlignmentMultiplier;
+    //     robot->yVel += dy * vipAlignmentMultiplier;
+    // }
 
     // For other bots
     robot->xVel += robot->boidData.closeDx * avoidanceFactor;
@@ -224,6 +231,11 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
     // For obstacles
     robot->xVel -= robot->boidData.closeDxObs * avoidObstructionFactor;
     robot->yVel -= robot->boidData.closeDyObs * avoidObstructionFactor;
+
+    // For the VIP
+
+    robot->xVel -= robot->boidData.closeDxVip * vipSeparationMultiplier;
+    robot->yVel -= robot->boidData.closeDyVip * vipSeparationMultiplier;
 
     // Cohesion and Alignment
 
@@ -267,6 +279,8 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
     robot->boidData.closeDy = 0;
     robot->boidData.closeDxObs = 0;
     robot->boidData.closeDyObs = 0;
+    robot->boidData.closeDxVip = 0;
+    robot->boidData.closeDyVip = 0;
     robot->boidData.averageXPos = 0;
     robot->boidData.averageYPos = 0;
     robot->boidData.averageXVel = 0;
