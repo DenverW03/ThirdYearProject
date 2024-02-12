@@ -32,6 +32,8 @@ ConvoyRobot::ConvoyRobot(ModelPosition *modelPos, Pose pose) {
     this->boidData.closeDyObs = 0;
     this->boidData.averageXPos = 0;
     this->boidData.averageYPos = 0;
+    this->boidData.averageXVel = 0;
+    this->boidData.averageYVel = 0;
     this->boidData.numNeighbours = 0;
 
     // Setting up positional model and callbacks
@@ -48,7 +50,7 @@ ConvoyRobot::ConvoyRobot(ModelPosition *modelPos, Pose pose) {
         data->num = i;
         void* dataPtr = static_cast<void*>(data);
 
-        this->cameras[i]->AddCallback(Model::CB_UPDATE, model_callback_t(SensorUpdate), dataPtr); // SHOULD ADD EXTRA PARAM FOR INDEX camera[i] for example
+        this->cameras[i]->AddCallback(Model::CB_UPDATE, model_callback_t(SensorUpdate), dataPtr);
         this->cameras[i]->Subscribe();
     }
     
@@ -105,8 +107,8 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
 
                 // Separation (prior guard clause already confirmed bot to be within avoidance distance)
                 if(distance <= avoidanceDistance) {
-                    robot->boidData.closeDx += robot->GetPose().x - position.first;
-                    robot->boidData.closeDy += robot->GetPose().y - position.second;
+                    robot->boidData.closeDx += pose.x - position.first;
+                    robot->boidData.closeDy += pose.y - position.second;
                 }
 
                 // If the distance is within the vision range of the robot but outside avoidance range
@@ -133,16 +135,40 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
                 Pose pose = robot->GetPose();
                 auto position = CalculatePosition(robot->angles[data->num], pose, distance);
 
-                if(distance <= vipMinDistance) {
-                    robot->boidData.closeDxObs -= pose.x - position.first;
-                    robot->boidData.closeDyObs -= pose.y - position.second;
+                // Alignment
+
+                if(robot->vipVector.empty()) {
+                    robot->vipVector.push_back(position);
+                }
+                else if(robot->vipVector.size() == 1) {
+                    robot->vipVector.push_back(position);
                 }
 
-                else if(distance <= vipMaxDistance) {
-                    robot->boidData.closeDxObs += pose.x - position.first;
-                    robot->boidData.closeDyObs += pose.y - position.second;
-                    // robot->boidData.averageXPos += position.first * vipCohesionMultiplier;
-                    // robot->boidData.averageYPos += position.second * vipCohesionMultiplier;
+                // Min distance to VIP
+                if(distance <= vipMinDistance) {
+                    robot->boidData.closeDx += (pose.x - position.first) * vipSeparationMultiplier;
+                    robot->boidData.closeDy += (pose.y - position.second) * vipSeparationMultiplier;
+                }
+
+                // Max distance from VIP
+                if(distance <= vipMaxDistance) {
+                    // robot->boidData.closeDx += pose.x - position.first;
+                    // robot->boidData.closeDy += pose.y - position.second;
+
+                    robot->boidData.numNeighbours += (1 * vipCohesionMultiplier);
+
+                    robot->boidData.averageXPos += position.first * vipCohesionMultiplier;
+                    robot->boidData.averageYPos += position.second * vipCohesionMultiplier;
+
+
+                }
+                
+                // Trying to keep the convoy in bounds
+                if(distance > vipMaxDistance) {
+
+                    robot->boidData.closeDx -= (pose.x - position.first) * vipCohesionMultiplier;
+                    robot->boidData.closeDy -= (pose.y - position.second) * vipCohesionMultiplier;
+
                 }
 
                 break;
@@ -180,7 +206,14 @@ std::pair<double, double> ConvoyRobot::CalculatePosition(double a, Pose pose, do
 
 // Position update function for stage (necessary for the bot to actually move)
 int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
-    // Avoidance
+    // Alignment with VIP
+    if(robot->vipVector.size() == 2) {
+        double dx = robot->vipVector[1].first - robot->vipVector[0].first;
+        double dy = robot->vipVector[1].second - robot->vipVector[0].second;
+
+        robot->xVel += dx * vipAlignmentMultiplier;
+        robot->yVel += dy * vipAlignmentMultiplier;
+    }
 
     // For other bots
     robot->xVel += robot->boidData.closeDx * avoidanceFactor;
@@ -234,7 +267,11 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
     robot->boidData.closeDyObs = 0;
     robot->boidData.averageXPos = 0;
     robot->boidData.averageYPos = 0;
+    robot->boidData.averageXVel = 0;
+    robot->boidData.averageYVel = 0;
     robot->boidData.numNeighbours = 0;
+
+    robot->vipVector.clear();
 
 
     // Setting stored velocity to the real velocity so it doesn't grow too large in magnitude

@@ -20,8 +20,10 @@ namespace ConvoyRBT {
 
     // VIP spacing parameters
     #define vipMinDistance 3
-    #define vipMaxDistance 5
-    #define vipCohesionMultiplier 30
+    #define vipMaxDistance 6
+    #define vipCohesionMultiplier 0.005
+    #define vipSeparationMultiplier 0.1
+    #define vipAlignmentMultiplier 0.05
 
     // Some definitions for colors
     #define black 0x000000ff
@@ -56,6 +58,8 @@ namespace ConvoyRBT {
         double closeDyObs;
         double averageXPos;
         double averageYPos;
+        double averageXVel;
+        double averageYVel;
         int numNeighbours;
     } BoidData;
     
@@ -68,6 +72,7 @@ namespace ConvoyRBT {
         double xVel;
         double yVel;
         BoidData boidData;
+        std::vector<std::pair<double,double>> vipVector;
 
         // Angles of the cameras places on the bot
 
