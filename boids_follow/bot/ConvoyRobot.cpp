@@ -147,10 +147,18 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
                 vipEffectX = position.first;
                 vipEffectY = position.second;
 
-                if(distance < vipMinDistance) {
+                if(distance <= vipMinDistance) {
                     robot->boidData.closeDxVip -= pose.x - position.first;
                     robot->boidData.closeDxVip -= pose.y - position.second;
                 }
+                else if(distance <= vipMaxDistance) {
+                    robot->boidData.averageXPos += position.first * vipCohesionMultiplier;
+                    robot->boidData.averageYPos += position.second * vipCohesionMultiplier;
+                }
+                // if(distance > vipMaxDistance) {
+                //     robot->boidData.averageXPos += position.first * vipCohesionMultiplier * 10;
+                //     robot->boidData.averageYPos += position.second * vipCohesionMultiplier * 10;
+                // }
 
                 // Min distance to VIP
                 // if(distance <= vipMinDistance) {
@@ -215,6 +223,14 @@ std::pair<double, double> ConvoyRobot::CalculatePosition(double a, Pose pose, do
 
 // Position update function for stage (necessary for the bot to actually move)
 int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
+    // Check for stalling (not working)
+
+    // if(robot->pos->Stalled()) {
+    //     printf("Stalled");
+    //     robot->pos->GoTo(Pose(0, 0, 0, 0));
+    //     return 0;
+    // }
+
     // Alignment with VIP
     // if (robot->stack->second != nullptr){
     //     double dx = robot->stack->xvel - robot->stack->second->yvel;
@@ -233,7 +249,6 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
     robot->yVel -= robot->boidData.closeDyObs * avoidObstructionFactor;
 
     // For the VIP
-
     robot->xVel -= robot->boidData.closeDxVip * vipSeparationMultiplier;
     robot->yVel -= robot->boidData.closeDyVip * vipSeparationMultiplier;
 
