@@ -147,6 +147,11 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
                 vipEffectX = position.first;
                 vipEffectY = position.second;
 
+                // Separation from VIP
+                if(distance <= vipMinDistance) {
+                    robot->boidData.closeDx += pose.x - position.first;
+                    robot->boidData.closeDy += pose.y - position.second;
+                }
                 break;
             }
         }
@@ -197,47 +202,35 @@ std::vector<std::pair<double, double>> ConvoyRobot::GeneratePoints(Pose pose, do
         points.push_back(std::make_pair(x, y));
     }
 
-    return points
+    return points;
 }
 
 // Position update function for stage (necessary for the bot to actually move)
 int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
-    // Check for stalling (not working)
-
-    // if(robot->pos->Stalled()) {
-    //     printf("Stalled");
-    //     robot->pos->GoTo(Pose(0, 0, 0, 0));
-    //     return 0;
-    // }
-
-    // Alignment with VIP
-    // if (robot->stack->second != nullptr){
-    //     double dx = robot->stack->xvel - robot->stack->second->xvel;
-    //     double dy = robot->stack->yvel - robot->stack->second->yvel;
-
-    //     robot->xVel += (dx - robot->xVel) * vipAlignmentMultiplier;
-    //     robot->yVel += (dy - robot->yVel) * vipAlignmentMultiplier;
-    // }
-
-
     // Cohesion for staying as close to "the circle" as possible
     // The circle is a concept of a "belt" around the VIP, much like a planet
     // This belt has a large weighting for attraction towards it
 
     // Getting the last recorded robot positions
-    double lastx = robot->stack->xvel;
-    double lasty = robot->stack->yvel;
+    double lastx = robot->stack->xpos;
+    double lasty = robot->stack->ypos;
 
     // Generating a vector of the points
     std::vector<std::pair<double, double>> vecPoint = GeneratePoints(Pose(lastx, lasty, 0, 0), vipCircleRadius);
 
+    // Initialising closest points pair to ridiculously large size so first pair will always be closer
     std::pair<double, double> closest = std::make_pair(10000, 10000);
+
     // Looping through the points to find the closest one
     for(std::pair<double, double> points : vecPoint) {
-        if(CalculateDistance(Pose(points.first, points.second), robot) < CalculateDistance(Pose(closest.first, closest.second), robot)) closest = points;
-        
+        Pose pose1 = Pose(points.first, points.second, 0, 0);
+        Pose pose2 = Pose(closest.first, closest.second, 0, 0);
+        if(CalculateDistance(pose1, robot) < CalculateDistance(pose2, robot)) closest = points;
     }
 
+    // Add the position as a large weight
+    robot->boidData.averageXPos += closest.first * vipCohesionMultiplier;
+    robot->boidData.averageYPos += closest.second * vipCohesionMultiplier;
 
     // For other bots
     robot->xVel += robot->boidData.closeDx * avoidanceFactor;
@@ -247,9 +240,9 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
     robot->xVel -= robot->boidData.closeDxObs * avoidObstructionFactor;
     robot->yVel -= robot->boidData.closeDyObs * avoidObstructionFactor;
 
-    // // For the VIP
-    // robot->xVel -= robot->boidData.closeDxVip * vipSeparationMultiplier;
-    // robot->yVel -= robot->boidData.closeDyVip * vipSeparationMultiplier;
+    // For the VIP
+    robot->xVel -= robot->boidData.closeDxVip * vipSeparationMultiplier;
+    robot->yVel -= robot->boidData.closeDyVip * vipSeparationMultiplier;
 
 
     // Cohesion and Alignment BETWEEN CONVOT BOTS
@@ -369,10 +362,10 @@ void ConvoyRobot::push(double xvel, double yvel, ConvoyRobot *robot) {
 }
 
 // Created a new node for the stack with the given velocity data
-struct ConvoyRobot::VipVelocityNode* ConvoyRobot::newNode(double xvel, double yvel) {
+struct ConvoyRobot::VipVelocityNode* ConvoyRobot::newNode(double xpos, double ypos) {
     struct VipVelocityNode* newNode = (struct VipVelocityNode*)malloc(sizeof(struct VipVelocityNode));
-    newNode->xvel = xvel;
-    newNode->yvel = yvel;
+    newNode->xpos = xpos;
+    newNode->ypos = ypos;
     newNode->second = nullptr;
     return newNode;
 }

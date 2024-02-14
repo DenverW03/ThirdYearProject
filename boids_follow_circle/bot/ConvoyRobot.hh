@@ -20,7 +20,7 @@ namespace ConvoyRBT {
     // VIP spacing parameters
     #define vipMinDistance 3
     #define vipMaxDistance 6
-    #define vipCohesionMultiplier 0.1
+    #define vipCohesionMultiplier 10
     #define vipSeparationMultiplier 1
     #define vipAlignmentMultiplier 0.1
     #define vipCircleRadius 4
@@ -97,7 +97,7 @@ namespace ConvoyRBT {
         static double CalculateDistance(Pose pose, ConvoyRobot *robot);
         static std::vector<std::pair<double, double>> GeneratePoints(Pose pose, double radius);
         static void push(double xvel, double yvel, ConvoyRobot *robot);
-        static struct VipVelocityNode* newNode(double xvel, double yvel);
+        static struct VipVelocityNode* newNode(double xpos, double ypos);
         static HVelocities CalculateHolonomic(double xvel, double turnvel, ConvoyRobot *robot);
         static NHVelocities CalculateNonHolonomic(double xvel, double yvel, ConvoyRobot *robot);
         Pose GetPose();
