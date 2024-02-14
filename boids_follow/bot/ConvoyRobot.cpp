@@ -147,45 +147,29 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
                 vipEffectX = position.first;
                 vipEffectY = position.second;
 
+                // Min distance to VIP
                 if(distance <= vipMinDistance) {
-                    robot->boidData.closeDxVip -= pose.x - position.first;
-                    robot->boidData.closeDxVip -= pose.y - position.second;
+                    robot->boidData.closeDx += pose.x - position.first;
+                    robot->boidData.closeDy += pose.y - position.second;
                 }
-                else if(distance <= vipMaxDistance) {
+                
+                // Max distance from VIP
+                if(distance <= vipMaxDistance) {
+                    robot->boidData.numNeighbours += (1 * vipCohesionMultiplier);
+                
                     robot->boidData.averageXPos += position.first * vipCohesionMultiplier;
                     robot->boidData.averageYPos += position.second * vipCohesionMultiplier;
+                
+                
                 }
-                // if(distance > vipMaxDistance) {
-                //     robot->boidData.averageXPos += position.first * vipCohesionMultiplier * 10;
-                //     robot->boidData.averageYPos += position.second * vipCohesionMultiplier * 10;
-                // }
-
-                // Min distance to VIP
-                // if(distance <= vipMinDistance) {
-                //     robot->boidData.closeDx += (pose.x - position.first) * vipSeparationMultiplier;
-                //     robot->boidData.closeDy += (pose.y - position.second) * vipSeparationMultiplier;
-                // }
-                //
-                // // Max distance from VIP
-                // if(distance <= vipMaxDistance) {
-                //     // robot->boidData.closeDx += pose.x - position.first;
-                //     // robot->boidData.closeDy += pose.y - position.second;
-                //
-                //     robot->boidData.numNeighbours += (1 * vipCohesionMultiplier);
-                //
-                //     robot->boidData.averageXPos += position.first * vipCohesionMultiplier;
-                //     robot->boidData.averageYPos += position.second * vipCohesionMultiplier;
-                //
-                //
-                // }
-                //
-                // // Trying to keep the convoy in bounds
-                // if(distance > vipMaxDistance) {
-                //
-                //     robot->boidData.closeDx -= (pose.x - position.first) * vipCohesionMultiplier;
-                //     robot->boidData.closeDy -= (pose.y - position.second) * vipCohesionMultiplier;
-                //
-                // }
+                
+                // Trying to keep the convoy in bounds
+                if(distance > vipMaxDistance) {
+                
+                    robot->boidData.closeDx -= (pose.x - position.first) * vipCohesionMultiplier;
+                    robot->boidData.closeDy -= (pose.y - position.second) * vipCohesionMultiplier;
+                
+                }
 
                 break;
             }

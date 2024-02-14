@@ -11,7 +11,7 @@ namespace ConvoyRBT {
     #define visionRange 8
     #define cohesionFactor 0.005
     #define avoidanceDistance 2
-    #define avoidanceFactor 0.5
+    #define avoidanceFactor 0.1
 
     // Obstruction avoidance parameters, the distance is the same as the range for the sonar
     #define avoidObstructionDistance 3
@@ -21,7 +21,7 @@ namespace ConvoyRBT {
     #define vipMinDistance 3
     #define vipMaxDistance 6
     #define vipCohesionMultiplier 10
-    #define vipSeparationMultiplier 1
+    #define vipSeparationMultiplier 100
     #define vipAlignmentMultiplier 0.01
 
     // Some definitions for colors
