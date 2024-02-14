@@ -155,10 +155,10 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
                 
                 // Max distance from VIP
                 if(distance <= vipMaxDistance) {
-                    robot->boidData.numNeighbours += (1 * vipCohesionMultiplier);
+                    // robot->boidData.numNeighbours += (1 * vipCohesionMultiplier);
                 
-                    robot->boidData.averageXPos += position.first * vipCohesionMultiplier;
-                    robot->boidData.averageYPos += position.second * vipCohesionMultiplier;
+                    robot->boidData.averageXPos += position.first;
+                    robot->boidData.averageYPos += position.second;
                 
                 
                 }
@@ -166,8 +166,8 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
                 // Trying to keep the convoy in bounds
                 if(distance > vipMaxDistance) {
                 
-                    robot->boidData.closeDx -= (pose.x - position.first) * vipCohesionMultiplier;
-                    robot->boidData.closeDy -= (pose.y - position.second) * vipCohesionMultiplier;
+                    robot->boidData.closeDx -= (pose.x - position.first);
+                    robot->boidData.closeDy -= (pose.y - position.second);
                 
                 }
 
@@ -216,13 +216,13 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
     // }
 
     // Alignment with VIP
-    // if (robot->stack->second != nullptr){
-    //     double dx = robot->stack->xvel - robot->stack->second->yvel;
-    //     double dy = robot->stack->yvel - robot->stack->second->yvel;
+    if (robot->stack->second != nullptr){
+        double dx = robot->stack->xvel - robot->stack->second->xvel;
+        double dy = robot->stack->yvel - robot->stack->second->yvel;
 
-    //     robot->xVel += dx * vipAlignmentMultiplier;
-    //     robot->yVel += dy * vipAlignmentMultiplier;
-    // }
+        robot->xVel += (dx - robot->xVel) * vipAlignmentMultiplier;
+        robot->yVel += (dy - robot->yVel) * vipAlignmentMultiplier;
+    }
 
     // For other bots
     robot->xVel += robot->boidData.closeDx * avoidanceFactor;
