@@ -147,30 +147,6 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
                 vipEffectX = position.first;
                 vipEffectY = position.second;
 
-                // Min distance to VIP
-                if(distance <= vipMinDistance) {
-                    robot->boidData.closeDx += pose.x - position.first;
-                    robot->boidData.closeDy += pose.y - position.second;
-                }
-                
-                // Max distance from VIP
-                if(distance <= vipMaxDistance) {
-                    // robot->boidData.numNeighbours += (1 * vipCohesionMultiplier);
-                
-                    robot->boidData.averageXPos += position.first;
-                    robot->boidData.averageYPos += position.second;
-                
-                
-                }
-                
-                // Trying to keep the convoy in bounds
-                if(distance > vipMaxDistance) {
-                
-                    robot->boidData.closeDx -= (pose.x - position.first);
-                    robot->boidData.closeDy -= (pose.y - position.second);
-                
-                }
-
                 break;
             }
         }
@@ -205,6 +181,25 @@ std::pair<double, double> ConvoyRobot::CalculatePosition(double a, Pose pose, do
     return std::make_pair(xpos, ypos);
 }
 
+// Returns a vector of paired x,y points that are points on a circle of the radius around the position given as a pose
+std::vector<std::pair<double, double>> ConvoyRobot::GeneratePoints(Pose pose, double radius) {
+    std::vector<std::pair<double, double>> points;
+
+    // Generating the points and pushing them to the array
+    for(int i=0; i<vipCircleNumPoints; i++) {
+        // Determining the angle to generate the point at (radians)
+        double angle = ((2 * M_PI) / vipCircleNumPoints) * i;
+
+        // Using circle parametric equations
+        double x = pose.x + (radius * cos(angle));
+        double y = pose.y + (radius * sin(angle));
+
+        points.push_back(std::make_pair(x, y));
+    }
+
+    return points
+}
+
 // Position update function for stage (necessary for the bot to actually move)
 int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
     // Check for stalling (not working)
@@ -216,13 +211,33 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
     // }
 
     // Alignment with VIP
-    if (robot->stack->second != nullptr){
-        double dx = robot->stack->xvel - robot->stack->second->xvel;
-        double dy = robot->stack->yvel - robot->stack->second->yvel;
+    // if (robot->stack->second != nullptr){
+    //     double dx = robot->stack->xvel - robot->stack->second->xvel;
+    //     double dy = robot->stack->yvel - robot->stack->second->yvel;
 
-        robot->xVel += (dx - robot->xVel) * vipAlignmentMultiplier;
-        robot->yVel += (dy - robot->yVel) * vipAlignmentMultiplier;
+    //     robot->xVel += (dx - robot->xVel) * vipAlignmentMultiplier;
+    //     robot->yVel += (dy - robot->yVel) * vipAlignmentMultiplier;
+    // }
+
+
+    // Cohesion for staying as close to "the circle" as possible
+    // The circle is a concept of a "belt" around the VIP, much like a planet
+    // This belt has a large weighting for attraction towards it
+
+    // Getting the last recorded robot positions
+    double lastx = robot->stack->xvel;
+    double lasty = robot->stack->yvel;
+
+    // Generating a vector of the points
+    std::vector<std::pair<double, double>> vecPoint = GeneratePoints(Pose(lastx, lasty, 0, 0), vipCircleRadius);
+
+    std::pair<double, double> closest = std::make_pair(10000, 10000);
+    // Looping through the points to find the closest one
+    for(std::pair<double, double> points : vecPoint) {
+        if(CalculateDistance(Pose(points.first, points.second), robot) < CalculateDistance(Pose(closest.first, closest.second), robot)) closest = points;
+        
     }
+
 
     // For other bots
     robot->xVel += robot->boidData.closeDx * avoidanceFactor;
@@ -232,24 +247,17 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
     robot->xVel -= robot->boidData.closeDxObs * avoidObstructionFactor;
     robot->yVel -= robot->boidData.closeDyObs * avoidObstructionFactor;
 
-    // For the VIP
-    robot->xVel -= robot->boidData.closeDxVip * vipSeparationMultiplier;
-    robot->yVel -= robot->boidData.closeDyVip * vipSeparationMultiplier;
+    // // For the VIP
+    // robot->xVel -= robot->boidData.closeDxVip * vipSeparationMultiplier;
+    // robot->yVel -= robot->boidData.closeDyVip * vipSeparationMultiplier;
 
-    // Cohesion and Alignment
+
+    // Cohesion and Alignment BETWEEN CONVOT BOTS
 
     if(robot->boidData.numNeighbours > 0) {
-        // // Calculating the averages for velocity
-        // averageXVel = averageXVel / numNeighbours;
-        // averageYVel = averageYVel / numNeighbours;
-
         // Calculating the averages for position
         robot->boidData.averageXPos = robot->boidData.averageXPos / robot->boidData.numNeighbours;
         robot->boidData.averageYPos = robot->boidData.averageYPos / robot->boidData.numNeighbours;
-
-        // // Alignment
-        // robot->xVel += (averageXVel - robot->xVel) * alignmentFactor;
-        // robot->yVel += (averageYVel - robot->yVel) * alignmentFactor;
 
         // Cohesion
         robot->xVel += (robot->boidData.averageXPos - robot->GetPose().x) * cohesionFactor;

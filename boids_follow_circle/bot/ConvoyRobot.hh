@@ -23,6 +23,8 @@ namespace ConvoyRBT {
     #define vipCohesionMultiplier 0.1
     #define vipSeparationMultiplier 1
     #define vipAlignmentMultiplier 0.1
+    #define vipCircleRadius 4
+    #define vipCircleNumPoints 20
 
     // Some definitions for colors
     #define black 0x000000ff
@@ -65,8 +67,8 @@ namespace ConvoyRBT {
     } BoidData;
 
     struct VipVelocityNode {
-        double xvel;
-        double yvel;
+        double xpos;
+        double ypos;
         struct VipVelocityNode *second;
     };
     
@@ -93,6 +95,7 @@ namespace ConvoyRBT {
         static int PositionUpdate(Model *, ConvoyRobot *robot);
         static std::pair<double, double> CalculatePosition(double a, Pose pose, double distance);
         static double CalculateDistance(Pose pose, ConvoyRobot *robot);
+        static std::vector<std::pair<double, double>> GeneratePoints(Pose pose, double radius);
         static void push(double xvel, double yvel, ConvoyRobot *robot);
         static struct VipVelocityNode* newNode(double xvel, double yvel);
         static HVelocities CalculateHolonomic(double xvel, double turnvel, ConvoyRobot *robot);
