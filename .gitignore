@@ -6,16 +6,21 @@
 
 # OBJECT FILES
 boids/*.o
-boids_follow/*.o
+boids_follow_classic/*.o
+boid_follow_circle/*.o
 
 # GENERATED FILES
 boids/main
 boids/main.cpp
 boids/run.sh
-boids_follow/main
-boids_follow/main.cpp
-boids_follow/run.sh
+boids_follow_classic/main
+boids_follow_classic/main.cpp
+boids_follow_classic/run.sh
+boids_follow_circle/main
+boids_follow_circle/main.cpp
+boids_follow_circle/run.sh
 
 # GENERATED WORLD FILE
 boids/world/generated.world
-boids_follow/world/generated.world
+boids_follow_classic/world/generated.world
+boids_follow_circle/world/generated.world

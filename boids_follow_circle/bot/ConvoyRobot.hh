@@ -20,7 +20,7 @@ namespace ConvoyRBT {
     // VIP spacing parameters
     #define vipMinDistance 3
     #define vipMaxDistance 6
-    #define vipCohesionMultiplier 10
+    #define vipCohesionMultiplier 100
     #define vipSeparationMultiplier 1
     #define vipAlignmentMultiplier 0.1
     #define vipCircleRadius 4

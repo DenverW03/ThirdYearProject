@@ -40,6 +40,10 @@ ConvoyRobot::ConvoyRobot(ModelPosition *modelPos, Pose pose) {
     this->boidData.averageYVel = 0;
     this->boidData.numNeighbours = 0;
 
+    // Making the VIP last position stack empty to begin
+    push(0, 0, this);
+    push(0, 0, this);
+
     // Setting up positional model and callbacks
     this->pos = modelPos;
     this->pos->AddCallback(Model::CB_UPDATE, model_callback_t(PositionUpdate), this);
@@ -85,10 +89,6 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
         unsigned int full = (r << 24) | (g << 16) | (b << 8) | a; // unsigned to hold full 32 bit colour
 
         double distance = blob.range;
-
-        // Using these varibales so that when sight of VIP lost velocity is not still affected
-        double vipEffectX = 0;
-        double vipEffectY = 0;
 
         // Case for handling obstacles and case for handling other bots
         switch(full) {
@@ -144,18 +144,19 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
                 auto position = CalculatePosition(robot->angles[data->num], pose, distance);
 
                 // Alignment, updating the vip Velocities
-                vipEffectX = position.first;
-                vipEffectY = position.second;
+                double vipEffectX = position.first;
+                double vipEffectY = position.second;
 
                 // Separation from VIP
                 if(distance <= vipMinDistance) {
                     robot->boidData.closeDx += pose.x - position.first;
                     robot->boidData.closeDy += pose.y - position.second;
                 }
+
+                push(vipEffectX, vipEffectY, robot);
                 break;
             }
         }
-        push(vipEffectX, vipEffectY, robot);
     }
     return 0;
 }
@@ -215,8 +216,16 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
     double lastx = robot->stack->xpos;
     double lasty = robot->stack->ypos;
 
+    printf("Last Position: %f, %f\r\n", lastx, lasty);
+
     // Generating a vector of the points
     std::vector<std::pair<double, double>> vecPoint = GeneratePoints(Pose(lastx, lasty, 0, 0), vipCircleRadius);
+
+    std::cout << "--------------\r\n";
+    for(std::pair<double, double> p : vecPoint) {
+        printf("Circle points: %f, %f\r\n", p.first, p.second);
+    }
+    std::cout << "--------------\r\n";
 
     // Initialising closest points pair to ridiculously large size so first pair will always be closer
     std::pair<double, double> closest = std::make_pair(10000, 10000);
@@ -228,9 +237,12 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
         if(CalculateDistance(pose1, robot) < CalculateDistance(pose2, robot)) closest = points;
     }
 
+    printf("Closest Point: %f, %f\r\n", closest.first, closest.second);
+
     // Add the position as a large weight
     robot->boidData.averageXPos += closest.first * vipCohesionMultiplier;
     robot->boidData.averageYPos += closest.second * vipCohesionMultiplier;
+    robot->boidData.numNeighbours += vipCohesionMultiplier;
 
     // For other bots
     robot->xVel += robot->boidData.closeDx * avoidanceFactor;
