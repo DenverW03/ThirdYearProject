@@ -1,5 +1,5 @@
 # Boids
 
-This directory contains an almost standard version of the boids algorithm.
+This directory contains the first convoy algorithm created.
 
-The only thing it lacks is alignment, without communication to determine velocities of other bots, this was unnecessary to implement at this stage.
+It uses attraction and repulsion to attempt to keep convoy robots around the VIP.

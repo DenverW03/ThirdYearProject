@@ -1,5 +1,6 @@
 # Boids
 
-This directory contains an almost standard version of the boids algorithm.
+This directory contains the second convoy algorithm created.
 
-The only thing it lacks is alignment, without communication to determine velocities of other bots, this was unnecessary to implement at this stage.
+This algorithm uses VIP position estimates and parametric circle equations to generate points on an imaginary circle.
+The imaginary circle points are then used for attraction instead of the VIP robot itself.
