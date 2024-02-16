@@ -1,4 +1,5 @@
 #include "ConvoyRobot.hh"
+#include "CircleVisualizer.hh"
 #include <stage.hh>
 #include <cmath>
 #include <random>
@@ -69,6 +70,10 @@ ConvoyRobot::ConvoyRobot(ModelPosition *modelPos, Pose pose) {
     this->pos->SetPose(pose);
     NHVelocities nonHolonomic = CalculateNonHolonomic(this->xVel, this->yVel, this);
     this->pos->SetSpeed(nonHolonomic.linearVel, 0, nonHolonomic.rotationalVel);
+
+    // Adding the circle visualizer
+    this->cv = new CircleVIS::CircleVisualizer();
+    this->pos->AddVisualizer(this->cv, true);
 }
 
 // Sensor update callback
@@ -303,6 +308,8 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
     robot->xVel = vels2.xvel;
     robot->yVel = vels2.yvel;
 
+    Pose pose = robot->pos->GetPose();
+    
 
     return 0;
 }

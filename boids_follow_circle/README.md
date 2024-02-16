@@ -1,4 +1,4 @@
-# Boids
+# Circle Convoy
 
 This directory contains the second convoy algorithm created.
 

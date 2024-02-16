@@ -1,4 +1,4 @@
-# Boids
+# Classic Convoy
 
 This directory contains the first convoy algorithm created.
 
