@@ -8,6 +8,8 @@ using namespace Stg;
 namespace CircleVIS {
     class CircleVisualizer : public Visualizer {
 
+        #define numPoints 720
+
         // Struct for the circle info
         typedef struct {
             double x;
@@ -17,7 +19,7 @@ namespace CircleVIS {
 
         public:
             // The constructor
-            CircleVisualizer();
+            CircleVisualizer(double x, double y, double radius);
 
             // The stage visualise function
             void Visualize( Model* mod, Camera* cam );

@@ -70,10 +70,6 @@ ConvoyRobot::ConvoyRobot(ModelPosition *modelPos, Pose pose) {
     this->pos->SetPose(pose);
     NHVelocities nonHolonomic = CalculateNonHolonomic(this->xVel, this->yVel, this);
     this->pos->SetSpeed(nonHolonomic.linearVel, 0, nonHolonomic.rotationalVel);
-
-    // Adding the circle visualizer
-    this->cv = new CircleVIS::CircleVisualizer();
-    this->pos->AddVisualizer(this->cv, true);
 }
 
 // Sensor update callback
@@ -307,11 +303,6 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
     // Setting stored velocity to the real velocity so it doesn't grow too large in magnitude
     robot->xVel = vels2.xvel;
     robot->yVel = vels2.yvel;
-
-    Pose pose = robot->pos->GetPose();
-
-    robot->cv->CircleVIS::CircleVisualizer::drawPoint(4, 4);
-    // robot->cv->CircleVIS::CircleVisualizer::drawPoint(4, 4);
     return 0;
 }
 
