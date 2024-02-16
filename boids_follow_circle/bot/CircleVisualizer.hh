@@ -7,6 +7,7 @@ using namespace Stg;
 
 namespace CircleVIS {
     class CircleVisualizer : public Visualizer {
+
         // Struct for the circle info
         typedef struct {
             double x;
@@ -21,13 +22,11 @@ namespace CircleVIS {
             // The stage visualise function
             void Visualize( Model* mod, Camera* cam );
 
-            // CircleVisualizer& operator=(const CircleVisualizer&) = delete;
-        private:
             // The struct holding the circle data
             CircleData cdata;
 
             // Draws a point to the given coordinates
-            inline void drawPoint(double x, double y);
+            void drawPoint(double x, double y);
     };
 }
 

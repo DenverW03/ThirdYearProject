@@ -221,16 +221,16 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
     double lastx = robot->stack->xpos;
     double lasty = robot->stack->ypos;
 
-    printf("Last Position: %f, %f\r\n", lastx, lasty);
+    // printf("Last Position: %f, %f\r\n", lastx, lasty);
 
     // Generating a vector of the points
     std::vector<std::pair<double, double>> vecPoint = GeneratePoints(Pose(lastx, lasty, 0, 0), vipCircleRadius);
 
-    std::cout << "--------------\r\n";
-    for(std::pair<double, double> p : vecPoint) {
-        printf("Circle points: %f, %f\r\n", p.first, p.second);
-    }
-    std::cout << "--------------\r\n";
+    // std::cout << "--------------\r\n";
+    // for(std::pair<double, double> p : vecPoint) {
+    //     printf("Circle points: %f, %f\r\n", p.first, p.second);
+    // }
+    // std::cout << "--------------\r\n";
 
     // Initialising closest points pair to ridiculously large size so first pair will always be closer
     std::pair<double, double> closest = std::make_pair(10000, 10000);
@@ -242,7 +242,7 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
         if(CalculateDistance(pose1, robot) < CalculateDistance(pose2, robot)) closest = points;
     }
 
-    printf("Closest Point: %f, %f\r\n", closest.first, closest.second);
+    // printf("Closest Point: %f, %f\r\n", closest.first, closest.second);
 
     // Add the position as a large weight
     robot->boidData.averageXPos += closest.first * vipCohesionMultiplier;
@@ -309,8 +309,9 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
     robot->yVel = vels2.yvel;
 
     Pose pose = robot->pos->GetPose();
-    
 
+    robot->cv->CircleVIS::CircleVisualizer::drawPoint(4, 4);
+    // robot->cv->CircleVIS::CircleVisualizer::drawPoint(4, 4);
     return 0;
 }
 
