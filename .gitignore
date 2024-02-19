@@ -24,3 +24,6 @@ boids_follow_circle/run.sh
 boids/world/generated.world
 boids_follow_classic/world/generated.world
 boids_follow_circle/world/generated.world
+
+# JUST A TO DO LIST
+todo.md
