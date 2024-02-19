@@ -9,7 +9,7 @@ namespace ConvoyRBT {
     class ConvoyRobot {
         // Some class parameter definitions
         #define visionRange 8
-        #define cohesionFactor 0.005
+        #define cohesionFactor 0.0005
         #define avoidanceDistance 2
         #define avoidanceFactor 0.1
 
@@ -19,7 +19,7 @@ namespace ConvoyRBT {
 
         // VIP spacing parameters
         #define vipMinDistance 3
-        #define vipCohesionMultiplier 0.005
+        #define vipCohesionMultiplier 0.0005
         #define vipSeparationMultiplier 0.1
         #define vipAlignmentMultiplier 0.01
         #define vipCircleRadius 6

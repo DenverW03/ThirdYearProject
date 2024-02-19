@@ -146,7 +146,7 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
 
                 // Separation from VIP
                 if(distance <= vipMinDistance) {
-                    robot->boidData.numNeighbours += 1;
+                    // robot->boidData.numNeighbours += 1;
 
                     robot->boidData.closeDx += pose.x - position.first;
                     robot->boidData.closeDy += pose.y - position.second;
@@ -156,12 +156,12 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
 
                     double angle = robot->angles[data->num];
                     if(angle < 0) angle += 180;
-                    if(angle >= 0) angle -= 180;
+                    else if(angle >= 0) angle -= 180;
 
-                    auto positionBounding = CalculatePosition(robot->angles[data->num], pose, distance + 2);
+                    auto positionBounding = CalculatePosition(angle, pose, distance + 2);
 
-                    robot->boidData.closeDx -= pose.x - positionBounding.first;
-                    robot->boidData.closeDy -= pose.y - positionBounding.second;
+                    robot->boidData.closeDx += pose.x - positionBounding.first;
+                    robot->boidData.closeDy += pose.y - positionBounding.second;
                 }
 
                 push(vipEffectX, vipEffectY, robot);
