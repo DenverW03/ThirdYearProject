@@ -243,7 +243,7 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
     // Add the position as a large weight
     robot->boidData.averageXPos += closest.first * vipCohesionMultiplier;
     robot->boidData.averageYPos += closest.second * vipCohesionMultiplier;
-    robot->boidData.numNeighbours += vipCohesionMultiplier;
+    robot->boidData.numNeighbours += 5;
 
     // For other bots
     robot->xVel += robot->boidData.closeDx * avoidanceFactor;
@@ -269,6 +269,16 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
         robot->xVel += (robot->boidData.averageXPos - robot->GetPose().x) * cohesionFactor;
         robot->yVel += (robot->boidData.averageYPos - robot->GetPose().y) * cohesionFactor;
     }
+
+    // Alignment for the VIP
+
+    // if (robot->stack->second != nullptr){
+    //     double dx = robot->stack->xpos - robot->stack->second->ypos;
+    //     double dy = robot->stack->ypos - robot->stack->second->ypos;
+
+    //     robot->xVel += dx * vipAlignmentMultiplier;
+    //     robot->yVel += dy * vipAlignmentMultiplier;
+    // }
 
     // Diagnostic printing
 

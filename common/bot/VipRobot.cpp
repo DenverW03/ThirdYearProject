@@ -24,7 +24,7 @@ VipRobot::VipRobot(ModelPosition *modelPos, Pose pose) {
     this->pos->GoTo(Pose(8, 8, 0, 0));
 
     // Adding the circle visualizer
-    this->cv = new CircleVIS::CircleVisualizer(0, 0, 4);
+    this->cv = new CircleVIS::CircleVisualizer(0, 0, vipCircleRadius);
     this->pos->AddVisualizer(this->cv, true);
 }
 
