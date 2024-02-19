@@ -271,8 +271,10 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
     // Alignment of convoy bot with VIP bot
 
     if(robot->stack->second != nullptr){
-        double dx = robot->stack->xpos - robot->stack->second->ypos;
+        double dx = robot->stack->xpos - robot->stack->second->xpos;
         double dy = robot->stack->ypos - robot->stack->second->ypos;
+
+        // printf("Estimated vels: %f, %f\r\n", dx, dy);
 
         robot->xVel += (robot->xVel - dx) * vipAlignmentMultiplier;
         robot->yVel += (robot->yVel - dx) * vipAlignmentMultiplier;
