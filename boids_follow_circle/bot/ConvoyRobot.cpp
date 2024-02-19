@@ -243,7 +243,7 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
     // Add the position as a large weight
     robot->boidData.averageXPos += closest.first * vipCohesionMultiplier;
     robot->boidData.averageYPos += closest.second * vipCohesionMultiplier;
-    robot->boidData.numNeighbours += 5;
+    robot->boidData.numNeighbours += robot->boidData.numNeighbours * 0.5; // half the number of bots currently as neighbours to introduce a large bias
 
     // For other bots
     robot->xVel += robot->boidData.closeDx * avoidanceFactor;
