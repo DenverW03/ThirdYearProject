@@ -122,10 +122,6 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
 
                 // If the distance is within the vision range of the robot but outside avoidance range
                 if(distance <= visionRange) {
-                    // Alignment
-                    // averageXVel += robot->robots[i].xVel;
-                    // averageYVel += robot->robots[i].yVel;
-
                     robot->boidData.numNeighbours += 1;
 
                     // Cohesion
@@ -150,6 +146,8 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
 
                 // Separation from VIP
                 if(distance <= vipMinDistance) {
+                    robot->boidData.numNeighbours += 1;
+
                     robot->boidData.closeDx += pose.x - position.first;
                     robot->boidData.closeDy += pose.y - position.second;
                 }
@@ -270,15 +268,15 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
         robot->yVel += (robot->boidData.averageYPos - robot->GetPose().y) * cohesionFactor;
     }
 
-    // Alignment for the VIP
+    // Alignment of convoy bot with VIP bot
 
-    // if (robot->stack->second != nullptr){
-    //     double dx = robot->stack->xpos - robot->stack->second->ypos;
-    //     double dy = robot->stack->ypos - robot->stack->second->ypos;
+    if(robot->stack->second != nullptr){
+        double dx = robot->stack->xpos - robot->stack->second->ypos;
+        double dy = robot->stack->ypos - robot->stack->second->ypos;
 
-    //     robot->xVel += dx * vipAlignmentMultiplier;
-    //     robot->yVel += dy * vipAlignmentMultiplier;
-    // }
+        robot->xVel += (robot->xVel - dx) * vipAlignmentMultiplier;
+        robot->yVel += (robot->yVel - dx) * vipAlignmentMultiplier;
+    }
 
     // Diagnostic printing
 
