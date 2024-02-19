@@ -18,12 +18,13 @@ namespace ConvoyRBT {
         #define avoidObstructionFactor 0.1
 
         // VIP spacing parameters
-        #define vipMinDistance 2
-        #define vipCohesionMultiplier 0.5
+        #define vipMinDistance 3
+        #define vipCohesionMultiplier 0.005
         #define vipSeparationMultiplier 0.1
         #define vipAlignmentMultiplier 0.01
         #define vipCircleRadius 6
         #define vipCircleNumPoints 360
+        #define vipBoundingDistance 8
 
         // Some definitions for colors
         #define black 0x000000ff

@@ -151,6 +151,18 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
                     robot->boidData.closeDx += pose.x - position.first;
                     robot->boidData.closeDy += pose.y - position.second;
                 }
+                else if(distance <= vipBoundingDistance) {
+                    robot->boidData.numNeighbours += 1;
+
+                    double angle = robot->angles[data->num];
+                    if(angle < 0) angle += 180;
+                    if(angle >= 0) angle -= 180;
+
+                    auto positionBounding = CalculatePosition(robot->angles[data->num], pose, distance + 2);
+
+                    robot->boidData.closeDx -= pose.x - positionBounding.first;
+                    robot->boidData.closeDy -= pose.y - positionBounding.second;
+                }
 
                 push(vipEffectX, vipEffectY, robot);
                 break;
@@ -211,37 +223,39 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
     // The circle is a concept of a "belt" around the VIP, much like a planet
     // This belt has a large weighting for attraction towards it
 
-    // Getting the last recorded robot positions
-    double lastx = robot->stack->xpos;
-    double lasty = robot->stack->ypos;
+    if(robot->stack->second != nullptr){
+        // Getting the last recorded robot positions
+        double lastx = robot->stack->xpos;
+        double lasty = robot->stack->ypos;
 
-    // printf("Last Position: %f, %f\r\n", lastx, lasty);
+        // printf("Last Position: %f, %f\r\n", lastx, lasty);
 
-    // Generating a vector of the points
-    std::vector<std::pair<double, double>> vecPoint = GeneratePoints(Pose(lastx, lasty, 0, 0), vipCircleRadius);
+        // Generating a vector of the points
+        std::vector<std::pair<double, double>> vecPoint = GeneratePoints(Pose(lastx, lasty, 0, 0), vipCircleRadius);
 
-    // std::cout << "--------------\r\n";
-    // for(std::pair<double, double> p : vecPoint) {
-    //     printf("Circle points: %f, %f\r\n", p.first, p.second);
-    // }
-    // std::cout << "--------------\r\n";
+        // std::cout << "--------------\r\n";
+        // for(std::pair<double, double> p : vecPoint) {
+        //     printf("Circle points: %f, %f\r\n", p.first, p.second);
+        // }
+        // std::cout << "--------------\r\n";
 
-    // Initialising closest points pair to ridiculously large size so first pair will always be closer
-    std::pair<double, double> closest = std::make_pair(10000, 10000);
+        // Initialising closest points pair to ridiculously large size so first pair will always be closer
+        std::pair<double, double> closest = std::make_pair(10000, 10000);
 
-    // Looping through the points to find the closest one
-    for(std::pair<double, double> points : vecPoint) {
-        Pose pose1 = Pose(points.first, points.second, 0, 0);
-        Pose pose2 = Pose(closest.first, closest.second, 0, 0);
-        if(CalculateDistance(pose1, robot) < CalculateDistance(pose2, robot)) closest = points;
+        // Looping through the points to find the closest one
+        for(std::pair<double, double> points : vecPoint) {
+            Pose pose1 = Pose(points.first, points.second, 0, 0);
+            Pose pose2 = Pose(closest.first, closest.second, 0, 0);
+            if(CalculateDistance(pose1, robot) < CalculateDistance(pose2, robot)) closest = points;
+        }
+
+        // printf("Closest Point: %f, %f\r\n", closest.first, closest.second);
+
+        // Add the position as a large weight
+        robot->boidData.averageXPos += closest.first * vipCohesionMultiplier;
+        robot->boidData.averageYPos += closest.second * vipCohesionMultiplier;
+        robot->boidData.numNeighbours += 1; // half the number of bots currently as neighbours to introduce a large bias
     }
-
-    // printf("Closest Point: %f, %f\r\n", closest.first, closest.second);
-
-    // Add the position as a large weight
-    robot->boidData.averageXPos += closest.first * vipCohesionMultiplier;
-    robot->boidData.averageYPos += closest.second * vipCohesionMultiplier;
-    robot->boidData.numNeighbours += robot->boidData.numNeighbours * 0.5; // half the number of bots currently as neighbours to introduce a large bias
 
     // For other bots
     robot->xVel += robot->boidData.closeDx * avoidanceFactor;
