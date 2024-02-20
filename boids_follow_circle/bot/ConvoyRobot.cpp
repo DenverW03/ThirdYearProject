@@ -251,6 +251,7 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
         // Add the position as a large weight
         robot->boidData.averageXPos += closest.first * vipCohesionMultiplier;
         robot->boidData.averageYPos += closest.second * vipCohesionMultiplier;
+        robot->boidData.numNeighbours += vipCohesionMultiplier;
         // robot->boidData.averageXPos += (closest.first * vipCohesionMultiplier) * robot->boidData.numNeighbours / 2;
         // robot->boidData.averageYPos += (closest.second * vipCohesionMultiplier) * robot->boidData.numNeighbours / 2;
         // robot->boidData.numNeighbours += robot->boidData.numNeighbours / 2; // half the number of bots currently as neighbours to introduce a large bias
@@ -279,21 +280,21 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
         // Cohesion
         robot->xVel += (robot->boidData.averageXPos - robot->GetPose().x) * cohesionFactor;
         robot->yVel += (robot->boidData.averageYPos - robot->GetPose().y) * cohesionFactor;
-    }
 
-    // Alignment of convoy bot with VIP bot
+        // Alignment of convoy bot with VIP bot
 
-    if(robot->stack->second != nullptr){
-        double dx = robot->stack->xpos - robot->stack->second->xpos;
-        double dy = robot->stack->ypos - robot->stack->second->ypos;
+        if(robot->stack->second != nullptr){
+            double dx = robot->stack->xpos - robot->stack->second->xpos;
+            double dy = robot->stack->ypos - robot->stack->second->ypos;
 
-        // printf("Estimated vels: %f, %f\r\n", dx, dy);
+            // printf("Estimated vels: %f, %f\r\n", dx, dy);
 
-        robot->xVel += (robot->xVel - dx) * vipAlignmentMultiplier;
-        robot->yVel += (robot->yVel - dx) * vipAlignmentMultiplier;
+            robot->xVel += (robot->xVel - dx) * vipAlignmentMultiplier;
+            robot->yVel += (robot->yVel - dx) * vipAlignmentMultiplier;
 
-        // printf("Estimated Velocity: %f, %f\r\n", dx, dy);
-        // printf("Estimated Position: %f, %f\r\n", robot->stack->xpos, robot->stack->ypos);
+            // printf("Estimated Velocity: %f, %f\r\n", dx, dy);
+            // printf("Estimated Position: %f, %f\r\n", robot->stack->xpos, robot->stack->ypos);
+        }
     }
 
     // Diagnostic printing
