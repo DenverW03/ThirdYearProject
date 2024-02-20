@@ -131,9 +131,6 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
                 break;
             }
             case red: { // THE VIPs
-
-                /* ONCE THIS HAS ALIGNMENT, IT SHOULD BE PRETTY GOOD FOR STAYING COHERENT AROUND VIP */
-
                 // For red VIP going to have the same vision range as for fellow convoy bots
                 if(distance > visionRange) break;
 
@@ -152,16 +149,16 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
                     robot->boidData.closeDy += pose.y - position.second;
                 }
                 else if(distance <= vipBoundingDistance) {
-                    robot->boidData.numNeighbours += 1;
-
                     double angle = robot->angles[data->num];
                     if(angle < 0) angle += 180;
                     else if(angle >= 0) angle -= 180;
 
-                    auto positionBounding = CalculatePosition(angle, pose, distance + 2);
+                    auto positionBounding = CalculatePosition(angle, pose, visionRange - vipBoundingDistance);
 
                     robot->boidData.closeDx += pose.x - positionBounding.first;
                     robot->boidData.closeDy += pose.y - positionBounding.second;
+
+                    robot->boidData.numNeighbours += 1;
                 }
 
                 push(vipEffectX, vipEffectY, robot);
@@ -254,7 +251,9 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
         // Add the position as a large weight
         robot->boidData.averageXPos += closest.first * vipCohesionMultiplier;
         robot->boidData.averageYPos += closest.second * vipCohesionMultiplier;
-        robot->boidData.numNeighbours += 1; // half the number of bots currently as neighbours to introduce a large bias
+        // robot->boidData.averageXPos += (closest.first * vipCohesionMultiplier) * robot->boidData.numNeighbours / 2;
+        // robot->boidData.averageYPos += (closest.second * vipCohesionMultiplier) * robot->boidData.numNeighbours / 2;
+        // robot->boidData.numNeighbours += robot->boidData.numNeighbours / 2; // half the number of bots currently as neighbours to introduce a large bias
     }
 
     // For other bots
@@ -266,8 +265,8 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
     robot->yVel -= robot->boidData.closeDyObs * avoidObstructionFactor;
 
     // For the VIP
-    robot->xVel -= robot->boidData.closeDxVip * vipSeparationMultiplier;
-    robot->yVel -= robot->boidData.closeDyVip * vipSeparationMultiplier;
+    robot->xVel += robot->boidData.closeDxVip * vipSeparationMultiplier;
+    robot->yVel += robot->boidData.closeDyVip * vipSeparationMultiplier;
 
 
     // Cohesion and Alignment BETWEEN CONVOT BOTS
@@ -292,6 +291,9 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
 
         robot->xVel += (robot->xVel - dx) * vipAlignmentMultiplier;
         robot->yVel += (robot->yVel - dx) * vipAlignmentMultiplier;
+
+        // printf("Estimated Velocity: %f, %f\r\n", dx, dy);
+        // printf("Estimated Position: %f, %f\r\n", robot->stack->xpos, robot->stack->ypos);
     }
 
     // Diagnostic printing

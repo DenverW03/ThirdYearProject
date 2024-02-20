@@ -7,7 +7,7 @@ using namespace Stg;
 
 namespace VipRBT {
     class VipRobot {
-        #define vipCircleRadius 6
+        #define vipCircleRadius 4
         
         public:
             ModelPosition *pos;
