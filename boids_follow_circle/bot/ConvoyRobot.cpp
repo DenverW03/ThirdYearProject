@@ -151,24 +151,24 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
                 if(distance <= vipMinDistance) {
                     // robot->boidData.numNeighbours += 1;
 
-                    robot->boidData.closeDx += pose.x - position.first;
-                    robot->boidData.closeDy += pose.y - position.second;
+                    robot->boidData.closeDxVip += pose.x - position.first;
+                    robot->boidData.closeDyVip += pose.y - position.second;
                 }
-                else if(distance <= vipCircleRadius) {
-                    double angle = robot->angles[data->num];
-                    if(angle < 0) angle += 180;
-                    else if(angle >= 0) angle -= 180;
+                // else if(distance <= vipCircleRadius) {
+                //     double angle = robot->angles[data->num];
+                //     if(angle < 0) angle += 180;
+                //     else if(angle >= 0) angle -= 180;
 
-                    auto positionBounding = CalculatePosition(angle, pose, vipBoundingDistance - distance);
+                //     auto positionBounding = CalculatePosition(angle, pose, vipBoundingDistance - distance);
 
-                    robot->boidData.closeDx += pose.x - positionBounding.first;
-                    robot->boidData.closeDy += pose.y - positionBounding.second;
+                //     robot->boidData.closeDxVip += pose.x - positionBounding.first;
+                //     robot->boidData.closeDyVip += pose.y - positionBounding.second;
 
-                    robot->boidData.numNeighbours += 1;
-                }
+                //     robot->boidData.numNeighbours += 1;
+                // }
 
                 // If it has been over 5 seconds
-                if(timeDiff > 5) {
+                if(timeDiff > vipVelPollingRate) {
                     push(vipEffectX, vipEffectY, robot);
                     robot->lastSysTime = std::time(nullptr);
                 }
@@ -249,10 +249,15 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
         }
 
         // Add the position as a large weight
-        robot->boidData.averageXPos += closest.first * vipCohesionMultiplier;
-        robot->boidData.averageYPos += closest.second * vipCohesionMultiplier;
-        robot->boidData.numNeighbours += vipCohesionMultiplier;
+        // robot->boidData.averageXPos += closest.first * vipCohesionMultiplier;
+        // robot->boidData.averageYPos += closest.second * vipCohesionMultiplier;
+        // robot->boidData.numNeighbours += vipCohesionMultiplier;
+
+        robot->xVel += (closest.first - robot->GetPose().x) * vipCohesionMultiplier;
+        robot->yVel += (closest.second - robot->GetPose().y) * vipCohesionMultiplier;
     }
+
+    // AVOIDANCE
 
     // For other bots
     robot->xVel += robot->boidData.closeDx * avoidanceFactor;
