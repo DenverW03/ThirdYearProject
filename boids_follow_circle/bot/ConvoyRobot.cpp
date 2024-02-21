@@ -3,6 +3,7 @@
 #include <stage.hh>
 #include <cmath>
 #include <random>
+#include <thread>
 
 using namespace Stg;
 using namespace ConvoyRBT;
@@ -70,6 +71,8 @@ ConvoyRobot::ConvoyRobot(ModelPosition *modelPos, Pose pose) {
     this->pos->SetPose(pose);
     NHVelocities nonHolonomic = CalculateNonHolonomic(this->xVel, this->yVel, this);
     this->pos->SetSpeed(nonHolonomic.linearVel, 0, nonHolonomic.rotationalVel);
+
+    this->lastSysTime = std::time(nullptr);
 }
 
 // Sensor update callback
@@ -134,6 +137,9 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
                 // For red VIP going to have the same vision range as for fellow convoy bots
                 if(distance > visionRange) break;
 
+                // Getting the time difference
+                unsigned long timeDiff = std::time(nullptr) - robot->lastSysTime;
+
                 Pose pose = robot->GetPose();
                 auto position = CalculatePosition(robot->angles[data->num], pose, distance);
 
@@ -161,7 +167,11 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
                     robot->boidData.numNeighbours += 1;
                 }
 
-                push(vipEffectX, vipEffectY, robot);
+                // If it has been over 5 seconds
+                if(timeDiff > 5) {
+                    push(vipEffectX, vipEffectY, robot);
+                    robot->lastSysTime = std::time(nullptr);
+                }
                 break;
             }
         }
@@ -225,16 +235,8 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
         double lastx = robot->stack->xpos;
         double lasty = robot->stack->ypos;
 
-        // printf("Last Position: %f, %f\r\n", lastx, lasty);
-
         // Generating a vector of the points
         std::vector<std::pair<double, double>> vecPoint = GeneratePoints(Pose(lastx, lasty, 0, 0), vipCircleRadius);
-
-        // std::cout << "--------------\r\n";
-        // for(std::pair<double, double> p : vecPoint) {
-        //     printf("Circle points: %f, %f\r\n", p.first, p.second);
-        // }
-        // std::cout << "--------------\r\n";
 
         // Initialising closest points pair to ridiculously large size so first pair will always be closer
         std::pair<double, double> closest = std::make_pair(10000, 10000);
@@ -246,15 +248,10 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
             if(CalculateDistance(pose1, robot) < CalculateDistance(pose2, robot)) closest = points;
         }
 
-        // printf("Closest Point: %f, %f\r\n", closest.first, closest.second);
-
         // Add the position as a large weight
         robot->boidData.averageXPos += closest.first * vipCohesionMultiplier;
         robot->boidData.averageYPos += closest.second * vipCohesionMultiplier;
         robot->boidData.numNeighbours += vipCohesionMultiplier;
-        // robot->boidData.averageXPos += (closest.first * vipCohesionMultiplier) * robot->boidData.numNeighbours / 2;
-        // robot->boidData.averageYPos += (closest.second * vipCohesionMultiplier) * robot->boidData.numNeighbours / 2;
-        // robot->boidData.numNeighbours += robot->boidData.numNeighbours / 2; // half the number of bots currently as neighbours to introduce a large bias
     }
 
     // For other bots
@@ -268,7 +265,6 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
     // For the VIP
     robot->xVel += robot->boidData.closeDxVip * vipSeparationMultiplier;
     robot->yVel += robot->boidData.closeDyVip * vipSeparationMultiplier;
-
 
     // Cohesion and Alignment BETWEEN CONVOT BOTS
 
@@ -287,29 +283,14 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
             double dx = robot->stack->xpos - robot->stack->second->xpos;
             double dy = robot->stack->ypos - robot->stack->second->ypos;
 
-            // printf("Estimated vels: %f, %f\r\n", dx, dy);
-
             robot->xVel += (robot->xVel - dx) * vipAlignmentMultiplier;
             robot->yVel += (robot->yVel - dx) * vipAlignmentMultiplier;
-
-            // printf("Estimated Velocity: %f, %f\r\n", dx, dy);
-            // printf("Estimated Position: %f, %f\r\n", robot->stack->xpos, robot->stack->ypos);
         }
     }
 
     // Diagnostic printing
 
     HVelocities vels2 = CalculateHolonomic(robot->pos->GetVelocity().x, robot->pos->GetVelocity().a, robot);
-
-    // std::cout << "--------------------------------\r\n";
-    // printf("Obstacles - closeDx: %f closeDy: %f\r\n", robot->boidData.closeDxObs, robot->boidData.closeDyObs);
-    // std::cout << "--------------------------------\r\n";
-    // // printf("Calc Polar: %f %f\r\n", vels.linearVel, vels.rotationalVel);
-    // printf("Real Polar: %f %f\r\n", robot->pos->GetVelocity().x, robot->pos->GetVelocity().a);
-    // printf("Calc Cartesian: %f %f\r\n", vels2.xvel, vels2.yvel);
-    // printf("Class velocity: %f %f\r\n", robot->xVel, robot->yVel);
-    // std::cout << "--------------------------------\r\n";
-
 
     NHVelocities nonHolonomic = CalculateNonHolonomic(robot->xVel, robot->yVel, robot);
     robot->pos->SetSpeed(nonHolonomic.linearVel, 0, nonHolonomic.rotationalVel);

@@ -17,14 +17,15 @@ namespace ConvoyRBT {
         #define avoidObstructionDistance 3
         #define avoidObstructionFactor 0.1
 
-        // VIP spacing parameters
+        // VIP parameters
         #define vipMinDistance 3
         #define vipCohesionMultiplier 0.01
         #define vipSeparationMultiplier 0.5
-        #define vipAlignmentMultiplier 0
+        #define vipAlignmentMultiplier 0.01
         #define vipCircleRadius 5
         #define vipCircleNumPoints 360
         #define vipBoundingDistance 7
+        #define velocityPollingRate 5000 // in ms
 
         // Some definitions for colors
         #define black 0x000000ff
@@ -81,7 +82,10 @@ namespace ConvoyRBT {
             double xVel;
             double yVel;
             BoidData boidData;
+
+            // These variables are used in the VIP velocity estimation
             struct VipVelocityNode *stack;
+            unsigned long lastSysTime;
 
             // Angles of the cameras places on the bot
 
