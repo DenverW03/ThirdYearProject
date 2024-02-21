@@ -154,12 +154,12 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
                     robot->boidData.closeDx += pose.x - position.first;
                     robot->boidData.closeDy += pose.y - position.second;
                 }
-                else if(distance <= vipBoundingDistance) {
+                else if(distance <= vipCircleRadius) {
                     double angle = robot->angles[data->num];
                     if(angle < 0) angle += 180;
                     else if(angle >= 0) angle -= 180;
 
-                    auto positionBounding = CalculatePosition(angle, pose, visionRange - vipBoundingDistance);
+                    auto positionBounding = CalculatePosition(angle, pose, vipBoundingDistance - distance);
 
                     robot->boidData.closeDx += pose.x - positionBounding.first;
                     robot->boidData.closeDy += pose.y - positionBounding.second;
