@@ -154,21 +154,21 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
                     robot->boidData.closeDxVip += pose.x - position.first;
                     robot->boidData.closeDyVip += pose.y - position.second;
                 }
-                // else if(distance <= vipCircleRadius) {
-                //     double angle = robot->angles[data->num];
-                //     if(angle < 0) angle += 180;
-                //     else if(angle >= 0) angle -= 180;
+                else if(distance <= vipCircleRadius) {
+                    double angle = robot->angles[data->num];
+                    if(angle < 0) angle += 180;
+                    else if(angle >= 0) angle -= 180;
 
-                //     auto positionBounding = CalculatePosition(angle, pose, vipBoundingDistance - distance);
+                    auto positionBounding = CalculatePosition(angle, pose, vipBoundingDistance - distance);
 
-                //     robot->boidData.closeDxVip += pose.x - positionBounding.first;
-                //     robot->boidData.closeDyVip += pose.y - positionBounding.second;
+                    robot->boidData.closeDxVip += pose.x - positionBounding.first;
+                    robot->boidData.closeDyVip += pose.y - positionBounding.second;
 
-                //     robot->boidData.numNeighbours += 1;
-                // }
+                    robot->boidData.numNeighbours += 1;
+                }
 
                 // If it has been over 5 seconds
-                if(timeDiff > vipVelPollingRate) {
+                if(timeDiff > velocityPollingRate) {
                     push(vipEffectX, vipEffectY, robot);
                     robot->lastSysTime = std::time(nullptr);
                 }
@@ -285,11 +285,13 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
         // Alignment of convoy bot with VIP bot
 
         if(robot->stack->second != nullptr){
-            double dx = robot->stack->xpos - robot->stack->second->xpos;
-            double dy = robot->stack->ypos - robot->stack->second->ypos;
+            double dx = (robot->stack->xpos - robot->stack->second->xpos) / velocityPollingRate;
+            double dy = (robot->stack->ypos - robot->stack->second->ypos) / velocityPollingRate;
 
             robot->xVel += (robot->xVel - dx) * vipAlignmentMultiplier;
             robot->yVel += (robot->yVel - dx) * vipAlignmentMultiplier;
+
+            printf("Estimated velocity is: %f, %f\r\n", dx, dy);
         }
     }
 
