@@ -26,15 +26,17 @@ def world_setup(numRobots):
     with open('main_template.cpp','r',encoding='utf-8') as mainFile:
         data = mainFile.readlines()
 
-    # Edit line 6 to ensure we malloc correct data size
-    data[5] = 'ConvoyRobot *robots = (ConvoyRobot *) malloc(' + str(numRobots) + ' * sizeof(ConvoyRobot));\r\n'
+    # Edit line 9 to ensure we malloc correct data size
+    data[8] = 'ConvoyRobot *robots = (ConvoyRobot *) malloc(' + str(numRobots) + ' * sizeof(ConvoyRobot));\r\n'
 
-    # Edit line 13 to add the VIP robot spawning
-    data[12] = "    VipRBT::VipRobot vip = VipRBT::VipRobot((ModelPosition *)world.GetModel(argv[2]), Pose(-8, 8, 0, 0));\r\n"
+    # Edit line 16 to add the VIP robot spawning
+    data[15] = "    VipRBT::VipRobot vip = VipRBT::VipRobot((ModelPosition *)world.GetModel(argv[2]), Pose(-8, 8, 0, 0));\r\n"
 
-    # Edit line 13 to add robot spawning lines
+    # Edit line 16 to add robot spawning lines
     for i in range(numRobots):
-        data[12] = data[12] + '    robots[' + str(i) + '] = ConvoyRobot((ModelPosition *)world.GetModel(argv[' + str(i + 3) + ']), Pose::Random(-12, 12, -12, 12));\r\n'
+        data[15] = data[15] + '    robots[' + str(i) + '] = ConvoyRobot((ModelPosition *)world.GetModel(argv[' + str(i + 3) + ']), Pose::Random(-12, 12, -12, 12));\r\n'
+
+    data[23] = "    for(int i=0; i<" + (numRobots) + "; i++) {\r\n"
 
     # Write new file structure to main
     with open('main.cpp', 'w', encoding='utf-8') as mainFile:
