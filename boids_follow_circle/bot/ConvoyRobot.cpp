@@ -4,6 +4,9 @@
 #include <cmath>
 #include <random>
 #include <thread>
+#include <iostream>
+#include <fstream>
+#include <sstream>
 
 using namespace Stg;
 using namespace ConvoyRBT;
@@ -179,51 +182,6 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
     return 0;
 }
 
-std::pair<double, double> ConvoyRobot::CalculatePosition(double a, Pose pose, double distance) {
-    // Get angle of sensor on bot (if negative just add (pi - absolute value) to pi to get positive angle representation)
-    double theta = a * (M_PI / 180);
-    if (theta < 0) theta = (2 * M_PI) - abs(theta);
-
-    // Get obstacle distance (hypotenuse)
-    double hyp = distance;
-
-    // Using a composite angle for real world sensor angle
-    // Pose pose = robot->GetPose();
-    double botAngle = pose.a;
-    if (botAngle < 0) botAngle = (2 * M_PI) - abs(botAngle);
-    double compositeAngle = botAngle + theta;
-    if (compositeAngle > (2 * M_PI)) compositeAngle -= (2 * M_PI);
-
-    // Use trigonometry to deduce the position of the obstacle in vector from bot, using abs value to decide direction in post
-    double opp = hyp * sin(compositeAngle); // y
-    double adj = hyp * cos(compositeAngle); // x
-
-    // Obstacle position calculations
-    double xpos = pose.x + adj;
-    double ypos = pose.y + opp;
-
-    return std::make_pair(xpos, ypos);
-}
-
-// Returns a vector of paired x,y points that are points on a circle of the radius around the position given as a pose
-std::vector<std::pair<double, double>> ConvoyRobot::GeneratePoints(Pose pose, double radius) {
-    std::vector<std::pair<double, double>> points;
-
-    // Generating the points and pushing them to the array
-    for(int i=0; i<vipCircleNumPoints; i++) {
-        // Determining the angle to generate the point at (radians)
-        double angle = ((2 * M_PI) / vipCircleNumPoints) * i;
-
-        // Using circle parametric equations
-        double x = pose.x + (radius * cos(angle));
-        double y = pose.y + (radius * sin(angle));
-
-        points.push_back(std::make_pair(x, y));
-    }
-
-    return points;
-}
-
 // Position update function for stage (necessary for the bot to actually move)
 int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
     // Cohesion for staying as close to "the circle" as possible
@@ -318,7 +276,75 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
     // Setting stored velocity to the real velocity so it doesn't grow too large in magnitude
     robot->xVel = vels2.xvel;
     robot->yVel = vels2.yvel;
+
+    // Outputting the test data
+    TestingDistance(robot);
+
     return 0;
+}
+
+void ConvoyRobot::TestingDistance(ConvoyRobot *robot) {
+    std::ofstream dataFile("../testing/boids_follow_circle_results/distances.csv", std::ios::app);
+    if (!dataFile.is_open()){
+        std::cerr << "File failed to open: " << std::strerror(errno) << std::endl;
+        return;
+    }
+
+    // Getting the distance between VIP and this bot
+    double distance = CalculateDistance(Pose(robot->stack->xpos, robot->stack->ypos, 0, 0), robot);
+
+    // Use a data stream to write to the file
+    dataFile << distance << std::endl;
+    dataFile.close();
+}
+
+void ConvoyRobot::TestingStall(ConvoyRobot *robot) {
+    
+}
+
+std::pair<double, double> ConvoyRobot::CalculatePosition(double a, Pose pose, double distance) {
+    // Get angle of sensor on bot (if negative just add (pi - absolute value) to pi to get positive angle representation)
+    double theta = a * (M_PI / 180);
+    if (theta < 0) theta = (2 * M_PI) - abs(theta);
+
+    // Get obstacle distance (hypotenuse)
+    double hyp = distance;
+
+    // Using a composite angle for real world sensor angle
+    // Pose pose = robot->GetPose();
+    double botAngle = pose.a;
+    if (botAngle < 0) botAngle = (2 * M_PI) - abs(botAngle);
+    double compositeAngle = botAngle + theta;
+    if (compositeAngle > (2 * M_PI)) compositeAngle -= (2 * M_PI);
+
+    // Use trigonometry to deduce the position of the obstacle in vector from bot, using abs value to decide direction in post
+    double opp = hyp * sin(compositeAngle); // y
+    double adj = hyp * cos(compositeAngle); // x
+
+    // Obstacle position calculations
+    double xpos = pose.x + adj;
+    double ypos = pose.y + opp;
+
+    return std::make_pair(xpos, ypos);
+}
+
+// Returns a vector of paired x,y points that are points on a circle of the radius around the position given as a pose
+std::vector<std::pair<double, double>> ConvoyRobot::GeneratePoints(Pose pose, double radius) {
+    std::vector<std::pair<double, double>> points;
+
+    // Generating the points and pushing them to the array
+    for(int i=0; i<vipCircleNumPoints; i++) {
+        // Determining the angle to generate the point at (radians)
+        double angle = ((2 * M_PI) / vipCircleNumPoints) * i;
+
+        // Using circle parametric equations
+        double x = pose.x + (radius * cos(angle));
+        double y = pose.y + (radius * sin(angle));
+
+        points.push_back(std::make_pair(x, y));
+    }
+
+    return points;
 }
 
 ConvoyRobot::HVelocities ConvoyRobot::CalculateHolonomic(double linearvel, double turnvel, ConvoyRobot *robot) {
