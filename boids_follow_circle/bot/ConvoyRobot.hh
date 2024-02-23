@@ -72,6 +72,9 @@ namespace ConvoyRBT {
 
             double angles[16] = {0, 22.5, 45, 67.5, 90, 112.5, 135, 157.5, 180, -22.5, -45, -67.5, -90, -112.5, -135, -157.5};
 
+            // Storing distances for testing data output
+            std::vector<double> testingDistances;
+
             // Function declarations
 
             ConvoyRobot();

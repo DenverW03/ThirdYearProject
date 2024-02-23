@@ -188,6 +188,17 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
     // The circle is a concept of a "belt" around the VIP, much like a planet
     // This belt has a large weighting for attraction towards it
 
+    // Testing for when robot has crashed
+    if(robot->pos->Stalled()) {
+        // Unsubscribe from callback so no longer called
+        robot->pos->Unsubscribe();
+        // Call data output function for bot stalling
+        TestingStall(robot);
+
+        // Exit so no wasting compute
+        return 0;
+    }
+
     if(robot->stack->second != nullptr){
         // Getting the last recorded robot positions
         double lastx = robot->stack->xpos;
@@ -277,29 +288,43 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
     robot->xVel = vels2.xvel;
     robot->yVel = vels2.yvel;
 
-    // Outputting the test data
-    TestingDistance(robot);
+    // Adding to the test data vector
+    robot->testingDistances.push_back(CalculateDistance(Pose(robot->stack->xpos, robot->stack->ypos, 0, 0), robot));
 
     return 0;
 }
 
 void ConvoyRobot::TestingDistance(ConvoyRobot *robot) {
+    // Writing the average distance from VIP recorded for this robot
     std::ofstream dataFile("../testing/boids_follow_circle_results/distances.csv", std::ios::app);
     if (!dataFile.is_open()){
         std::cerr << "File failed to open: " << std::strerror(errno) << std::endl;
         return;
     }
 
-    // Getting the distance between VIP and this bot
-    double distance = CalculateDistance(Pose(robot->stack->xpos, robot->stack->ypos, 0, 0), robot);
+    // Calculating the average distance
+    double result = 0.0;
+    for(double i : robot->testingDistances) {
+        result += i;
+    }
+    result = result / robot->testingDistances.size();
 
-    // Use a data stream to write to the file
-    dataFile << distance << std::endl;
+    dataFile << result << std::endl;
     dataFile.close();
 }
 
 void ConvoyRobot::TestingStall(ConvoyRobot *robot) {
-    
+    // If the bot has stalled always output average distance here
+    TestingDistance(robot);
+
+    // // Output that the bot has stalled too
+    // std::ofstream dataFile("../testing/boids_follow_circle_results/stalled.csv", std::ios::app);
+    // if (!dataFile.is_open()){
+    //     std::cerr << "File failed to open: " << std::strerror(errno) << std::endl;
+    //     return;
+    // }
+    // dataFile << result << std::endl;
+    // dataFile.close();
 }
 
 std::pair<double, double> ConvoyRobot::CalculatePosition(double a, Pose pose, double distance) {
