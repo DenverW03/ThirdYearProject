@@ -291,7 +291,7 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
             robot->xVel += (robot->xVel - dx) * vipAlignmentMultiplier;
             robot->yVel += (robot->yVel - dx) * vipAlignmentMultiplier;
 
-            printf("Estimated velocity is: %f, %f\r\n", dx, dy);
+            // printf("Estimated velocity is: %f, %f\r\n", dx, dy);
         }
     }
 
