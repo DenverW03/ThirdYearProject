@@ -40,12 +40,6 @@ def world_setup(numRobots):
     with open('main.cpp', 'w', encoding='utf-8') as mainFile:
         mainFile.writelines(data)
 
-
-## Running stage
-def run_simulation(numRobot):
-    # Running the terminal commands to get the simulation running
-    subprocess.call(["sh","compile.sh"])
-
     # Editing the template shell script to load the models correctly
     data = ""
     with open('run_template.sh','r',encoding='utf-8') as mainFile:
@@ -60,6 +54,10 @@ def run_simulation(numRobot):
     # Write the new shell script
     with open('run.sh', 'w', encoding='utf-8') as mainFile:
         mainFile.writelines(data)
+
+## Running stage
+def run_simulation(numRobot):
+    subprocess.call(["make", "Makefile", "build"])
 
     try:
         # Run the shell script to run simulation

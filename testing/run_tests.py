@@ -1,5 +1,6 @@
 import sys
 import subprocess
+import os
 
 ## Function to build the parameter file
 def build_parameters(directory, string):
@@ -50,7 +51,7 @@ def world_setup(directory, num_robots):
 
     # Editing the template shell script to load the models correctly
     data = ""
-    with open('run_template.sh','r',encoding='utf-8') as mainFile:
+    with open(directory + 'run_template.sh','r',encoding='utf-8') as mainFile:
         data = mainFile.readlines()
 
     # Edit line 13 to add robot spawning lines
@@ -63,7 +64,27 @@ def world_setup(directory, num_robots):
     with open(directory + 'run.sh', 'w', encoding='utf-8') as mainFile:
         mainFile.writelines(data)
 
+## Running the simulation
+def run_simulation(directory):
+    # Compiling the code
+    os.chdir(directory)
+    subprocess.call(["make", "Makefile", "build"])
+
+    try:
+        # Run the shell script to run simulation
+        subprocess.call(["sh","run.sh"])
+    # Ignoring keyboard interrupts when ending simulation because they are annoying :)
+    except KeyboardInterrupt:
+        sys.exit(0)
+    except Exception as e:
+        print("An error occurred:", e)
+
 num_robots = int(sys.argv[1])
 string = "#define visionRange 10\r\n#define cohesionFactor 0.005\r\n#define avoidanceDistance 2\r\n#define avoidanceFactor 0.1\r\n#define avoidObstructionDistance 3\r\n#define avoidObstructionFactor 0.1\r\n#define vipMinDistance 3\r\n#define vipCohesionMultiplier 0.01\r\n#define vipSeparationMultiplier 0.5\r\n#define vipAlignmentMultiplier 0.02\r\n#define vipCircleRadius 5\r\n#define vipCircleNumPoints 360\r\n#define vipBoundingDistance 7\r\n#define velocityPollingRate 2"
-build_parameters("../boids_follow_circle", string)
-world_setup("../boids_follow_circle", num_robots)
+
+this_path = os.path.abspath(__file__) # The path of this script
+directory = "../boids_follow_circle/" # The path of the current algorithm directory
+
+build_parameters(directory, string)
+world_setup(directory, num_robots)
+run_simulation(directory)
