@@ -79,12 +79,30 @@ def run_simulation(directory):
     except Exception as e:
         print("An error occurred:", e)
 
-num_robots = int(sys.argv[1])
-string = "#define visionRange 10\r\n#define cohesionFactor 0.005\r\n#define avoidanceDistance 2\r\n#define avoidanceFactor 0.1\r\n#define avoidObstructionDistance 3\r\n#define avoidObstructionFactor 0.1\r\n#define vipMinDistance 3\r\n#define vipCohesionMultiplier 0.01\r\n#define vipSeparationMultiplier 0.5\r\n#define vipAlignmentMultiplier 0.02\r\n#define vipCircleRadius 5\r\n#define vipCircleNumPoints 360\r\n#define vipBoundingDistance 7\r\n#define velocityPollingRate 2"
+## Running a parameter set
+def test_parameter_set(params):
+    num_robots = int(sys.argv[1])
 
-this_path = os.path.abspath(__file__) # The path of this script
-directory = "../boids_follow_circle/" # The path of the current algorithm directory
+    # Outlining the string with all parameters replaced with 1 for editing string next
+    string = "#define visionRange 1\r\n#define cohesionFactor 1\r\n#define avoidanceDistance 1\r\n#define avoidanceFactor 1\r\n#define avoidObstructionDistance 1\r\n#define avoidObstructionFactor 1\r\n#define vipMinDistance 1\r\n#define vipCohesionMultiplier 1\r\n#define vipSeparationMultiplier 1\r\n#define vipAlignmentMultiplier 1\r\n#define vipCircleRadius 1\r\n#define vipCircleNumPoints 1\r\n#define vipBoundingDistance 1\r\n#define velocityPollingRate 1"
 
-build_parameters(directory, string)
-world_setup(directory, num_robots)
-run_simulation(directory)
+    # Building the string with the parameters passed into function inserted
+    final_string = ""
+    counter = 0
+    for line in string.split("\r\n"):
+        temp = line.split(" ")
+        newline = temp[0] + " " + temp[1] + " " + str(params[counter]) + "\r\n"
+        final_string += newline
+        counter += 1
+
+    this_path = os.path.abspath(__file__) # The path of this script
+    directory = "../boids_follow_circle/" # The path of the current algorithm directory
+
+    build_parameters(directory, final_string)
+    world_setup(directory, num_robots)
+    run_simulation(directory)
+
+    os.chdir(this_path)
+
+params = [10, 0.005, 2, 0.1, 3, 0.1, 3, 0.01, 0.5, 0.02, 5, 360, 7, 2]
+test_parameter_set(params)
