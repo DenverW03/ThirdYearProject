@@ -14,7 +14,7 @@ int main(int argc, char* argv[]) {
     world.Start();
     while(!world.TestQuit()) {
         if(!world.UpdateAll()) { // When UpdateAll() returns false, simulation continues
-        world.Run();
+            world.Run();
         };
     }
     // Cleanup

@@ -91,8 +91,8 @@ def test_parameter_set(params):
     counter = 0
     for line in string.split("\r\n"):
         temp = line.split(" ")
-        newline = temp[0] + " " + temp[1] + " " + str(params[counter]) + "\r\n"
-        final_string += newline
+        new_line = temp[0] + " " + temp[1] + " " + str(params[counter]) + "\r\n"
+        final_string += new_line
         counter += 1
 
     this_path = os.path.abspath(__file__) # The path of this script
