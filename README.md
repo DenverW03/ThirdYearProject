@@ -16,6 +16,7 @@ This project uses stage as a library, through the libstage plugin for C++
 - C++ for main logic
 
 Note: C++11 required, it is enforced in the compilation script, some features not available in previous C++ versions are used.
+Note++: Compilation is set up using clang with makefile as I use macos, however you can change this very easily by editing makefiles!
 
 ## Directories
 
