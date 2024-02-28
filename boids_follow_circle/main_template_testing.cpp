@@ -10,7 +10,7 @@ using namespace ConvoyRBT;
 
 int main(int argc, char* argv[]) {
     Init(&argc, &argv); // Initialising the stage library
-    WorldGui world(635, 666, "Simulation");
+    World world("Simulation");
     world.Load(argv[1]);
     // After this comment the necessary robot spawns are added
     

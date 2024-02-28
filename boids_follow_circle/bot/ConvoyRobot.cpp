@@ -189,7 +189,7 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
     // This belt has a large weighting for attraction towards it
 
     // Testing for when robot has crashed
-    if(robot->pos->Stalled()) {
+    if(robot->pos->Stalled() && testing) {
         // Unsubscribe from callback so no longer called
         robot->pos->Unsubscribe();
         // Call data output function for bot stalling

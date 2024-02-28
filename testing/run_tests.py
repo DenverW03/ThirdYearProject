@@ -31,7 +31,7 @@ def world_setup(directory, num_robots):
     ## MAIN METHOD WRITING
     # Editing the main method to match
     data = ""
-    with open(directory + 'main_template.cpp','r',encoding='utf-8') as mainFile:
+    with open(directory + 'main_template_testing.cpp','r',encoding='utf-8') as mainFile:
         data = mainFile.readlines()
 
     # Edit line 9 to ensure we malloc correct data size
@@ -81,13 +81,8 @@ def run_simulation(directory):
     except Exception as e:
         print("An error occurred:", e)
 
-## Running a parameter set
-def test_parameter_set(params):
-    num_robots = int(sys.argv[1])
-
-    # Outlining the string with all parameters replaced with 1 for editing string next
-    string = "#define visionRange 1\r\n#define cohesionFactor 1\r\n#define avoidanceDistance 1\r\n#define avoidanceFactor 1\r\n#define avoidObstructionDistance 1\r\n#define avoidObstructionFactor 1\r\n#define vipMinDistance 1\r\n#define vipCohesionMultiplier 1\r\n#define vipSeparationMultiplier 1\r\n#define vipAlignmentMultiplier 1\r\n#define vipCircleRadius 1\r\n#define vipCircleNumPoints 1\r\n#define vipBoundingDistance 1\r\n#define velocityPollingRate 1"
-
+# Creates a param string from the param template string given
+def create_param_string(string, params):
     # Building the string with the parameters passed into function inserted
     final_string = ""
     counter = 0
@@ -96,6 +91,15 @@ def test_parameter_set(params):
         new_line = temp[0] + " " + temp[1] + " " + str(params[counter]) + "\r\n"
         final_string += new_line
         counter += 1
+    return final_string
+
+## Running a parameter set
+def test_parameter_set(params):
+    num_robots = int(sys.argv[1])
+
+    # Outlining the string with all parameters replaced with 1 for editing string next
+    string = "#define visionRange 1\r\n#define cohesionFactor 1\r\n#define avoidanceDistance 1\r\n#define avoidanceFactor 1\r\n#define avoidObstructionDistance 1\r\n#define avoidObstructionFactor 1\r\n#define vipMinDistance 1\r\n#define vipCohesionMultiplier 1\r\n#define vipSeparationMultiplier 1\r\n#define vipAlignmentMultiplier 1\r\n#define vipCircleRadius 1\r\n#define vipCircleNumPoints 1\r\n#define vipBoundingDistance 1\r\n#define velocityPollingRate 1\r\n#define testing 0"
+    final_string = create_param_string(string, params)
 
     this_path = os.path.abspath(__file__) # The path of this script
     directory = "../boids_follow_circle/" # The path of the current algorithm directory
@@ -106,5 +110,12 @@ def test_parameter_set(params):
 
     os.chdir(this_path)
 
-params = [10, 0.005, 2, 0.1, 3, 0.1, 3, 0.01, 0.5, 0.02, 5, 360, 7, 2]
-test_parameter_set(params)
+def test_all_sets(sets):
+    for params in sets:
+        test_parameter_set(params)
+
+params = [
+    [10, 0.005, 2, 0.1, 3, 0.1, 3, 0.01, 0.5, 0.02, 5, 360, 7, 2, 1], # First parameter set
+    [10, 0.005, 2, 0.1, 3, 0.2, 3, 0.01, 0.5, 0.02, 5, 360, 7, 2, 1]
+    ]
+test_all_sets(params)

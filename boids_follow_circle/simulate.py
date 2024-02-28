@@ -23,7 +23,7 @@ def world_setup(numRobots):
 
     # Editing the main method to match
     data = ""
-    with open('main_template.cpp','r',encoding='utf-8') as mainFile:
+    with open('main_template_demo.cpp','r',encoding='utf-8') as mainFile:
         data = mainFile.readlines()
 
     # Edit line 9 to ensure we malloc correct data size
@@ -35,8 +35,6 @@ def world_setup(numRobots):
     # Edit line 16 to add robot spawning lines
     for i in range(numRobots):
         data[15] = data[15] + '    robots[' + str(i) + '] = ConvoyRobot((ModelPosition *)world.GetModel(argv[' + str(i + 3) + ']), Pose::Random(-12, 12, -12, 12));\r\n'
-
-    data[23] = "    for(int i=0; i<" + (numRobots) + "; i++) {\r\n"
 
     # Write new file structure to main
     with open('main.cpp', 'w', encoding='utf-8') as mainFile:
@@ -57,6 +55,22 @@ def world_setup(numRobots):
     with open('run.sh', 'w', encoding='utf-8') as mainFile:
         mainFile.writelines(data)
 
+## Function to build the parameter file
+def build_parameters(string):
+    with open('./bot/Parameters.hh', 'w', encoding='utf-8') as param_file:
+        param_file.writelines(string)
+
+def create_param_string(string, params):
+    # Building the string with the parameters passed into function inserted
+    final_string = ""
+    counter = 0
+    for line in string.split("\r\n"):
+        temp = line.split(" ")
+        new_line = temp[0] + " " + temp[1] + " " + str(params[counter]) + "\r\n"
+        final_string += new_line
+        counter += 1
+    return final_string
+
 ## Running stage
 def run_simulation(numRobot):
     subprocess.call(["make", "Makefile", "build"])
@@ -73,5 +87,9 @@ def run_simulation(numRobot):
 
 # Use command line to choose number of robots
 numRobots = int(sys.argv[1])
+string = "#define visionRange 1\r\n#define cohesionFactor 1\r\n#define avoidanceDistance 1\r\n#define avoidanceFactor 1\r\n#define avoidObstructionDistance 1\r\n#define avoidObstructionFactor 1\r\n#define vipMinDistance 1\r\n#define vipCohesionMultiplier 1\r\n#define vipSeparationMultiplier 1\r\n#define vipAlignmentMultiplier 1\r\n#define vipCircleRadius 1\r\n#define vipCircleNumPoints 1\r\n#define vipBoundingDistance 1\r\n#define velocityPollingRate 1\r\n#define testing 0"
+params = [10, 0.005, 2, 0.1, 3, 0.1, 3, 0.01, 0.5, 0.02, 5, 360, 7, 2, 0]
+final_string = create_param_string(string, params)
+build_parameters(final_string)
 world_setup(numRobots)
 run_simulation(numRobots)
