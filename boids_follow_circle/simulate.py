@@ -3,8 +3,15 @@ import sys
 
 ## Setup stage
 def world_setup(numRobots):
+    # Change world speed
+    with open("./world/template.world", 'r', encoding='utf-8') as template:
+        file_read = template.readlines()
+        file_read[4] = "speedup 1\r\n"
+        with open("./world/generated.world", 'w', encoding='utf-8') as generated:
+            generated.writelines(file_read)
+
     # Import template world file
-    file = open("./world/template.world")
+    file = open("./world/generated.world")
     # Read file to string buffer
     fileRead = file.read()
     file.close()
