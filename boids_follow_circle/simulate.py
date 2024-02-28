@@ -33,11 +33,11 @@ def world_setup(numRobots):
     with open('main_template_demo.cpp','r',encoding='utf-8') as mainFile:
         data = mainFile.readlines()
 
-    # Edit line 9 to ensure we malloc correct data size
-    data[8] = 'ConvoyRobot *robots = (ConvoyRobot *) malloc(' + str(numRobots) + ' * sizeof(ConvoyRobot));\r\n'
+    # Add the robot array allocation
+    data[15] = "    ConvoyRobot *robots = (ConvoyRobot *) malloc(" + str(numRobots) + " * sizeof(ConvoyRobot));\r\n"
 
     # Edit line 16 to add the VIP robot spawning
-    data[15] = "    VipRBT::VipRobot vip = VipRBT::VipRobot((ModelPosition *)world.GetModel(argv[2]), Pose(-8, 8, 0, 0));\r\n"
+    data[15] += "    VipRBT::VipRobot vip = VipRBT::VipRobot((ModelPosition *)world.GetModel(argv[2]), Pose(-8, 8, 0, 0));\r\n"
 
     # Edit line 16 to add robot spawning lines
     for i in range(numRobots):

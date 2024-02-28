@@ -188,6 +188,8 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
     // The circle is a concept of a "belt" around the VIP, much like a planet
     // This belt has a large weighting for attraction towards it
 
+    printf("Running\r\n");
+
     // Testing for when robot has crashed
     if(robot->pos->Stalled() && testing) {
         // Unsubscribe from callback so no longer called
@@ -373,10 +375,6 @@ std::vector<std::pair<double, double>> ConvoyRobot::GeneratePoints(Pose pose, do
 ConvoyRobot::HVelocities ConvoyRobot::CalculateHolonomic(double linearvel, double turnvel, ConvoyRobot *robot) {
     // Declaring a struct to hold velocity values
     HVelocities vels;
-
-    // Calculating the angle difference
-
-    // double angleDiff = turnvel * (1.0/60.0);
 
     // Calculating the new direction
 
