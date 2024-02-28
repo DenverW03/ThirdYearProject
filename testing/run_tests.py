@@ -34,17 +34,18 @@ def world_setup(directory, num_robots):
     with open(directory + 'main_template_testing.cpp','r',encoding='utf-8') as mainFile:
         data = mainFile.readlines()
 
-    # Edit line 9 to ensure we malloc correct data size
-    data[8] = 'ConvoyRobot *robots = (ConvoyRobot *) malloc(' + str(num_robots) + ' * sizeof(ConvoyRobot));\r\n'
+    # Replace the number of robots definition
+    data[10] = "#define numRobots " + str(num_robots) + "\r\n"
+
+    # Add the robot array allocation
+    data[17] = "    ConvoyRobot *robots = (ConvoyRobot *) malloc(" + str(num_robots) + " * sizeof(ConvoyRobot));\r\n"
 
     # Edit line 16 to add the VIP robot spawning
-    data[15] = "    VipRBT::VipRobot vip = VipRBT::VipRobot((ModelPosition *)world.GetModel(argv[2]), Pose(-8, 8, 0, 0));\r\n"
+    data[17] += "    VipRBT::VipRobot vip = VipRBT::VipRobot((ModelPosition *)world.GetModel(argv[2]), Pose(-8, 8, 0, 0));\r\n"
 
     # Edit line 13 to add robot spawning lines
     for i in range(num_robots):
-        data[15] = data[15] + '    robots[' + str(i) + '] = ConvoyRobot((ModelPosition *)world.GetModel(argv[' + str(i + 3) + ']), Pose::Random(-12, 12, -12, 12));\r\n'
-
-    data[23] = "    for(int i=0; i<" + str(num_robots) + "; i++) {\r\n"
+        data[17] = data[17] + '    robots[' + str(i) + '] = ConvoyRobot((ModelPosition *)world.GetModel(argv[' + str(i + 3) + ']), Pose::Random(-12, 12, -12, 12));\r\n'
 
     # Write new file structure to main
     with open(directory + 'main.cpp', 'w', encoding='utf-8') as mainFile:
