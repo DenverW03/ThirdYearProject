@@ -37,8 +37,9 @@ def world_setup(directory, num_robots):
     # Replace the number of robots definition
     data[10] = "#define numRobots " + str(num_robots) + "\r\n"
 
+    #ConvoyRobot *robots = new ConvoyRobot[numRobots];
     # Add the robot array allocation
-    data[17] = "    ConvoyRobot *robots = (ConvoyRobot *) malloc(" + str(num_robots) + " * sizeof(ConvoyRobot));\r\n"
+    data[17] = "    ConvoyRobot *robots = new ConvoyRobot[" + str(num_robots) + "];\r\n"
 
     # Edit line 16 to add the VIP robot spawning
     data[17] += "    VipRBT::VipRobot vip = VipRBT::VipRobot((ModelPosition *)world.GetModel(argv[2]), Pose(-8, 8, 0, 0));\r\n"
