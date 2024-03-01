@@ -57,7 +57,6 @@ namespace ConvoyRBT {
         public:
 
             // Variable declarations
-
             ModelPosition *pos;
             ModelBlobfinder **cameras;
             double xVel;
@@ -67,10 +66,12 @@ namespace ConvoyRBT {
             // These variables are used in the VIP velocity estimation
             struct VipVelocityNode *stack;
             unsigned long lastSysTime;
+
+            // Used for data reporting
+            int id;
             unsigned long startTime;
 
             // Angles of the cameras places on the bot
-
             double angles[16] = {0, 22.5, 45, 67.5, 90, 112.5, 135, 157.5, 180, -22.5, -45, -67.5, -90, -112.5, -135, -157.5};
 
             // Storing distances for testing data output
@@ -79,7 +80,7 @@ namespace ConvoyRBT {
             // Function declarations
 
             ConvoyRobot();
-            ConvoyRobot(ModelPosition *modelPos, Pose pose);
+            ConvoyRobot(ModelPosition *modelPos, Pose pose, int id);
             static int SensorUpdate(Model *, SensorInputData *data);
             static int PositionUpdate(Model *, ConvoyRobot *robot);
             static void TestingDistance(ConvoyRobot *robot);

@@ -17,7 +17,8 @@ ConvoyRobot::ConvoyRobot(){
 };
 
 // Constructor for the class with appropriate setup
-ConvoyRobot::ConvoyRobot(ModelPosition *modelPos, Pose pose) {
+ConvoyRobot::ConvoyRobot(ModelPosition *modelPos, Pose pose, int id) {
+    this->id = id;
     this->pos = nullptr;
 
     this->stack = (struct VipVelocityNode*)malloc(sizeof(struct VipVelocityNode));
@@ -310,7 +311,7 @@ void ConvoyRobot::TestingDistance(ConvoyRobot *robot) {
     }
     result = result / robot->testingDistances.size();
 
-    dataFile << result << std::endl;
+    dataFile << robot->id << "," << result << std::endl;
     dataFile.close();
 }
 
@@ -328,7 +329,7 @@ void ConvoyRobot::TestingStall(ConvoyRobot *robot) {
     double result = ((double)std::time(nullptr) - (double)robot->startTime);
     result = result * timeScale;
 
-    dataFile << result << std::endl;
+    dataFile << robot->id << "," << result << std::endl;
     dataFile.close();
 }
 

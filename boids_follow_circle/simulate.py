@@ -41,7 +41,7 @@ def world_setup(numRobots):
 
     # Edit line 16 to add robot spawning lines
     for i in range(numRobots):
-        data[15] = data[15] + '    robots[' + str(i) + '] = ConvoyRobot((ModelPosition *)world.GetModel(argv[' + str(i + 3) + ']), Pose::Random(-12, 12, -12, 12));\r\n'
+        data[15] = data[15] + '    robots[' + str(i) + '] = ConvoyRobot((ModelPosition *)world.GetModel(argv[' + str(i + 3) + ']), Pose::Random(-12, 12, -12, 12), ' + str(i + 1) + ');\r\n'
 
     # Write new file structure to main
     with open('main.cpp', 'w', encoding='utf-8') as mainFile:
