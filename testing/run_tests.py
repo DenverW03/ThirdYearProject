@@ -97,7 +97,7 @@ def test_parameter_set(params, directory):
     this_path = "../testing/" # The path of this script
 
     build_parameters(directory, final_string)
-    world_setup(directory, num_robots)
+    world_setup(directory)
     run_simulation(directory)
 
     os.chdir(this_path)
@@ -109,11 +109,11 @@ def test_all_sets(sets):
     for params in sets:
         for i in range(runs):
             test_parameter_set(params, directory)
-        subprocess.call(["python", "evaluate.py", data_directory, str(num_robots), str(runs)]) # Calling the data evaluation script
+        subprocess.call(["/opt/homebrew/bin/python3.11", "evaluate.py", data_directory, str(num_robots), str(runs)]) # Calling the data evaluation script
 
 # Global Variables
 num_robots = int(sys.argv[1])
-runs = 20 # Number of testing runs
+runs = 1 # Number of testing runs
 
 params = [
     [10, 0.005, 2, 0.1, 3, 0.1, 3, 0.01, 0.5, 0.02, 5, 360, 7, 2, 1, 60],
