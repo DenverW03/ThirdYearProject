@@ -67,6 +67,7 @@ namespace ConvoyRBT {
             // These variables are used in the VIP velocity estimation
             struct VipVelocityNode *stack;
             unsigned long lastSysTime;
+            unsigned long startTime;
 
             // Angles of the cameras places on the bot
 

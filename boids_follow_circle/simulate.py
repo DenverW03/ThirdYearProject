@@ -94,8 +94,24 @@ def run_simulation(numRobot):
 
 # Use command line to choose number of robots
 numRobots = int(sys.argv[1])
-string = "#define visionRange 1\r\n#define cohesionFactor 1\r\n#define avoidanceDistance 1\r\n#define avoidanceFactor 1\r\n#define avoidObstructionDistance 1\r\n#define avoidObstructionFactor 1\r\n#define vipMinDistance 1\r\n#define vipCohesionMultiplier 1\r\n#define vipSeparationMultiplier 1\r\n#define vipAlignmentMultiplier 1\r\n#define vipCircleRadius 1\r\n#define vipCircleNumPoints 1\r\n#define vipBoundingDistance 1\r\n#define velocityPollingRate 1\r\n#define testing 0"
-params = [10, 0.005, 2, 0.1, 3, 0.1, 3, 0.01, 0.5, 0.02, 5, 360, 7, 2, 0]
+string = "#define visionRange 1\r\n#define cohesionFactor 1\r\n#define avoidanceDistance 1\r\n#define avoidanceFactor 1\r\n
+#define avoidObstructionDistance 1\r\n#define avoidObstructionFactor 1\r\n#define vipMinDistance 1\r\n#define vipCohesionMultiplier 1\r\n#define vipSeparationMultiplier 1\r\n#define vipAlignmentMultiplier 1\r\n#define vipCircleRadius 1\r\n#define vipCircleNumPoints 1\r\n#define vipBoundingDistance 1\r\n#define velocityPollingRate 1\r\n#define testing 0\r\n#define timeScale 1"
+params = [10, # vision range
+          0.005, # cohesion factor
+          2, # avoidance distance
+          0.1, # avoidance factor
+          3, # avoid obstruction distance
+          0.1, # avoid obstruction factor
+          3, # vip min distance
+          0.01, # vip cohesion mutliplier
+          0.5, # vip separation multiplier
+          0.02, # vip alignment multiplier
+          5, # vip circle radius
+          360, # vip circle num points
+          7, # vip bounding distance
+          2, # velocity polling rate
+          0, # testing truth value
+          1] # time scale
 final_string = create_param_string(string, params)
 build_parameters(final_string)
 world_setup(numRobots)

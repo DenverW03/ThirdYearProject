@@ -13,3 +13,4 @@
 #define vipBoundingDistance 7
 #define velocityPollingRate 2
 #define testing 1
+#define timeScale 60

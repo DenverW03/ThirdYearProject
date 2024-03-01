@@ -14,40 +14,38 @@ int main(int argc, char* argv[]) {
     Init(&argc, &argv); // Initialising the stage library
     World world("Simulation");
     world.Load(argv[1]);
-    // After this comment the necessary robot spawns are added
+
+    // Adding the robots for the simulation
+    ConvoyRobot *robots = new ConvoyRobot[numRobots];
+    VipRBT::VipRobot vip = VipRBT::VipRobot((ModelPosition *)world.GetModel(argv[2]), Pose(-8, 8, 0, 0));
+    // for(int i=0; i<numRobots; i++) {
+    //     robots[i] = ConvoyRobot((ModelPosition *)world.GetModel(argv[i + 3]), Pose::Random(-12, 12, -12, 12));
+    //     printf("Added: %d", i);
+    // }
+    
     
     world.Start();
     while(!world.TestQuit()) {
         if(!world.UpdateAll()) { // When UpdateAll() returns false, simulation continues
             world.Run();
-
+            
+            // If can quit early
             int counter = 0;
             for(int i=0; i<numRobots; i++) {
                 if(robots[i].pos->Stalled()) {
+                    // Storing the time to stall in seconds
+                    // timeToStall[i] = world.SimTimeNow();
+                    // printf("Time to stall %llu\r\n", world.SimTimeNow());
                     counter += 1;
                 }
             }
             if(counter == numRobots) world.Quit();
         };
     }
-    
-    for(int i=0; i<numRobots; i++) {
-        std::ofstream dataFile("../testing/boids_follow_circle_results/stalled.csv", std::ios::app);
-        if (!dataFile.is_open()){
-            std::cerr << "File failed to open: " << std::strerror(errno) << std::endl;
-            // File fails to open just end program
-            break;
-        }
-        if(robots[i].pos->Stalled()) {
-            dataFile << 1 << std::endl;
-        }
-        else {
-            dataFile << 0 << std::endl;
-        }
-        dataFile.close();
-    }
+    world.Quit();
 
     // Cleanup
-    free(robots);
+    delete[] robots;
+    // delete[] timeToStall;
     exit(0);
 }

@@ -75,6 +75,9 @@ ConvoyRobot::ConvoyRobot(ModelPosition *modelPos, Pose pose) {
     NHVelocities nonHolonomic = CalculateNonHolonomic(this->xVel, this->yVel, this);
     this->pos->SetSpeed(nonHolonomic.linearVel, 0, nonHolonomic.rotationalVel);
 
+    printf("Running\r\n");
+
+    this->startTime = std::time(nullptr);
     this->lastSysTime = std::time(nullptr);
 }
 
@@ -140,8 +143,8 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
                 // For red VIP going to have the same vision range as for fellow convoy bots
                 if(distance > visionRange) break;
 
-                // Getting the time difference
-                unsigned long timeDiff = std::time(nullptr) - robot->lastSysTime;
+                // Getting the stage simulation time difference which has to be adjusted for the time scale
+                unsigned long timeDiff = (std::time(nullptr) - robot->lastSysTime) / timeScale;
 
                 Pose pose = robot->GetPose();
                 auto position = CalculatePosition(robot->angles[data->num], pose, distance);
@@ -170,7 +173,7 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
                     robot->boidData.numNeighbours += 1;
                 }
 
-                // If it has been over 5 seconds
+                // If it has been over 5 seconds, adjusted for stage time scale
                 if(timeDiff > velocityPollingRate) {
                     push(vipEffectX, vipEffectY, robot);
                     robot->lastSysTime = std::time(nullptr);
@@ -187,8 +190,6 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
     // Cohesion for staying as close to "the circle" as possible
     // The circle is a concept of a "belt" around the VIP, much like a planet
     // This belt has a large weighting for attraction towards it
-
-    printf("Running\r\n");
 
     // Testing for when robot has crashed
     if(robot->pos->Stalled() && testing) {
@@ -317,14 +318,18 @@ void ConvoyRobot::TestingStall(ConvoyRobot *robot) {
     // If the bot has stalled always output average distance here
     TestingDistance(robot);
 
-    // // Output that the bot has stalled too
-    // std::ofstream dataFile("../testing/boids_follow_circle_results/stalled.csv", std::ios::app);
-    // if (!dataFile.is_open()){
-    //     std::cerr << "File failed to open: " << std::strerror(errno) << std::endl;
-    //     return;
-    // }
-    // dataFile << result << std::endl;
-    // dataFile.close();
+    std::ofstream dataFile("../testing/boids_follow_circle_results/stalled.csv", std::ios::app);
+    if (!dataFile.is_open()){
+        std::cerr << "File failed to open: " << std::strerror(errno) << std::endl;
+        return;
+    }
+
+    // Calculating the time it took to stall
+    double result = ((double)std::time(nullptr) - (double)robot->startTime);
+    result = result * timeScale;
+
+    dataFile << result << std::endl;
+    dataFile.close();
 }
 
 std::pair<double, double> ConvoyRobot::CalculatePosition(double a, Pose pose, double distance) {
@@ -336,7 +341,6 @@ std::pair<double, double> ConvoyRobot::CalculatePosition(double a, Pose pose, do
     double hyp = distance;
 
     // Using a composite angle for real world sensor angle
-    // Pose pose = robot->GetPose();
     double botAngle = pose.a;
     if (botAngle < 0) botAngle = (2 * M_PI) - abs(botAngle);
     double compositeAngle = botAngle + theta;
