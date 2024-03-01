@@ -93,7 +93,7 @@ def test_parameter_set(params):
     num_robots = int(sys.argv[1])
 
     # Outlining the string with all parameters replaced with 1 for editing string next
-    string = "#define visionRange 1\r\n#define cohesionFactor 1\r\n#define avoidanceDistance 1\r\n#define avoidanceFactor 1\r\n#define avoidObstructionDistance 1\r\n#define avoidObstructionFactor 1\r\n#define vipMinDistance 1\r\n#define vipCohesionMultiplier 1\r\n#define vipSeparationMultiplier 1\r\n#define vipAlignmentMultiplier 1\r\n#define vipCircleRadius 1\r\n#define vipCircleNumPoints 1\r\n#define vipBoundingDistance 1\r\n#define velocityPollingRate 1\r\n#define testing 0"
+    string = "#define visionRange 1\r\n#define cohesionFactor 1\r\n#define avoidanceDistance 1\r\n#define avoidanceFactor 1\r\n#define avoidObstructionDistance 1\r\n#define avoidObstructionFactor 1\r\n#define vipMinDistance 1\r\n#define vipCohesionMultiplier 1\r\n#define vipSeparationMultiplier 1\r\n#define vipAlignmentMultiplier 1\r\n#define vipCircleRadius 1\r\n#define vipCircleNumPoints 1\r\n#define vipBoundingDistance 1\r\n#define velocityPollingRate 1\r\n#define testing 0\r\n#define timeScale 1"
     final_string = create_param_string(string, params)
 
     this_path = "../testing/" # The path of this script
@@ -110,7 +110,7 @@ def test_all_sets(sets):
         test_parameter_set(params)
 
 params = [
-    [10, 0.005, 2, 0.1, 3, 0.1, 3, 0.01, 0.5, 0.02, 5, 360, 7, 2, 1], # First parameter set
-    [10, 0.005, 2, 0.1, 3, 0.2, 3, 0.01, 0.5, 0.02, 5, 360, 7, 2, 1]
+    [10, 0.005, 2, 0.1, 3, 0.1, 3, 0.01, 0.5, 0.02, 5, 360, 7, 2, 1, 60], # First parameter set
+    [10, 0.005, 2, 0.1, 3, 0.2, 3, 0.01, 0.5, 0.02, 5, 360, 7, 2, 1, 60]
     ]
 test_all_sets(params)
