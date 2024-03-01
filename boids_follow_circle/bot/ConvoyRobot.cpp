@@ -78,7 +78,10 @@ ConvoyRobot::ConvoyRobot(ModelPosition *modelPos, Pose pose, int id) {
 
     printf("Running\r\n");
 
-    this->startTime = std::time(nullptr);
+    auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
+    long long milliseconds_count = milliseconds.count();
+    this->startTime = static_cast<unsigned long>(milliseconds_count);
+    // this->startTime = static_cast<unsigned long>(std::chrono::duration_cast< std::chrono::milliseconds >(std::chrono::system_clock::now().time_since_epoch()));
     this->lastSysTime = std::time(nullptr);
 }
 
@@ -296,40 +299,31 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
     return 0;
 }
 
-void ConvoyRobot::TestingDistance(ConvoyRobot *robot) {
-    // Writing the average distance from VIP recorded for this robot
-    std::ofstream dataFile("../testing/boids_follow_circle_results/distances.csv", std::ios::app);
+void ConvoyRobot::TestingStall(ConvoyRobot *robot) {
+    // Creating a filestream to the output csv
+    std::ofstream dataFile("../testing/boids_follow_circle_results/output.csv", std::ios::app);
     if (!dataFile.is_open()){
         std::cerr << "File failed to open: " << std::strerror(errno) << std::endl;
         return;
     }
+
+    // Calculating the time this robot took to stall
+    auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
+    long long milliseconds_count = milliseconds.count();
+    unsigned long timeNow = static_cast<unsigned long>(milliseconds_count);
+
+    double result = ((double)timeNow - (double)robot->startTime);
+    result = result / 1000; // time elapsed in seconds
+    result = result * timeScale / 2;
 
     // Calculating the average distance
-    double result = 0.0;
+    double result2 = 0.0;
     for(double i : robot->testingDistances) {
-        result += i;
+        result2 += i;
     }
-    result = result / robot->testingDistances.size();
+    result2 = result2 / robot->testingDistances.size();
 
-    dataFile << robot->id << "," << result << std::endl;
-    dataFile.close();
-}
-
-void ConvoyRobot::TestingStall(ConvoyRobot *robot) {
-    // If the bot has stalled always output average distance here
-    TestingDistance(robot);
-
-    std::ofstream dataFile("../testing/boids_follow_circle_results/stalled.csv", std::ios::app);
-    if (!dataFile.is_open()){
-        std::cerr << "File failed to open: " << std::strerror(errno) << std::endl;
-        return;
-    }
-
-    // Calculating the time it took to stall
-    double result = ((double)std::time(nullptr) - (double)robot->startTime);
-    result = result * timeScale;
-
-    dataFile << robot->id << "," << result << std::endl;
+    dataFile << robot->id << "," << result2 << "," << result << std::endl;
     dataFile.close();
 }
 

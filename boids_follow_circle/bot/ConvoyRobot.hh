@@ -83,7 +83,6 @@ namespace ConvoyRBT {
             ConvoyRobot(ModelPosition *modelPos, Pose pose, int id);
             static int SensorUpdate(Model *, SensorInputData *data);
             static int PositionUpdate(Model *, ConvoyRobot *robot);
-            static void TestingDistance(ConvoyRobot *robot);
             static void TestingStall(ConvoyRobot *robot);
             static std::pair<double, double> CalculatePosition(double a, Pose pose, double distance);
             static double CalculateDistance(Pose pose, ConvoyRobot *robot);
