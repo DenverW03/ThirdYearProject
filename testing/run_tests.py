@@ -8,7 +8,7 @@ def build_parameters(directory, string):
         param_file.writelines(string)
 
 ## Setup stage, takes directory as string and the number of robots
-def world_setup(directory, num_robots):
+def world_setup(directory):
     ## WORLDFILE WRITING
     # Import template world file
     file = open(directory + "/world/template.world")
@@ -89,15 +89,12 @@ def create_param_string(string, params):
     return final_string
 
 ## Running a parameter set
-def test_parameter_set(params):
-    num_robots = int(sys.argv[1])
-
+def test_parameter_set(params, directory):
     # Outlining the string with all parameters replaced with 1 for editing string next
     string = "#define visionRange 1\r\n#define cohesionFactor 1\r\n#define avoidanceDistance 1\r\n#define avoidanceFactor 1\r\n#define avoidObstructionDistance 1\r\n#define avoidObstructionFactor 1\r\n#define vipMinDistance 1\r\n#define vipCohesionMultiplier 1\r\n#define vipSeparationMultiplier 1\r\n#define vipAlignmentMultiplier 1\r\n#define vipCircleRadius 1\r\n#define vipCircleNumPoints 1\r\n#define vipBoundingDistance 1\r\n#define velocityPollingRate 1\r\n#define testing 0\r\n#define timeScale 1"
     final_string = create_param_string(string, params)
 
     this_path = "../testing/" # The path of this script
-    directory = "../boids_follow_circle/" # The path of the current algorithm directory
 
     build_parameters(directory, final_string)
     world_setup(directory, num_robots)
@@ -106,11 +103,22 @@ def test_parameter_set(params):
     os.chdir(this_path)
 
 def test_all_sets(sets):
+    # Testing the ring based algorithm
+    directory = "../boids_follow_circle/"
+    data_directory = "./boids_follow_circle_results/"
     for params in sets:
-        test_parameter_set(params)
+        for i in range(runs):
+            test_parameter_set(params, directory)
+        subprocess.call(["python", "evaluate.py", data_directory, str(num_robots), str(runs)]) # Calling the data evaluation script
+
+# Global Variables
+num_robots = int(sys.argv[1])
+runs = 20 # Number of testing runs
 
 params = [
     [10, 0.005, 2, 0.1, 3, 0.1, 3, 0.01, 0.5, 0.02, 5, 360, 7, 2, 1, 60],
     [10, 0.005, 2, 0.1, 3, 0.2, 3, 0.01, 0.5, 0.02, 5, 360, 7, 2, 1, 60]
     ]
+
+# Running testing on parameter sets
 test_all_sets(params)
