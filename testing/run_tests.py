@@ -37,17 +37,6 @@ def world_setup(directory, num_robots):
     # Replace the number of robots definition
     data[10] = "#define numRobots " + str(num_robots) + "\r\n"
 
-    #ConvoyRobot *robots = new ConvoyRobot[numRobots];
-    # Add the robot array allocation
-    data[17] = "    ConvoyRobot *robots = new ConvoyRobot[" + str(num_robots) + "];\r\n"
-
-    # Edit line 16 to add the VIP robot spawning
-    data[17] += "    VipRBT::VipRobot vip = VipRBT::VipRobot((ModelPosition *)world.GetModel(argv[2]), Pose(-8, 8, 0, 0));\r\n"
-
-    # Edit line 13 to add robot spawning lines
-    for i in range(num_robots):
-        data[17] = data[17] + '    robots[' + str(i) + '] = ConvoyRobot((ModelPosition *)world.GetModel(argv[' + str(i + 3) + ']), Pose::Random(-12, 12, -12, 12));\r\n'
-
     # Write new file structure to main
     with open(directory + 'main.cpp', 'w', encoding='utf-8') as mainFile:
         mainFile.writelines(data)
