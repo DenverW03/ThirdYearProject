@@ -23,17 +23,19 @@ for i in range(runs):
     # Reading the csv
     temp_dataframe = pd.read_csv(data_directory, dtype=float, skiprows=row_skip, nrows=skip_length, names=["id","AvgDistance","TimeToStall"])
 
-    print("----------")
-    print(temp_dataframe)
-    print("----------")
-
     # Dropping duplicate ids in the range
     temp_dataframe_no_duplicates = temp_dataframe.drop_duplicates(subset=["id"])
+
+    # print(temp_dataframe_no_duplicates)
 
     # Dropping the first column
     temp_dataframe_no_id = temp_dataframe_no_duplicates.drop(columns=["id"])
 
+    # print(temp_dataframe_no_id)
+
     # Concatenating the frame
     new_dataframe = pd.concat([new_dataframe, temp_dataframe_no_id])
+
+    # print(new_dataframe)
     
 new_dataframe.to_csv(directory + 'processed_data.csv', index=False)

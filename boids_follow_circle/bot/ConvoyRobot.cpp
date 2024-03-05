@@ -323,6 +323,11 @@ void ConvoyRobot::TestingStall(ConvoyRobot *robot) {
     }
     result2 = result2 / robot->testingDistances.size();
 
+    if(std::isnan(result2)) {
+        dataFile.close();
+        return;
+    }
+
     dataFile << robot->id << "," << result2 << "," << result << std::endl;
     dataFile.close();
 }

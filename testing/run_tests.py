@@ -69,8 +69,11 @@ def run_simulation(directory):
 
     try:
         # Run the shell script to run simulation
-        subprocess.call(["sh","run.sh"])
-    # Ignoring keyboard interrupts when ending simulation because they are annoying :)
+        with subprocess.Popen(["sh", "run.sh"]) as process:
+            try:
+                stdout, stderr = process.communicate(timeout=15) # no simulation should take longer than 10 seconds, using 15 to be safe
+            except subprocess.TimeoutExpired:
+                process.kill()
     except KeyboardInterrupt:
         sys.exit(0)
     except Exception as e:
@@ -113,7 +116,7 @@ def test_all_sets(sets):
 
 # Global Variables
 num_robots = int(sys.argv[1])
-runs = 1 # Number of testing runs
+runs = 20 # Number of testing runs
 
 params = [
     [10, 0.005, 2, 0.1, 3, 0.1, 3, 0.01, 0.5, 0.02, 5, 360, 7, 2, 1, 60],
