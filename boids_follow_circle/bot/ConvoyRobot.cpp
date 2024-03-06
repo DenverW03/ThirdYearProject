@@ -150,7 +150,6 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
                 if(distance > visionRange) break;
 
                 // Getting the stage simulation time difference which has to be adjusted for the time scale
-                // unsigned long timeDiff = (std::time(nullptr) - robot->lastSysTime) * timeScale;
                 auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
                 long long ms_count = ms.count();
                 unsigned long timeDiff = (static_cast<unsigned long>(ms_count) - robot->lastSysTime) * timeScale;

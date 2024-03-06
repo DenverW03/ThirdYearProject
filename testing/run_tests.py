@@ -119,8 +119,24 @@ num_robots = int(sys.argv[1])
 runs = 20 # Number of testing runs
 
 params = [
-    [10, 0.005, 2, 0.1, 3, 0.1, 3, 0.01, 0.5, 0.02, 5, 360, 7, 2, 1, 60],
-    [10, 0.005, 2, 0.1, 3, 0.2, 3, 0.01, 0.5, 0.02, 5, 360, 7, 2, 1, 60]
+        [
+            10, # vision range
+            0.005, # cohesion factor
+            2, # avoidance distance
+            0.3, # avoidance factor
+            3, # avoid obstruction distance
+            0.1, # avoid obstruction factor
+            3, # vip min distance
+            0.01, # vip cohesion mutliplier
+            0.1, # vip separation multiplier
+            0.01, # vip alignment multiplier
+            5, # vip circle radius
+            360, # vip circle num points
+            7, # vip bounding distance
+            2000, # velocity polling rate
+            0, # testing truth value
+            1
+        ] # time scale
     ]
 
 # Running testing on parameter sets
