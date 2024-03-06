@@ -98,13 +98,13 @@ string = "#define visionRange 1\r\n#define cohesionFactor 1\r\n#define avoidance
 params = [10, # vision range
           0.005, # cohesion factor
           2, # avoidance distance
-          0.1, # avoidance factor
+          0.3, # avoidance factor
           3, # avoid obstruction distance
           0.1, # avoid obstruction factor
           3, # vip min distance
           0.01, # vip cohesion mutliplier
-          0.5, # vip separation multiplier
-          0.02, # vip alignment multiplier
+          0.1, # vip separation multiplier
+          0.01, # vip alignment multiplier
           5, # vip circle radius
           360, # vip circle num points
           7, # vip bounding distance
