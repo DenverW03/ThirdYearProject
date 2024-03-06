@@ -108,7 +108,7 @@ params = [10, # vision range
           5, # vip circle radius
           360, # vip circle num points
           7, # vip bounding distance
-          2, # velocity polling rate
+          2000, # velocity polling rate
           0, # testing truth value
           1] # time scale
 final_string = create_param_string(string, params)

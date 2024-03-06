@@ -82,7 +82,9 @@ ConvoyRobot::ConvoyRobot(ModelPosition *modelPos, Pose pose, int id) {
     long long milliseconds_count = milliseconds.count();
     this->startTime = static_cast<unsigned long>(milliseconds_count);
     // this->startTime = static_cast<unsigned long>(std::chrono::duration_cast< std::chrono::milliseconds >(std::chrono::system_clock::now().time_since_epoch()));
-    this->lastSysTime = std::time(nullptr);
+    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
+    long long ms_count = ms.count();
+    this->lastSysTime = static_cast<unsigned long>(ms_count);
 }
 
 // Sensor update callback
@@ -148,7 +150,10 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
                 if(distance > visionRange) break;
 
                 // Getting the stage simulation time difference which has to be adjusted for the time scale
-                unsigned long timeDiff = (std::time(nullptr) - robot->lastSysTime) / timeScale;
+                // unsigned long timeDiff = (std::time(nullptr) - robot->lastSysTime) * timeScale;
+                auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
+                long long ms_count = ms.count();
+                unsigned long timeDiff = (static_cast<unsigned long>(ms_count) - robot->lastSysTime) * timeScale;
 
                 Pose pose = robot->GetPose();
                 auto position = CalculatePosition(robot->angles[data->num], pose, distance);
@@ -177,10 +182,12 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
                     robot->boidData.numNeighbours += 1;
                 }
 
-                // If it has been over 5 seconds, adjusted for stage time scale
+                // If it has been over polling rate, 
                 if(timeDiff > velocityPollingRate) {
                     push(vipEffectX, vipEffectY, robot);
-                    robot->lastSysTime = std::time(nullptr);
+                    auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
+                    long long milliseconds_count = milliseconds.count();
+                    robot->startTime = static_cast<unsigned long>(milliseconds_count);
                 }
                 break;
             }

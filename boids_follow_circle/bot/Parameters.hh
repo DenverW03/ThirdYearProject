@@ -11,6 +11,6 @@
 #define vipCircleRadius 5
 #define vipCircleNumPoints 360
 #define vipBoundingDistance 7
-#define velocityPollingRate 2
+#define velocityPollingRate 2000
 #define testing 0
 #define timeScale 1
