@@ -267,8 +267,8 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
         // Alignment of convoy bot with VIP bot
 
         if(robot->stack->second != nullptr){
-            double dx = (robot->stack->xpos - robot->stack->second->xpos) / velocityPollingRate;
-            double dy = (robot->stack->ypos - robot->stack->second->ypos) / velocityPollingRate;
+            double dx = (robot->stack->xpos - robot->stack->second->xpos);
+            double dy = (robot->stack->ypos - robot->stack->second->ypos);
 
             robot->xVel += (robot->xVel - dx) * vipAlignmentMultiplier;
             robot->yVel += (robot->yVel - dx) * vipAlignmentMultiplier;
