@@ -134,9 +134,9 @@ params = [
             360, # vip circle num points
             7, # vip bounding distance
             2000, # velocity polling rate
-            0, # testing truth value
-            1
-        ] # time scale
+            1, # testing truth value
+            60 # time scale
+        ]
     ]
 
 # Running testing on parameter sets

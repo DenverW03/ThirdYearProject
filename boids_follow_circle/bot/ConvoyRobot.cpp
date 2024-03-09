@@ -82,9 +82,7 @@ ConvoyRobot::ConvoyRobot(ModelPosition *modelPos, Pose pose, int id) {
     long long milliseconds_count = milliseconds.count();
     this->startTime = static_cast<unsigned long>(milliseconds_count);
     // this->startTime = static_cast<unsigned long>(std::chrono::duration_cast< std::chrono::milliseconds >(std::chrono::system_clock::now().time_since_epoch()));
-    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
-    long long ms_count = ms.count();
-    this->lastSysTime = static_cast<unsigned long>(ms_count);
+    this->lastSysTime = this->startTime;
 }
 
 // Sensor update callback
@@ -186,7 +184,7 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
                     push(vipEffectX, vipEffectY, robot);
                     auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
                     long long milliseconds_count = milliseconds.count();
-                    robot->startTime = static_cast<unsigned long>(milliseconds_count);
+                    robot->lastSysTime = static_cast<unsigned long>(milliseconds_count);
                 }
                 break;
             }
@@ -318,9 +316,13 @@ void ConvoyRobot::TestingStall(ConvoyRobot *robot) {
     long long milliseconds_count = milliseconds.count();
     unsigned long timeNow = static_cast<unsigned long>(milliseconds_count);
 
-    double result = ((double)timeNow - (double)robot->startTime);
-    result = result / 1000; // time elapsed in seconds
-    result = result * timeScale / 2;
+    unsigned long result = (timeNow - robot->startTime);
+    result *= timeScale;
+    result /= 1000; // in seconds
+
+    std::cout << "time now: " << timeNow << " time start: " << robot->startTime << " result: " << result << std::endl;
+    // result = result / 1000; // time elapsed in seconds
+    // result = result * timeScale / 2;
 
     // Calculating the average distance
     double result2 = 0.0;
