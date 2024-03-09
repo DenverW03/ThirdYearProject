@@ -320,10 +320,6 @@ void ConvoyRobot::TestingStall(ConvoyRobot *robot) {
     result *= timeScale;
     result /= 1000; // in seconds
 
-    std::cout << "time now: " << timeNow << " time start: " << robot->startTime << " result: " << result << std::endl;
-    // result = result / 1000; // time elapsed in seconds
-    // result = result * timeScale / 2;
-
     // Calculating the average distance
     double result2 = 0.0;
     for(double i : robot->testingDistances) {
