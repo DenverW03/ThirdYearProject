@@ -1,29 +1,12 @@
 #ifndef CONVOY_ROBOT
 #define CONVOY_ROBOT
 #include <stage.hh>  // Include the appropriate library for Stg
+#include "Parameters.hh"
 
 using namespace Stg;
 
 namespace ConvoyRBT {
     class ConvoyRobot {
-
-    // Some class parameter definitions
-    #define visionRange 10
-    #define cohesionFactor 0.005
-    #define avoidanceDistance 2
-    #define avoidanceFactor 0.1
-
-    // Obstruction avoidance parameters, the distance is the same as the range for the sonar
-    #define avoidObstructionDistance 3
-    #define avoidObstructionFactor 0.1
-
-    // VIP spacing parameters
-    #define vipMinDistance 3
-    #define vipMaxDistance 6
-    #define vipCohesionMultiplier 0.1
-    #define vipSeparationMultiplier 1
-    #define vipAlignmentMultiplier 0.1
-
     // Some definitions for colors
     #define black 0x000000ff
     #define blue 0x0000ffff
