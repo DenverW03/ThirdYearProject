@@ -1,7 +1,7 @@
 #ifndef VIP_ROBOT
 #define VIP_ROBOT
 #include <stage.hh>  // Include the appropriate library for Stg
-#include "../../boids_follow_circle/bot/CircleVisualizer.hh"
+#include "./CircleVisualizer.hh"
 
 using namespace Stg;
 

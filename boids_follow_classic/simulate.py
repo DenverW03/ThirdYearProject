@@ -46,8 +46,8 @@ with open('main.cpp', 'w', encoding='utf-8') as mainFile:
 
 ## Running stage
 
-# Running the terminal commands to get the simulation running
-subprocess.call(["sh","compile.sh"])
+# Running make file to the program
+subprocess.call(["make","build"])
 
 # Editing the template shell script to load the models correctly
 data = ""
