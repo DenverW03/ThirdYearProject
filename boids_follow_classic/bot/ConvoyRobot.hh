@@ -8,7 +8,7 @@ namespace ConvoyRBT {
     class ConvoyRobot {
 
     // Some class parameter definitions
-    #define visionRange 8
+    #define visionRange 10
     #define cohesionFactor 0.005
     #define avoidanceDistance 2
     #define avoidanceFactor 0.1
@@ -88,7 +88,7 @@ namespace ConvoyRBT {
         // Function declarations
 
         ConvoyRobot();
-        ConvoyRobot(ModelPosition *modelPos, Pose pose);
+        ConvoyRobot(ModelPosition *modelPos, Pose pose, int id);
         static int SensorUpdate(Model *, SensorInputData *data);
         static int PositionUpdate(Model *, ConvoyRobot *robot);
         static std::pair<double, double> CalculatePosition(double a, Pose pose, double distance);

@@ -12,7 +12,7 @@ ConvoyRobot::ConvoyRobot(){
 };
 
 // Constructor for the class with appropriate setup
-ConvoyRobot::ConvoyRobot(ModelPosition *modelPos, Pose pose) {
+ConvoyRobot::ConvoyRobot(ModelPosition *modelPos, Pose pose, int id) {
     this->pos = nullptr;
 
     this->stack = (struct VipVelocityNode*)malloc(sizeof(struct VipVelocityNode));

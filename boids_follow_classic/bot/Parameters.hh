@@ -1,0 +1,11 @@
+#define visionRange 10
+#define cohesionFactor 0.005
+#define avoidanceDistance 2
+#define avoidanceFactor 0.1
+#define avoidObstructionDistance 3
+#define avoidObstructionFactor 0.1
+#define vipMinDistance 3
+#define vipMaxDistance 6
+#define vipCohesionMultiplier 0.1
+#define vipSeparationMultiplier 1
+#define vipAlignmentMultiplier 0.1
