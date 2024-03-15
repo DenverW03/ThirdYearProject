@@ -16,7 +16,6 @@ namespace ConvoyRBT {
     #define camCount 16
 
     // Defining a struct for passing converted speed values
-
     typedef struct {
         double linearVel;
         double rotationalVel;

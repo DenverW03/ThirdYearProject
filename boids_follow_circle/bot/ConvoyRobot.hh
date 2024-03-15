@@ -1,7 +1,7 @@
 #ifndef CONVOY_ROBOT
 #define CONVOY_ROBOT
 #include <stage.hh>  // Include the appropriate library for Stg
-#include "CircleVisualizer.hh"
+#include "../../common/bot/CircleVisualizer.hh"
 #include "Parameters.hh"
 
 using namespace Stg;

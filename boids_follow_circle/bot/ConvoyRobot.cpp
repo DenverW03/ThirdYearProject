@@ -1,5 +1,5 @@
 #include "ConvoyRobot.hh"
-#include "CircleVisualizer.hh"
+#include "../../common/bot/CircleVisualizer.hh"
 #include <stage.hh>
 #include <cmath>
 #include <random>

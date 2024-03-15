@@ -9,3 +9,5 @@
 #define vipCohesionMultiplier 0.1
 #define vipSeparationMultiplier 1
 #define vipAlignmentMultiplier 0.1
+#define testing 0
+#define timeScale 1

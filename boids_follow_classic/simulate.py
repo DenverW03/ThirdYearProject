@@ -94,7 +94,7 @@ def run_simulation(numRobot):
 
 # Use command line to choose number of robots
 numRobots = int(sys.argv[1])
-string = "#define visionRange 1\r\n#define cohesionFactor 1\r\n#define avoidanceDistance 1\r\n#define avoidanceFactor 1\r\n#define avoidObstructionDistance 1\r\n#define avoidObstructionFactor 1\r\n#define vipMinDistance 1\r\n#define vipMaxDistance 1\r\n#define vipCohesionMultiplier 1\r\n#define vipSeparationMultiplier 1\r\n#define vipAlignmentMultiplier 1"
+string = "#define visionRange 1\r\n#define cohesionFactor 1\r\n#define avoidanceDistance 1\r\n#define avoidanceFactor 1\r\n#define avoidObstructionDistance 1\r\n#define avoidObstructionFactor 1\r\n#define vipMinDistance 1\r\n#define vipMaxDistance 1\r\n#define vipCohesionMultiplier 1\r\n#define vipSeparationMultiplier 1\r\n#define vipAlignmentMultiplier 1\r\n#define testing 1\r\n#define timeScale 1"
 params = [10, # vision range
           0.005, # cohesion factor
           2, # avoidance distance
@@ -106,6 +106,8 @@ params = [10, # vision range
           0.1, # vip cohesion multiplier
           1, # vip separation multiplier
           0.1, # vip alignment mulitiplier
+          0, # testing
+          1, # timeScale
           ]
 final_string = create_param_string(string, params)
 build_parameters(final_string)

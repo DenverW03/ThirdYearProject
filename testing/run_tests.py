@@ -92,9 +92,7 @@ def create_param_string(string, params):
     return final_string
 
 ## Running a parameter set
-def test_parameter_set(params, directory):
-    # Outlining the string with all parameters replaced with 1 for editing string next
-    string = "#define visionRange 1\r\n#define cohesionFactor 1\r\n#define avoidanceDistance 1\r\n#define avoidanceFactor 1\r\n#define avoidObstructionDistance 1\r\n#define avoidObstructionFactor 1\r\n#define vipMinDistance 1\r\n#define vipCohesionMultiplier 1\r\n#define vipSeparationMultiplier 1\r\n#define vipAlignmentMultiplier 1\r\n#define vipCircleRadius 1\r\n#define vipCircleNumPoints 1\r\n#define vipBoundingDistance 1\r\n#define velocityPollingRate 1\r\n#define testing 0\r\n#define timeScale 1"
+def test_parameter_set(params, string, directory):
     final_string = create_param_string(string, params)
 
     this_path = "../testing/" # The path of this script
@@ -105,19 +103,22 @@ def test_parameter_set(params, directory):
 
     os.chdir(this_path)
 
-def test_all_sets(sets):
+def test_all_sets(sets, string, algorithm_dir):
     # Testing the ring based algorithm
-    directory = "../boids_follow_circle/"
-    data_directory = "./boids_follow_circle_results/"
+    directory = "../" + algorithm_dir + "/"
+    data_directory = "./" + algorithm_dir + "_results/"
     for params in sets:
         for i in range(runs):
-            test_parameter_set(params, directory)
+            test_parameter_set(params, string, directory)
         subprocess.call(["/opt/homebrew/bin/python3.11", "evaluate.py", data_directory, str(num_robots), str(runs)]) # Calling the data evaluation script
 
 # Global Variables
 num_robots = int(sys.argv[1])
 runs = 20 # Number of testing runs
 
+# For the circle based algorithm
+algorithm_dir = "boids_follow_circle"
+string = "#define visionRange 1\r\n#define cohesionFactor 1\r\n#define avoidanceDistance 1\r\n#define avoidanceFactor 1\r\n#define avoidObstructionDistance 1\r\n#define avoidObstructionFactor 1\r\n#define vipMinDistance 1\r\n#define vipCohesionMultiplier 1\r\n#define vipSeparationMultiplier 1\r\n#define vipAlignmentMultiplier 1\r\n#define vipCircleRadius 1\r\n#define vipCircleNumPoints 1\r\n#define vipBoundingDistance 1\r\n#define velocityPollingRate 1\r\n#define testing 0\r\n#define timeScale 1"
 params = [
         [
             10, # vision range
@@ -138,6 +139,28 @@ params = [
             60 # time scale
         ]
     ]
-
 # Running testing on parameter sets
-test_all_sets(params)
+test_all_sets(params, string, algorithm_dir)
+
+# For the classic approach algorithm
+algorithm_dir = "boids_follow_classic"
+string = "#define visionRange 1\r\n#define cohesionFactor 1\r\n#define avoidanceDistance 1\r\n#define avoidanceFactor 1\r\n#define avoidObstructionDistance 1\r\n#define avoidObstructionFactor 1\r\n#define vipMinDistance 1\r\n#define vipMaxDistance 1\r\n#define vipCohesionMultiplier 1\r\n#define vipSeparationMultiplier 1\r\n#define vipAlignmentMultiplier 1\r\n#define testing 1\r\n#define timeScale 1"
+params = [
+          [
+            10, # vision range
+            0.005, # cohesion factor
+            2, # avoidance distance
+            0.1, # avoidance factor
+            3, # avoid obstruction distance
+            0.1, # avoid obstruction factor
+            3, # vip min distance
+            6, # vip max distance
+            0.1, # vip cohesion multiplier
+            1, # vip separation multiplier
+            0.1, # vip alignment mulitiplier
+            0, # testing
+            1, # timeScale
+          ]
+        ]
+# Running testing on parameter sets
+test_all_sets(params, string, algorithm_dir)
