@@ -47,25 +47,33 @@ namespace ConvoyRBT {
     } BoidData;
 
     struct VipVelocityNode {
-        double xvel;
-        double yvel;
+        double xpos;
+        double ypos;
         struct VipVelocityNode *second;
     };
     
     public:
 
         // Variable declarations
-
         ModelPosition *pos;
         ModelBlobfinder **cameras;
         double xVel;
         double yVel;
         BoidData boidData;
+
+        // These variables are used in the VIP velocity estimation
         struct VipVelocityNode *stack;
+        unsigned long lastSysTime;
+
+        // Used for data reporting
+        int id;
+        unsigned long startTime;
 
         // Angles of the cameras places on the bot
-
         double angles[16] = {0, 22.5, 45, 67.5, 90, 112.5, 135, 157.5, 180, -22.5, -45, -67.5, -90, -112.5, -135, -157.5};
+
+        // Storing distances for testing data output
+        std::vector<double> testingDistances;
 
         // Function declarations
 
@@ -73,10 +81,11 @@ namespace ConvoyRBT {
         ConvoyRobot(ModelPosition *modelPos, Pose pose, int id);
         static int SensorUpdate(Model *, SensorInputData *data);
         static int PositionUpdate(Model *, ConvoyRobot *robot);
+        static void TestingStall(ConvoyRobot *robot);
         static std::pair<double, double> CalculatePosition(double a, Pose pose, double distance);
         static double CalculateDistance(Pose pose, ConvoyRobot *robot);
         static void push(double xvel, double yvel, ConvoyRobot *robot);
-        static struct VipVelocityNode* newNode(double xvel, double yvel);
+        static struct VipVelocityNode* newNode(double xpos, double ypos);
         static HVelocities CalculateHolonomic(double xvel, double turnvel, ConvoyRobot *robot);
         static NHVelocities CalculateNonHolonomic(double xvel, double yvel, ConvoyRobot *robot);
         Pose GetPose();

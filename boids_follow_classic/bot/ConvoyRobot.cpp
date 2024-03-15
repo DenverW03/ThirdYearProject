@@ -2,6 +2,10 @@
 #include <stage.hh>
 #include <cmath>
 #include <random>
+#include <thread>
+#include <iostream>
+#include <fstream>
+#include <sstream>
 
 using namespace Stg;
 using namespace ConvoyRBT;
@@ -13,6 +17,7 @@ ConvoyRobot::ConvoyRobot(){
 
 // Constructor for the class with appropriate setup
 ConvoyRobot::ConvoyRobot(ModelPosition *modelPos, Pose pose, int id) {
+    this->id = id;
     this->pos = nullptr;
 
     this->stack = (struct VipVelocityNode*)malloc(sizeof(struct VipVelocityNode));
@@ -40,6 +45,10 @@ ConvoyRobot::ConvoyRobot(ModelPosition *modelPos, Pose pose, int id) {
     this->boidData.averageYVel = 0;
     this->boidData.numNeighbours = 0;
 
+    // Making the VIP last position stack empty to begin
+    push(0, 0, this);
+    push(0, 0, this);
+
     // Setting up positional model and callbacks
     this->pos = modelPos;
     this->pos->AddCallback(Model::CB_UPDATE, model_callback_t(PositionUpdate), this);
@@ -65,6 +74,13 @@ ConvoyRobot::ConvoyRobot(ModelPosition *modelPos, Pose pose, int id) {
     this->pos->SetPose(pose);
     NHVelocities nonHolonomic = CalculateNonHolonomic(this->xVel, this->yVel, this);
     this->pos->SetSpeed(nonHolonomic.linearVel, 0, nonHolonomic.rotationalVel);
+
+    printf("Running\r\n");
+
+    auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
+    long long milliseconds_count = milliseconds.count();
+    this->startTime = static_cast<unsigned long>(milliseconds_count);
+    this->lastSysTime = this->startTime;
 }
 
 // Sensor update callback
@@ -135,7 +151,10 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
             }
             case red: { // THE VIPs
 
-                /* ONCE THIS HAS ALIGNMENT, IT SHOULD BE PRETTY GOOD FOR STAYING COHERENT AROUND VIP */
+                // Getting the stage simulation time difference which has to be adjusted for the time scale
+                auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
+                long long ms_count = ms.count();
+                unsigned long timeDiff = (static_cast<unsigned long>(ms_count) - robot->lastSysTime) * timeScale;
 
                 // For red VIP going to have the same vision range as for fellow convoy bots
                 if(distance > visionRange) break;
@@ -171,12 +190,130 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
                 
                 }
 
+                // If it has been over polling rate, 
+                if(timeDiff > velocityPollingRate) {
+                    push(vipEffectX, vipEffectY, robot);
+                    auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
+                    long long milliseconds_count = milliseconds.count();
+                    robot->lastSysTime = static_cast<unsigned long>(milliseconds_count);
+                }
                 break;
             }
         }
-        push(vipEffectX, vipEffectY, robot);
     }
     return 0;
+}
+
+// Position update function for stage (necessary for the bot to actually move)
+int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
+    // Check for stalling (not working)
+
+    // Testing for when robot has crashed
+    if(robot->pos->Stalled() && testing) {
+        // Unsubscribe from callback so no longer called
+        robot->pos->Unsubscribe();
+        // Call data output function for bot stalling
+        TestingStall(robot);
+
+        // Exit so no wasting compute
+        return 0;
+    }
+
+    // For other bots
+    robot->xVel += robot->boidData.closeDx * avoidanceFactor;
+    robot->yVel += robot->boidData.closeDy * avoidanceFactor;
+
+    // For obstacles
+    robot->xVel -= robot->boidData.closeDxObs * avoidObstructionFactor;
+    robot->yVel -= robot->boidData.closeDyObs * avoidObstructionFactor;
+
+    // For the VIP
+    robot->xVel -= robot->boidData.closeDxVip * vipSeparationMultiplier;
+    robot->yVel -= robot->boidData.closeDyVip * vipSeparationMultiplier;
+
+    // Cohesion and Alignment
+
+    if(robot->boidData.numNeighbours > 0) {
+        // Calculating the averages for position
+        robot->boidData.averageXPos = robot->boidData.averageXPos / robot->boidData.numNeighbours;
+        robot->boidData.averageYPos = robot->boidData.averageYPos / robot->boidData.numNeighbours;
+
+        // Cohesion
+        robot->xVel += (robot->boidData.averageXPos - robot->GetPose().x) * cohesionFactor;
+        robot->yVel += (robot->boidData.averageYPos - robot->GetPose().y) * cohesionFactor;
+
+        // Alignment of convoy bot with VIP bot
+        if(robot->stack->second != nullptr){
+            double dx = (robot->stack->xpos - robot->stack->second->xpos);
+            double dy = (robot->stack->ypos - robot->stack->second->ypos);
+
+            robot->xVel += (robot->xVel - dx) * vipAlignmentMultiplier;
+            robot->yVel += (robot->yVel - dx) * vipAlignmentMultiplier;
+        }
+    }
+
+    // Diagnostic printing
+
+    HVelocities vels2 = CalculateHolonomic(robot->pos->GetVelocity().x, robot->pos->GetVelocity().a, robot);
+
+
+    NHVelocities nonHolonomic = CalculateNonHolonomic(robot->xVel, robot->yVel, robot);
+    robot->pos->SetSpeed(nonHolonomic.linearVel, 0, nonHolonomic.rotationalVel);
+
+    // Resetting the boid data values
+    robot->boidData.closeDx = 0;
+    robot->boidData.closeDy = 0;
+    robot->boidData.closeDxObs = 0;
+    robot->boidData.closeDyObs = 0;
+    robot->boidData.closeDxVip = 0;
+    robot->boidData.closeDyVip = 0;
+    robot->boidData.averageXPos = 0;
+    robot->boidData.averageYPos = 0;
+    robot->boidData.averageXVel = 0;
+    robot->boidData.averageYVel = 0;
+    robot->boidData.numNeighbours = 0;
+
+    // Setting stored velocity to the real velocity so it doesn't grow too large in magnitude
+    robot->xVel = vels2.xvel;
+    robot->yVel = vels2.yvel;
+
+    // Adding to the test data vector
+    robot->testingDistances.push_back(CalculateDistance(Pose(robot->stack->xpos, robot->stack->ypos, 0, 0), robot));
+
+    return 0;
+}
+
+void ConvoyRobot::TestingStall(ConvoyRobot *robot) {
+    // Creating a filestream to the output csv
+    std::ofstream dataFile("../testing/boids_follow_circle_results/output.csv", std::ios::app);
+    if (!dataFile.is_open()){
+        std::cerr << "File failed to open: " << std::strerror(errno) << std::endl;
+        return;
+    }
+
+    // Calculating the time this robot took to stall
+    auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
+    long long milliseconds_count = milliseconds.count();
+    unsigned long timeNow = static_cast<unsigned long>(milliseconds_count);
+
+    unsigned long result = (timeNow - robot->startTime);
+    result *= timeScale;
+    result /= 1000; // in seconds
+
+    // Calculating the average distance
+    double result2 = 0.0;
+    for(double i : robot->testingDistances) {
+        result2 += i;
+    }
+    result2 = result2 / robot->testingDistances.size();
+
+    if(std::isnan(result2)) {
+        dataFile.close();
+        return;
+    }
+
+    dataFile << robot->id << "," << result2 << "," << result << std::endl;
+    dataFile.close();
 }
 
 std::pair<double, double> ConvoyRobot::CalculatePosition(double a, Pose pose, double distance) {
@@ -203,95 +340,6 @@ std::pair<double, double> ConvoyRobot::CalculatePosition(double a, Pose pose, do
     double ypos = pose.y + opp;
 
     return std::make_pair(xpos, ypos);
-}
-
-// Position update function for stage (necessary for the bot to actually move)
-int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
-    // Check for stalling (not working)
-
-    // if(robot->pos->Stalled()) {
-    //     printf("Stalled");
-    //     robot->pos->GoTo(Pose(0, 0, 0, 0));
-    //     return 0;
-    // }
-
-    // Alignment with VIP
-    if (robot->stack->second != nullptr){
-        double dx = robot->stack->xvel - robot->stack->second->xvel;
-        double dy = robot->stack->yvel - robot->stack->second->yvel;
-
-        robot->xVel += (dx - robot->xVel) * vipAlignmentMultiplier;
-        robot->yVel += (dy - robot->yVel) * vipAlignmentMultiplier;
-    }
-
-    // For other bots
-    robot->xVel += robot->boidData.closeDx * avoidanceFactor;
-    robot->yVel += robot->boidData.closeDy * avoidanceFactor;
-
-    // For obstacles
-    robot->xVel -= robot->boidData.closeDxObs * avoidObstructionFactor;
-    robot->yVel -= robot->boidData.closeDyObs * avoidObstructionFactor;
-
-    // For the VIP
-    robot->xVel -= robot->boidData.closeDxVip * vipSeparationMultiplier;
-    robot->yVel -= robot->boidData.closeDyVip * vipSeparationMultiplier;
-
-    // Cohesion and Alignment
-
-    if(robot->boidData.numNeighbours > 0) {
-        // // Calculating the averages for velocity
-        // averageXVel = averageXVel / numNeighbours;
-        // averageYVel = averageYVel / numNeighbours;
-
-        // Calculating the averages for position
-        robot->boidData.averageXPos = robot->boidData.averageXPos / robot->boidData.numNeighbours;
-        robot->boidData.averageYPos = robot->boidData.averageYPos / robot->boidData.numNeighbours;
-
-        // // Alignment
-        // robot->xVel += (averageXVel - robot->xVel) * alignmentFactor;
-        // robot->yVel += (averageYVel - robot->yVel) * alignmentFactor;
-
-        // Cohesion
-        robot->xVel += (robot->boidData.averageXPos - robot->GetPose().x) * cohesionFactor;
-        robot->yVel += (robot->boidData.averageYPos - robot->GetPose().y) * cohesionFactor;
-    }
-
-    // Diagnostic printing
-
-    HVelocities vels2 = CalculateHolonomic(robot->pos->GetVelocity().x, robot->pos->GetVelocity().a, robot);
-
-    // std::cout << "--------------------------------\r\n";
-    // printf("Obstacles - closeDx: %f closeDy: %f\r\n", robot->boidData.closeDxObs, robot->boidData.closeDyObs);
-    // std::cout << "--------------------------------\r\n";
-    // // printf("Calc Polar: %f %f\r\n", vels.linearVel, vels.rotationalVel);
-    // printf("Real Polar: %f %f\r\n", robot->pos->GetVelocity().x, robot->pos->GetVelocity().a);
-    // printf("Calc Cartesian: %f %f\r\n", vels2.xvel, vels2.yvel);
-    // printf("Class velocity: %f %f\r\n", robot->xVel, robot->yVel);
-    // std::cout << "--------------------------------\r\n";
-
-
-    NHVelocities nonHolonomic = CalculateNonHolonomic(robot->xVel, robot->yVel, robot);
-    robot->pos->SetSpeed(nonHolonomic.linearVel, 0, nonHolonomic.rotationalVel);
-
-    // Resetting the boid data values
-    robot->boidData.closeDx = 0;
-    robot->boidData.closeDy = 0;
-    robot->boidData.closeDxObs = 0;
-    robot->boidData.closeDyObs = 0;
-    robot->boidData.closeDxVip = 0;
-    robot->boidData.closeDyVip = 0;
-    robot->boidData.averageXPos = 0;
-    robot->boidData.averageYPos = 0;
-    robot->boidData.averageXVel = 0;
-    robot->boidData.averageYVel = 0;
-    robot->boidData.numNeighbours = 0;
-
-    // Setting stored velocity to the real velocity so it doesn't grow too large in magnitude
-    robot->xVel = vels2.xvel;
-    robot->yVel = vels2.yvel;
-
-
-    return 0;
 }
 
 ConvoyRobot::HVelocities ConvoyRobot::CalculateHolonomic(double linearvel, double turnvel, ConvoyRobot *robot) {
@@ -361,10 +409,10 @@ void ConvoyRobot::push(double xvel, double yvel, ConvoyRobot *robot) {
 }
 
 // Created a new node for the stack with the given velocity data
-struct ConvoyRobot::VipVelocityNode* ConvoyRobot::newNode(double xvel, double yvel) {
+struct ConvoyRobot::VipVelocityNode* ConvoyRobot::newNode(double xpos, double ypos) {
     struct VipVelocityNode* newNode = (struct VipVelocityNode*)malloc(sizeof(struct VipVelocityNode));
-    newNode->xvel = xvel;
-    newNode->yvel = yvel;
+    newNode->xpos = xpos;
+    newNode->ypos = ypos;
     newNode->second = nullptr;
     return newNode;
 }

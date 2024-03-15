@@ -81,7 +81,6 @@ ConvoyRobot::ConvoyRobot(ModelPosition *modelPos, Pose pose, int id) {
     auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
     long long milliseconds_count = milliseconds.count();
     this->startTime = static_cast<unsigned long>(milliseconds_count);
-    // this->startTime = static_cast<unsigned long>(std::chrono::duration_cast< std::chrono::milliseconds >(std::chrono::system_clock::now().time_since_epoch()));
     this->lastSysTime = this->startTime;
 }
 
@@ -263,7 +262,6 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
         robot->yVel += (robot->boidData.averageYPos - robot->GetPose().y) * cohesionFactor;
 
         // Alignment of convoy bot with VIP bot
-
         if(robot->stack->second != nullptr){
             double dx = (robot->stack->xpos - robot->stack->second->xpos);
             double dy = (robot->stack->ypos - robot->stack->second->ypos);

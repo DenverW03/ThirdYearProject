@@ -2,7 +2,7 @@ include "../../common/world/map.inc"
 include "../../common/bot/custombot.inc"
 include "../../common/bot/vipbot.inc"
 
-speedup 1 # multiple of realtime that stage should run at initially
+speedup 60 # multiple of realtime that stage should run at initially
 quit_time 3600 # amount of time the simulation should run before quitting (in seconds)
 
 # configure the simulation window
