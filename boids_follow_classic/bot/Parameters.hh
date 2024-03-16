@@ -6,9 +6,9 @@
 #define avoidObstructionFactor 0.1
 #define vipMinDistance 3
 #define vipMaxDistance 6
-#define vipCohesionMultiplier 0.1
+#define vipCohesionMultiplier 0.5
 #define vipSeparationMultiplier 1
-#define vipAlignmentMultiplier 0.1
+#define vipAlignmentMultiplier 0.01
 #define velocityPollingRate 2000
-#define testing 1
-#define timeScale 60
+#define testing 0
+#define timeScale 1
