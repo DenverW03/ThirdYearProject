@@ -174,10 +174,10 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
                 
                 // Max distance from VIP
                 if(distance <= vipMaxDistance) {
-                    // robot->boidData.numNeighbours += (1 * vipCohesionMultiplier);
+                    robot->boidData.numNeighbours += (1 * vipCohesionMultiplier);
                 
-                    robot->boidData.averageXPos += position.first;
-                    robot->boidData.averageYPos += position.second;
+                    robot->boidData.averageXPos += position.first * vipCohesionMultiplier;
+                    robot->boidData.averageYPos += position.second * vipCohesionMultiplier;
                 
                 
                 }
