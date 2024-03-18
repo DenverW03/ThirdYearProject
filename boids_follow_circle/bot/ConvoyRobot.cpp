@@ -176,7 +176,7 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
                     robot->boidData.numNeighbours += 1;
                 }
 
-                // If it has been over polling rate, 
+                // If it has been over polling rate then update position values
                 if(timeDiff > velocityPollingRate) {
                     push(vipEffectX, vipEffectY, robot);
                     auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
