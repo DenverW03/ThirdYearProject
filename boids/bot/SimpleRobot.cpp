@@ -192,15 +192,6 @@ int SimpleRobot::PositionUpdate(Model *, SimpleRobot* robot) {
 
     HVelocities vels2 = CalculateHolonomic(robot->pos->GetVelocity().x, robot->pos->GetVelocity().a, robot);
 
-    // std::cout << "--------------------------------\r\n";
-    // printf("Obstacles - closeDx: %f closeDy: %f\r\n", robot->boidData.closeDxObs, robot->boidData.closeDyObs);
-    // std::cout << "--------------------------------\r\n";
-    // // printf("Calc Polar: %f %f\r\n", vels.linearVel, vels.rotationalVel);
-    // printf("Real Polar: %f %f\r\n", robot->pos->GetVelocity().x, robot->pos->GetVelocity().a);
-    // printf("Calc Cartesian: %f %f\r\n", vels2.xvel, vels2.yvel);
-    // printf("Class velocity: %f %f\r\n", robot->xVel, robot->yVel);
-    // std::cout << "--------------------------------\r\n";
-
 
     NHVelocities nonHolonomic = CalculateNonHolonomic(robot->xVel, robot->yVel, robot);
     robot->pos->SetSpeed(nonHolonomic.linearVel, 0, nonHolonomic.rotationalVel);

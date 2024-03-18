@@ -156,7 +156,7 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
                 Pose pose = robot->GetPose();
                 auto position = CalculatePosition(robot->angles[data->num], pose, distance);
 
-                // Alignment, updating the vip Velocities
+                // Alignment, updating the vip positions
                 vipEffectX = position.first;
                 vipEffectY = position.second;
 
@@ -172,8 +172,6 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
                 
                     robot->boidData.averageXPos += position.first * vipCohesionMultiplier;
                     robot->boidData.averageYPos += position.second * vipCohesionMultiplier;
-                
-                
                 }
                 
                 // Trying to keep the convoy in bounds
@@ -221,8 +219,8 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
     robot->yVel -= robot->boidData.closeDyObs * avoidObstructionFactor;
 
     // For the VIP
-    robot->xVel -= robot->boidData.closeDxVip * vipSeparationMultiplier;
-    robot->yVel -= robot->boidData.closeDyVip * vipSeparationMultiplier;
+    robot->xVel -= robot->boidData.closeDx * vipSeparationMultiplier;
+    robot->yVel -= robot->boidData.closeDy * vipSeparationMultiplier;
 
     // Cohesion and Alignment
 

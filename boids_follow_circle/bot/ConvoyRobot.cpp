@@ -248,14 +248,14 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
     robot->xVel += robot->boidData.closeDxVip * vipSeparationMultiplier;
     robot->yVel += robot->boidData.closeDyVip * vipSeparationMultiplier;
 
-    // Cohesion and Alignment BETWEEN CONVOT BOTS
+    // Cohesion and Alignment
 
     if(robot->boidData.numNeighbours > 0) {
         // Calculating the averages for position
         robot->boidData.averageXPos = robot->boidData.averageXPos / robot->boidData.numNeighbours;
         robot->boidData.averageYPos = robot->boidData.averageYPos / robot->boidData.numNeighbours;
 
-        // Cohesion
+        // Cohesion with fellow convoy agents
         robot->xVel += (robot->boidData.averageXPos - robot->GetPose().x) * cohesionFactor;
         robot->yVel += (robot->boidData.averageYPos - robot->GetPose().y) * cohesionFactor;
 

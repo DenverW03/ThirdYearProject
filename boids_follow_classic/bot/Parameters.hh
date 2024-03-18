@@ -7,7 +7,7 @@
 #define vipMinDistance 3
 #define vipMaxDistance 6
 #define vipCohesionMultiplier 5
-#define vipSeparationMultiplier 1
+#define vipSeparationMultiplier 0.01
 #define vipAlignmentMultiplier 0.01
 #define velocityPollingRate 2000
 #define testing 0
