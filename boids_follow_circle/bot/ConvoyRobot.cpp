@@ -42,8 +42,6 @@ ConvoyRobot::ConvoyRobot(ModelPosition *modelPos, Pose pose, int id) {
     this->boidData.closeDyVip = 0;
     this->boidData.averageXPos = 0;
     this->boidData.averageYPos = 0;
-    this->boidData.averageXVel = 0;
-    this->boidData.averageYVel = 0;
     this->boidData.numNeighbours = 0;
 
     // Making the VIP last position stack empty to begin
@@ -287,8 +285,6 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
     robot->boidData.closeDyVip = 0;
     robot->boidData.averageXPos = 0;
     robot->boidData.averageYPos = 0;
-    robot->boidData.averageXVel = 0;
-    robot->boidData.averageYVel = 0;
     robot->boidData.numNeighbours = 0;
 
     // Setting stored velocity to the real velocity so it doesn't grow too large in magnitude

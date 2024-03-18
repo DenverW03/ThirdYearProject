@@ -41,8 +41,6 @@ namespace ConvoyRBT {
         double closeDyVip;
         double averageXPos;
         double averageYPos;
-        double averageXVel;
-        double averageYVel;
         int numNeighbours;
     } BoidData;
 

@@ -41,8 +41,6 @@ ConvoyRobot::ConvoyRobot(ModelPosition *modelPos, Pose pose, int id) {
     this->boidData.closeDyVip = 0;
     this->boidData.averageXPos = 0;
     this->boidData.averageYPos = 0;
-    this->boidData.averageXVel = 0;
-    this->boidData.averageYVel = 0;
     this->boidData.numNeighbours = 0;
 
     // Making the VIP last position stack empty to begin
@@ -137,10 +135,6 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
 
                 // If the distance is within the vision range of the robot but outside avoidance range
                 if(distance <= visionRange) {
-                    // Alignment
-                    // averageXVel += robot->robots[i].xVel;
-                    // averageYVel += robot->robots[i].yVel;
-
                     robot->boidData.numNeighbours += 1;
 
                     // Cohesion
@@ -184,13 +178,12 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
                 
                 // Trying to keep the convoy in bounds
                 if(distance > vipMaxDistance) {
-                
                     robot->boidData.closeDx -= (pose.x - position.first);
                     robot->boidData.closeDy -= (pose.y - position.second);
                 
                 }
 
-                // If it has been over polling rate, 
+                // If it has been over polling rate, take new position estimate
                 if(timeDiff > velocityPollingRate) {
                     push(vipEffectX, vipEffectY, robot);
                     auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
@@ -269,8 +262,6 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
     robot->boidData.closeDyVip = 0;
     robot->boidData.averageXPos = 0;
     robot->boidData.averageYPos = 0;
-    robot->boidData.averageXVel = 0;
-    robot->boidData.averageYVel = 0;
     robot->boidData.numNeighbours = 0;
 
     // Setting stored velocity to the real velocity so it doesn't grow too large in magnitude

@@ -155,7 +155,7 @@ params = [
             0.1, # avoid obstruction factor
             3, # vip min distance
             6, # vip max distance
-            0.1, # vip cohesion multiplier
+            5, # vip cohesion multiplier
             1, # vip separation multiplier
             0.1, # vip alignment mulitiplier
             2000, # velocity polling rate
