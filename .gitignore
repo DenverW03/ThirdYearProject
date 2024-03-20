@@ -28,6 +28,8 @@ boids_follow_circle/world/generated.world
 # TESTING OUTPUT DATA
 testing/boids_follow_circle_results/*.csv
 testing/boids_follow_classic_results/*.csv
+testing/boids_follow_circle_results/*.png
+testing/boids_follow_classic_results/*.png
 
 # JUST A TO DO LIST
 todo.md

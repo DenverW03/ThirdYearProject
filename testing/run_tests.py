@@ -112,11 +112,11 @@ def test_all_sets(sets, string, algorithm_dir):
     for params in sets:
         for i in range(runs):
             test_parameter_set(params, string, directory)
-        subprocess.call(["/opt/homebrew/bin/python3.11", "evaluate.py", data_directory, str(num_robots), str(runs)]) # Calling the data evaluation script
+        subprocess.call(["/opt/homebrew/bin/python3.11", "aggregate_data.py", data_directory, str(num_robots), str(runs)]) # Calling the data evaluation script
 
 # Global Variables
 num_robots = int(sys.argv[1])
-runs = 1 # Number of testing runs
+runs = 40 # Number of testing runs
 
 # For the circle based algorithm
 algorithm_dir = "boids_follow_circle"

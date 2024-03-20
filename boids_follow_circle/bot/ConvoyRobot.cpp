@@ -205,6 +205,7 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
     if((robot->pos->Stalled() || (static_cast<unsigned long>(ms_count) - robot->startTime) * (timeScale / 2) >= 580000) && testing) {
         // Unsubscribe from callback so no longer called
         robot->pos->Unsubscribe();
+
         // Call data output function for bot stalling
         TestingStall(robot);
 
@@ -310,6 +311,7 @@ void ConvoyRobot::TestingStall(ConvoyRobot *robot) {
         return;
     }
 
+    // Time to stall is 0 when the robot has not stalled
     unsigned long result = 0.0;
     if(robot->pos->Stalled()) {
         // Calculating the time this robot took to stall

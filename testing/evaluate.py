@@ -1,35 +1,31 @@
-import sys
 import pandas as pd
+import matplotlib.pyplot as plt
 
-# Taking the directory to output the summarized data to
-directory = sys.argv[1]
+def evaluate_data(directory):
+    # Loading the CSV data and removing rows where the value is 0
+    data = pd.read_csv(directory + 'processed_data.csv')
 
-# The number of robots multiplied by 2 is the skip length, as each robot outputs duplicate values, not sure why but perfection chasing is the enemy of progress aha
-skip_length = int(sys.argv[2]) * 2
+    # Plotting the average distance as a histogram
+    plt.hist(data['AvgDistance'], bins=20, color='blue', alpha=0.7)
+    plt.xlim(0, 20)
+    plt.xlabel('Average Distance From Vip')
+    plt.ylabel('Frequency')
+    plt.title("A histogram depicting average distances of a convoy robot from the VIP")
+    plt.savefig(directory + "distance_hist.png")
 
-# The number of testing runs conducted
-runs = int(sys.argv[3])
+    # Clearing the plot
+    plt.clf()
 
-# The output csv
-data_directory = directory + "output.csv"
+    # Plotting the time to stall
+    data_removed = data[data['TimeToStall'] != 0.0]
+    plt.hist(data_removed['TimeToStall'], bins=20, color='blue', alpha=0.7)
+    plt.xlabel('Average Distance From Vip')
+    plt.ylabel('Frequency')
+    plt.title("A histogram depicting average distances of a convoy robot from the VIP")
+    plt.savefig(directory + "distance_hist.png")
 
-# Constructing the overall data frame
-new_dataframe = pd.DataFrame({"AvgDistance": [], "TimeToStall": []})
+    # Calculating statistical measures
 
-for i in range(runs):
-    # Getting the first row to read
-    row_skip = i * skip_length
-    
-    # Reading the csv
-    temp_dataframe = pd.read_csv(data_directory, dtype=float, skiprows=row_skip, nrows=skip_length, names=["id","AvgDistance","TimeToStall"])
-
-    # Dropping duplicate ids in the range
-    temp_dataframe_no_duplicates = temp_dataframe.drop_duplicates(subset=["id"])
-
-    # Dropping the first column
-    temp_dataframe_no_id = temp_dataframe_no_duplicates.drop(columns=["id"])
-
-    # Concatenating the frame
-    new_dataframe = pd.concat([new_dataframe, temp_dataframe_no_id])
-    
-new_dataframe.to_csv(directory + 'processed_data.csv', index=False)
+evaluate_data("./boids_follow_circle_results/")
+plt.clf()
+evaluate_data("./boids_follow_classic_results/")

@@ -28,18 +28,6 @@ int main(int argc, char* argv[]) {
     while(!world.TestQuit()) {
         if(!world.UpdateAll()) { // When UpdateAll() returns false, simulation continues
             world.Run();
-            
-            // If can quit early
-            int counter = 0;
-            for(int i=0; i<numRobots; i++) {
-                if(robots[i].pos->Stalled()) {
-                    // Storing the time to stall in seconds
-                    // timeToStall[i] = world.SimTimeNow();
-                    // printf("Time to stall %llu\r\n", world.SimTimeNow());
-                    counter += 1;
-                }
-            }
-            if(counter == numRobots) world.Quit();
         };
     }
     world.Quit();
