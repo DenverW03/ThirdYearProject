@@ -1,6 +1,7 @@
 import sys
 import subprocess
 import os
+import time
 
 ## Function to build the parameter file
 def build_parameters(directory, string):
@@ -74,6 +75,7 @@ def run_simulation(directory):
                 stdout, stderr = process.communicate(timeout=15) # no simulation should take longer than 10 seconds, using 15 to be safe
             except subprocess.TimeoutExpired:
                 process.kill()
+            time.sleep(5)
     except KeyboardInterrupt:
         sys.exit(0)
     except Exception as e:
@@ -114,7 +116,7 @@ def test_all_sets(sets, string, algorithm_dir):
 
 # Global Variables
 num_robots = int(sys.argv[1])
-runs = 20 # Number of testing runs
+runs = 1 # Number of testing runs
 
 # For the circle based algorithm
 algorithm_dir = "boids_follow_circle"

@@ -199,8 +199,10 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
     // The circle is a concept of a "belt" around the VIP, much like a planet
     // This belt has a large weighting for attraction towards it
 
-    // Testing for when robot has crashed
-    if(robot->pos->Stalled() && testing) {
+    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
+    long long ms_count = ms.count();
+    // Testing for when robot has crashed, or if it hasn't printing the distances before the end of the simulation
+    if((robot->pos->Stalled() || (static_cast<unsigned long>(ms_count) - robot->startTime) * (timeScale / 2) >= 580000) && testing) {
         // Unsubscribe from callback so no longer called
         robot->pos->Unsubscribe();
         // Call data output function for bot stalling
@@ -303,19 +305,22 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
 void ConvoyRobot::TestingStall(ConvoyRobot *robot) {
     // Creating a filestream to the output csv
     std::ofstream dataFile("../testing/boids_follow_circle_results/output.csv", std::ios::app);
-    if (!dataFile.is_open()){
+    if(!dataFile.is_open()){
         std::cerr << "File failed to open: " << std::strerror(errno) << std::endl;
         return;
     }
 
-    // Calculating the time this robot took to stall
-    auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
-    long long milliseconds_count = milliseconds.count();
-    unsigned long timeNow = static_cast<unsigned long>(milliseconds_count);
+    unsigned long result = 0.0;
+    if(robot->pos->Stalled()) {
+        // Calculating the time this robot took to stall
+        auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
+        long long milliseconds_count = milliseconds.count();
+        unsigned long timeNow = static_cast<unsigned long>(milliseconds_count);
 
-    unsigned long result = (timeNow - robot->startTime);
-    result *= timeScale;
-    result /= 1000; // in seconds
+        result = (timeNow - robot->startTime);
+        result *= timeScale / 2;
+        result /= 1000; // in seconds
+    }
 
     // Calculating the average distance
     double result2 = 0.0;
