@@ -120,25 +120,25 @@ runs = 20 # Number of testing runs
 algorithm_dir = "boids_follow_circle"
 string = "#define visionRange 1\r\n#define cohesionFactor 1\r\n#define avoidanceDistance 1\r\n#define avoidanceFactor 1\r\n#define avoidObstructionDistance 1\r\n#define avoidObstructionFactor 1\r\n#define vipMinDistance 1\r\n#define vipCohesionMultiplier 1\r\n#define vipSeparationMultiplier 1\r\n#define vipAlignmentMultiplier 1\r\n#define vipCircleRadius 1\r\n#define vipCircleNumPoints 1\r\n#define vipBoundingDistance 1\r\n#define velocityPollingRate 1\r\n#define testing 0\r\n#define timeScale 1"
 params = [
-        [
-            10, # vision range
-            0.005, # cohesion factor
-            2, # avoidance distance
-            0.3, # avoidance factor
-            3, # avoid obstruction distance
-            0.1, # avoid obstruction factor
-            3, # vip min distance
-            0.01, # vip cohesion mutliplier
-            0.1, # vip separation multiplier
-            0.01, # vip alignment multiplier
-            5, # vip circle radius
-            360, # vip circle num points
-            7, # vip bounding distance
-            2000, # velocity polling rate
-            1, # testing truth value
-            60 # time scale
+            [
+                10, # vision range
+                0.005, # cohesion factor
+                2, # avoidance distance
+                0.3, # avoidance factor
+                3, # avoid obstruction distance
+                0.1, # avoid obstruction factor
+                3, # vip min distance
+                0.01, # vip cohesion mutliplier
+                0.1, # vip separation multiplier
+                0.01, # vip alignment multiplier
+                5, # vip circle radius
+                360, # vip circle num points
+                7, # vip bounding distance
+                2000, # velocity polling rate
+                1, # testing truth value
+                60 # time scale
+            ]
         ]
-    ]
 # Running testing on parameter sets
 test_all_sets(params, string, algorithm_dir)
 
@@ -146,22 +146,22 @@ test_all_sets(params, string, algorithm_dir)
 algorithm_dir = "boids_follow_classic"
 string = "#define visionRange 1\r\n#define cohesionFactor 1\r\n#define avoidanceDistance 1\r\n#define avoidanceFactor 1\r\n#define avoidObstructionDistance 1\r\n#define avoidObstructionFactor 1\r\n#define vipMinDistance 1\r\n#define vipMaxDistance 1\r\n#define vipCohesionMultiplier 1\r\n#define vipSeparationMultiplier 1\r\n#define vipAlignmentMultiplier 1\r\n#define velocityPollingRate\r\n#define testing 1\r\n#define timeScale 1"
 params = [
-          [
-            10, # vision range
-            0.005, # cohesion factor
-            2, # avoidance distance
-            0.1, # avoidance factor
-            3, # avoid obstruction distance
-            0.1, # avoid obstruction factor
-            3, # vip min distance
-            6, # vip max distance
-            5, # vip cohesion multiplier
-            1, # vip separation multiplier
-            0.1, # vip alignment mulitiplier
-            2000, # velocity polling rate
-            1, # testing
-            60, # timeScale
-          ]
+            [
+                10, # vision range
+                0.005, # cohesion factor
+                2, # avoidance distance
+                0.1, # avoidance factor
+                3, # avoid obstruction distance
+                0.1, # avoid obstruction factor
+                3, # vip min distance
+                6, # vip max distance
+                5, # vip cohesion multiplier
+                1, # vip separation multiplier
+                0.1, # vip alignment mulitiplier
+                2000, # velocity polling rate
+                1, # testing
+                60, # timeScale
+            ]
         ]
 # Running testing on parameter sets
 test_all_sets(params, string, algorithm_dir)

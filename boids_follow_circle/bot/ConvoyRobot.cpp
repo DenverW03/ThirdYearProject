@@ -141,18 +141,18 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
                 break;
             }
             case red: { // THE VIPs
-                // For red VIP going to have the same vision range as for fellow convoy bots
-                if(distance > visionRange) break;
-
                 // Getting the stage simulation time difference which has to be adjusted for the time scale
                 auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
                 long long ms_count = ms.count();
                 unsigned long timeDiff = (static_cast<unsigned long>(ms_count) - robot->lastSysTime) * timeScale;
 
+                // For red VIP going to have the same vision range as for fellow convoy bots
+                if(distance > visionRange) break;
+
                 Pose pose = robot->GetPose();
                 auto position = CalculatePosition(robot->angles[data->num], pose, distance);
 
-                // Alignment, updating the vip Velocities
+                // Alignment, updating the vip positions
                 double vipEffectX = position.first;
                 double vipEffectY = position.second;
 
@@ -164,12 +164,15 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
                     robot->boidData.closeDyVip += pose.y - position.second;
                 }
                 else if(distance <= vipCircleRadius) {
+                    // Reversing the angle
                     double angle = robot->angles[data->num];
                     if(angle < 0) angle += 180;
                     else if(angle >= 0) angle -= 180;
 
+                    // Imaginary circle point on the bounding circle tangential to a line drawn through the convoy robot and the VIP
                     auto positionBounding = CalculatePosition(angle, pose, vipBoundingDistance - distance);
 
+                    // Repulsive force from the bounding point generated
                     robot->boidData.closeDxVip += pose.x - positionBounding.first;
                     robot->boidData.closeDyVip += pose.y - positionBounding.second;
 
@@ -207,8 +210,22 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
         return 0;
     }
 
+    // AVOIDANCE
+
+    // For other bots
+    robot->xVel += robot->boidData.closeDx * avoidanceFactor;
+    robot->yVel += robot->boidData.closeDy * avoidanceFactor;
+
+    // For obstacles
+    robot->xVel -= robot->boidData.closeDxObs * avoidObstructionFactor;
+    robot->yVel -= robot->boidData.closeDyObs * avoidObstructionFactor;
+
+    // For the VIP
+    robot->xVel += robot->boidData.closeDxVip * vipSeparationMultiplier;
+    robot->yVel += robot->boidData.closeDyVip * vipSeparationMultiplier;
+
     if(robot->stack->second != nullptr){
-        // Getting the last recorded robot positions
+        // Getting the last recorded VIP positions
         double lastx = robot->stack->xpos;
         double lasty = robot->stack->ypos;
 
@@ -233,20 +250,6 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
         robot->xVel += (closest.first - robot->GetPose().x) * vipCohesionMultiplier;
         robot->yVel += (closest.second - robot->GetPose().y) * vipCohesionMultiplier;
     }
-
-    // AVOIDANCE
-
-    // For other bots
-    robot->xVel += robot->boidData.closeDx * avoidanceFactor;
-    robot->yVel += robot->boidData.closeDy * avoidanceFactor;
-
-    // For obstacles
-    robot->xVel -= robot->boidData.closeDxObs * avoidObstructionFactor;
-    robot->yVel -= robot->boidData.closeDyObs * avoidObstructionFactor;
-
-    // For the VIP
-    robot->xVel += robot->boidData.closeDxVip * vipSeparationMultiplier;
-    robot->yVel += robot->boidData.closeDyVip * vipSeparationMultiplier;
 
     // Cohesion and Alignment
 
@@ -365,7 +368,7 @@ std::vector<std::pair<double, double>> ConvoyRobot::GeneratePoints(Pose pose, do
         double angle = ((2 * M_PI) / vipCircleNumPoints) * i;
 
         // Using circle parametric equations
-        double x = pose.x + (radius * cos(angle));
+        double x = pose.x + (radius * cos(angle)); 
         double y = pose.y + (radius * sin(angle));
 
         points.push_back(std::make_pair(x, y));
@@ -404,7 +407,7 @@ ConvoyRobot::NHVelocities ConvoyRobot::CalculateNonHolonomic(double xvel, double
     double newDirection = atan2(yvel, xvel);
     double angleDiff = newDirection - robot->GetPose().a;
 
-    vels.rotationalVel = angleDiff / (1.0/60.0);
+    vels.rotationalVel = angleDiff / (1.0/timeScale);
 
     return vels;
 }
@@ -416,7 +419,6 @@ double ConvoyRobot::CalculateDistance(Pose pose, ConvoyRobot *robot) {
     double yDiff = (double)(poseThis.y - pose.y);
 
     // Pythagoras theorem used to calculate the distance between two points
-
     double distance = sqrt(abs((xDiff * xDiff) + (yDiff * yDiff)));
     return distance;
 }

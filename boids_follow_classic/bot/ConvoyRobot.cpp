@@ -274,7 +274,7 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
 
 void ConvoyRobot::TestingStall(ConvoyRobot *robot) {
     // Creating a filestream to the output csv
-    std::ofstream dataFile("../testing/boids_follow_circle_results/output.csv", std::ios::app);
+    std::ofstream dataFile("../testing/boids_follow_classic_results/output.csv", std::ios::app);
     if (!dataFile.is_open()){
         std::cerr << "File failed to open: " << std::strerror(errno) << std::endl;
         return;
@@ -365,7 +365,7 @@ ConvoyRobot::NHVelocities ConvoyRobot::CalculateNonHolonomic(double xvel, double
     double newDirection = atan2(yvel, xvel);
     double angleDiff = newDirection - robot->GetPose().a;
 
-    vels.rotationalVel = angleDiff / (1.0/60.0);
+    vels.rotationalVel = angleDiff / (1.0/timeScale);
 
     return vels;
 }
