@@ -33,7 +33,7 @@ for i in range(runs):
     # Concatenating the frame
     new_dataframe = pd.concat([new_dataframe, temp_dataframe_no_id])
 
-output_path = directory + 'processed_data.csv'
+output_path = directory + str(sys.argv[2])  + '_processed_data.csv'
     
 if os.path.exists(output_path):
     # Append to the existing CSV without headers

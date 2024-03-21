@@ -7,8 +7,8 @@
 #define vipMinDistance 3
 #define vipMaxDistance 6
 #define vipCohesionMultiplier 5
-#define vipSeparationMultiplier 0.01
-#define vipAlignmentMultiplier 0.01
+#define vipSeparationMultiplier 1
+#define vipAlignmentMultiplier 0.1
 #define velocityPollingRate 2000
-#define testing 0
-#define timeScale 1
+#define testing 1
+#define timeScale 60
