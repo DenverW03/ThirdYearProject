@@ -44,10 +44,10 @@ namespace SimpleRBT {
     } SensorInputData;
 
     typedef struct {
-        double closeDx;
-        double closeDy;
-        double closeDxObs;
-        double closeDyObs;
+        double separateX;
+        double separateY;
+        double separateXObs;
+        double separateYObs;
         double averageXPos;
         double averageYPos;
         int numNeighbours;

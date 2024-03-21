@@ -33,12 +33,10 @@ namespace ConvoyRBT {
     } SensorInputData;
 
     typedef struct {
-        double closeDx;
-        double closeDy;
-        double closeDxObs;
-        double closeDyObs;
-        double closeDxVip;
-        double closeDyVip;
+        double separateX;
+        double separateY;
+        double separateXObs;
+        double separateYObs;
         double averageXPos;
         double averageYPos;
         int numNeighbours;

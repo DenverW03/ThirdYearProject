@@ -33,12 +33,10 @@ ConvoyRobot::ConvoyRobot(ModelPosition *modelPos, Pose pose, int id) {
     this->yVel = distribution(generator); // Even though this bot is non holonomic, treat as holonomic until running bounding algorithm
 
     // Initialising the boid data values to zero
-    this->boidData.closeDx = 0;
-    this->boidData.closeDy = 0;
-    this->boidData.closeDxObs = 0;
-    this->boidData.closeDyObs = 0;
-    this->boidData.closeDxVip = 0;
-    this->boidData.closeDyVip = 0;
+    this->boidData.separateX = 0;
+    this->boidData.separateY = 0;
+    this->boidData.separateXObs = 0;
+    this->boidData.separateYObs = 0;
     this->boidData.averageXPos = 0;
     this->boidData.averageYPos = 0;
     this->boidData.numNeighbours = 0;
@@ -113,8 +111,8 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
                 // Add this blob to the close stacks
                 Pose pose = robot->GetPose();
                 auto position = CalculatePosition(robot->angles[data->num], pose, distance);
-                robot->boidData.closeDxObs -= pose.x - position.first;
-                robot->boidData.closeDyObs -= pose.y - position.second;
+                robot->boidData.separateXObs -= pose.x - position.first;
+                robot->boidData.separateYObs -= pose.y - position.second;
                 break;
             }
             case blue: { // OTHER CONVOY BOTS
@@ -129,8 +127,8 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
 
                 // Separation (prior guard clause already confirmed bot to be within avoidance distance)
                 if(distance <= avoidanceDistance) {
-                    robot->boidData.closeDx += pose.x - position.first;
-                    robot->boidData.closeDy += pose.y - position.second;
+                    robot->boidData.separateX += pose.x - position.first;
+                    robot->boidData.separateY += pose.y - position.second;
                 }
 
                 // If the distance is within the vision range of the robot but outside avoidance range
@@ -162,8 +160,8 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
 
                 // Min distance to VIP
                 if(distance <= vipMinDistance) {
-                    robot->boidData.closeDx += pose.x - position.first;
-                    robot->boidData.closeDy += pose.y - position.second;
+                    robot->boidData.separateX += pose.x - position.first;
+                    robot->boidData.separateY += pose.y - position.second;
                 }
                 
                 // Max distance from VIP
@@ -176,8 +174,8 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
                 
                 // Trying to keep the convoy in bounds
                 if(distance > vipMaxDistance) {
-                    robot->boidData.closeDx -= (pose.x - position.first);
-                    robot->boidData.closeDy -= (pose.y - position.second);
+                    robot->boidData.separateX -= (pose.x - position.first);
+                    robot->boidData.separateY -= (pose.y - position.second);
                 
                 }
 
@@ -214,16 +212,16 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
     }
 
     // For other bots
-    robot->xVel += robot->boidData.closeDx * avoidanceFactor;
-    robot->yVel += robot->boidData.closeDy * avoidanceFactor;
+    robot->xVel += robot->boidData.separateX * avoidanceFactor;
+    robot->yVel += robot->boidData.separateY * avoidanceFactor;
 
     // For obstacles
-    robot->xVel -= robot->boidData.closeDxObs * avoidObstructionFactor;
-    robot->yVel -= robot->boidData.closeDyObs * avoidObstructionFactor;
+    robot->xVel -= robot->boidData.separateXObs * avoidObstructionFactor;
+    robot->yVel -= robot->boidData.separateYObs * avoidObstructionFactor;
 
     // For the VIP
-    robot->xVel -= robot->boidData.closeDx * vipSeparationMultiplier;
-    robot->yVel -= robot->boidData.closeDy * vipSeparationMultiplier;
+    robot->xVel -= robot->boidData.separateX * vipSeparationMultiplier;
+    robot->yVel -= robot->boidData.separateY * vipSeparationMultiplier;
 
     // Cohesion and Alignment
 
@@ -255,12 +253,10 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
     robot->pos->SetSpeed(nonHolonomic.linearVel, 0, nonHolonomic.rotationalVel);
 
     // Resetting the boid data values
-    robot->boidData.closeDx = 0;
-    robot->boidData.closeDy = 0;
-    robot->boidData.closeDxObs = 0;
-    robot->boidData.closeDyObs = 0;
-    robot->boidData.closeDxVip = 0;
-    robot->boidData.closeDyVip = 0;
+    robot->boidData.separateX = 0;
+    robot->boidData.separateY = 0;
+    robot->boidData.separateXObs = 0;
+    robot->boidData.separateYObs = 0;
     robot->boidData.averageXPos = 0;
     robot->boidData.averageYPos = 0;
     robot->boidData.numNeighbours = 0;

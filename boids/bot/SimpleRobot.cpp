@@ -26,10 +26,10 @@ SimpleRobot::SimpleRobot(ModelPosition *modelPos, Pose pose) {
     this->yVel = distribution(generator); // Even though this bot is non holonomic, treat as holonomic until running bounding algorithm
 
     // Initialising the boid data values to zero
-    this->boidData.closeDx = 0;
-    this->boidData.closeDy = 0;
-    this->boidData.closeDxObs = 0;
-    this->boidData.closeDyObs = 0;
+    this->boidData.separateX = 0;
+    this->boidData.separateY = 0;
+    this->boidData.separateXObs = 0;
+    this->boidData.separateYObs = 0;
     this->boidData.averageXPos = 0;
     this->boidData.averageYPos = 0;
     this->boidData.numNeighbours = 0;
@@ -89,8 +89,8 @@ int SimpleRobot::SensorUpdate(Model *, SensorInputData* data) {
                 // Add this blob to the close stacks
                 Pose pose = robot->GetPose();
                 auto position = CalculatePosition(robot->angles[data->num], pose, distance);
-                robot->boidData.closeDxObs -= pose.x - position.first;
-                robot->boidData.closeDyObs -= pose.y - position.second;
+                robot->boidData.separateXObs -= pose.x - position.first;
+                robot->boidData.separateYObs -= pose.y - position.second;
                 break;
             }
             case blue: {
@@ -105,8 +105,8 @@ int SimpleRobot::SensorUpdate(Model *, SensorInputData* data) {
 
                 // Separation (prior guard clause already confirmed bot to be within avoidance distance)
                 if(distance <= avoidanceDistance) {
-                    robot->boidData.closeDx += robot->GetPose().x - position.first;
-                    robot->boidData.closeDy += robot->GetPose().y - position.second;
+                    robot->boidData.separateX += robot->GetPose().x - position.first;
+                    robot->boidData.separateY += robot->GetPose().y - position.second;
                 }
 
                 // If the distance is within the vision range of the robot but outside avoidance range
@@ -161,12 +161,12 @@ int SimpleRobot::PositionUpdate(Model *, SimpleRobot* robot) {
     // Avoidance
 
     // For other bots
-    robot->xVel += robot->boidData.closeDx * avoidanceFactor;
-    robot->yVel += robot->boidData.closeDy * avoidanceFactor;
+    robot->xVel += robot->boidData.separateX * avoidanceFactor;
+    robot->yVel += robot->boidData.separateY * avoidanceFactor;
 
     // For obstacles
-    robot->xVel -= robot->boidData.closeDxObs * avoidObstructionFactor;
-    robot->yVel -= robot->boidData.closeDyObs * avoidObstructionFactor;
+    robot->xVel -= robot->boidData.separateXObs * avoidObstructionFactor;
+    robot->yVel -= robot->boidData.separateYObs * avoidObstructionFactor;
 
     // Cohesion and Alignment
 
@@ -197,10 +197,10 @@ int SimpleRobot::PositionUpdate(Model *, SimpleRobot* robot) {
     robot->pos->SetSpeed(nonHolonomic.linearVel, 0, nonHolonomic.rotationalVel);
 
     // Resetting the boid data values
-    robot->boidData.closeDx = 0;
-    robot->boidData.closeDy = 0;
-    robot->boidData.closeDxObs = 0;
-    robot->boidData.closeDyObs = 0;
+    robot->boidData.separateX = 0;
+    robot->boidData.separateY = 0;
+    robot->boidData.separateXObs = 0;
+    robot->boidData.separateYObs = 0;
     robot->boidData.averageXPos = 0;
     robot->boidData.averageYPos = 0;
     robot->boidData.numNeighbours = 0;
