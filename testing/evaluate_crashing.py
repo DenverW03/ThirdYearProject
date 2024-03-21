@@ -21,7 +21,7 @@ def evaluate(directory, sets):
         crash_percentages = pd.concat([crash_percentages, new_frame], ignore_index=True)
 
     # Plotting the figure
-    plt.plot(crash_percentages['num_robots'], crash_percentages['crash_percentage'], marker='o', linestyle='-')
+    plt.plot(crash_percentages['num_robots'], crash_percentages['crash_percentage'], marker='o', linestyle='-', label=" ".join(directory.split('/')[-2].replace('_', ' ').split(' ')[2:]))
 
     # Add labels and title
     plt.xlabel('Number Of Convoy Robots')
@@ -31,4 +31,7 @@ def evaluate(directory, sets):
 sets = [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
 evaluate("./boids_follow_circle_results/", sets)
 evaluate("./boids_follow_classic_results/", sets)
+
+plt.legend()
+
 plt.savefig("./crash_graph.png")
