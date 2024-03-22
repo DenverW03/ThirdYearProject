@@ -18,11 +18,6 @@ int main(int argc, char* argv[]) {
     // Adding the robots for the simulation
     ConvoyRobot *robots = new ConvoyRobot[numRobots];
     VipRBT::VipRobot vip = VipRBT::VipRobot((ModelPosition *)world.GetModel(argv[2]), Pose(-8, 8, 0, 0));
-    // for(int i=0; i<numRobots; i++) {
-    //     robots[i] = ConvoyRobot((ModelPosition *)world.GetModel(argv[i + 3]), Pose::Random(-12, 12, -12, 12));
-    //     printf("Added: %d", i);
-    // }
-    
     
     world.Start();
     while(!world.TestQuit()) {

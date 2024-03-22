@@ -123,8 +123,6 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
                 Pose pose = robot->GetPose();
                 auto position = CalculatePosition(robot->angles[data->num], pose, distance);
 
-                // If the distance is within the avoidance range of the robot
-
                 // Separation (prior guard clause already confirmed bot to be within avoidance distance)
                 if(distance <= avoidanceDistance) {
                     robot->boidData.separateX += pose.x - position.first;
@@ -317,7 +315,6 @@ std::pair<double, double> ConvoyRobot::CalculatePosition(double a, Pose pose, do
     double hyp = distance;
 
     // Using a composite angle for real world sensor angle
-    // Pose pose = robot->GetPose();
     double botAngle = pose.a;
     if (botAngle < 0) botAngle = (2 * M_PI) - abs(botAngle);
     double compositeAngle = botAngle + theta;
@@ -339,16 +336,12 @@ ConvoyRobot::HVelocities ConvoyRobot::CalculateHolonomic(double linearvel, doubl
     HVelocities vels;
 
     // Calculating the angle difference
-
-    // double angleDiff = turnvel * (1.0/60.0);
+    double angleDiff = turnvel * (1.0/60.0);
 
     // Calculating the new direction
-
-    // double newDirection = angleDiff + robot->GetPose().a;
-    double newDirection = robot->GetPose().a;
+    double newDirection = angleDiff + robot->GetPose().a;
 
     // Using trig to convert from polar velocity to cartesian
-
     vels.xvel = linearvel * cos(newDirection);
     vels.yvel = linearvel * sin(newDirection);
 
@@ -360,11 +353,9 @@ ConvoyRobot::NHVelocities ConvoyRobot::CalculateNonHolonomic(double xvel, double
     NHVelocities vels;
 
     // Finding magnitude of linear velocity vector
-
     vels.linearVel = sqrt(pow((xvel), 2.0) + pow((yvel), 2.0));
 
     // Computing the rotational velocity
-
     double newDirection = atan2(yvel, xvel);
     double angleDiff = newDirection - robot->GetPose().a;
 
@@ -380,7 +371,6 @@ double ConvoyRobot::CalculateDistance(Pose pose, ConvoyRobot *robot) {
     double yDiff = (double)(poseThis.y - pose.y);
 
     // Pythagoras theorem used to calculate the distance between two points
-
     double distance = sqrt(abs((xDiff * xDiff) + (yDiff * yDiff)));
     return distance;
 }

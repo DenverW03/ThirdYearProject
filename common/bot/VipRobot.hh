@@ -6,6 +6,7 @@
 using namespace Stg;
 
 namespace VipRBT {
+    // THE VIP ROBOT, takes a predetermined path
     class VipRobot {
         #define vipCircleRadius 5
         

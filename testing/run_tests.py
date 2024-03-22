@@ -40,7 +40,7 @@ def world_setup(num_robots, directory):
 
     # Edit line 24 to add robot spawning lines
     for i in range(num_robots):
-        data[24] = data[24] + '    robots[' + str(i) + '] = ConvoyRobot((ModelPosition *)world.GetModel(argv[' + str(i + 3) + ']), Pose::Random(-12, 12, -12, 12), ' + str(i + 1) + ');\r\n'
+        data[20] = data[20] + '    robots[' + str(i) + '] = ConvoyRobot((ModelPosition *)world.GetModel(argv[' + str(i + 3) + ']), Pose::Random(-12, 12, -12, 12), ' + str(i + 1) + ');\r\n'
 
     # Write new file structure to main
     with open(directory + 'main.cpp', 'w', encoding='utf-8') as mainFile:
@@ -119,31 +119,31 @@ def test_all_sets(sets, params, string, algorithm_dir):
 # Global Variables
 runs = 40 # Number of testing runs
 
-# # For the circle based algorithm
-# algorithm_dir = "boids_follow_circle"
-# string = "#define visionRange 1\r\n#define cohesionFactor 1\r\n#define avoidanceDistance 1\r\n#define avoidanceFactor 1\r\n#define avoidObstructionDistance 1\r\n#define avoidObstructionFactor 1\r\n#define vipMinDistance 1\r\n#define vipCohesionMultiplier 1\r\n#define vipSeparationMultiplier 1\r\n#define vipAlignmentMultiplier 1\r\n#define vipCircleRadius 1\r\n#define vipCircleNumPoints 1\r\n#define vipBoundingDistance 1\r\n#define velocityPollingRate 1\r\n#define testing 0\r\n#define timeScale 1"
-# params = [
-#             10, # vision range
-#             0.005, # cohesion factor
-#             2, # avoidance distance
-#             0.3, # avoidance factor
-#             3, # avoid obstruction distance
-#             0.1, # avoid obstruction factor
-#             3, # vip min distance
-#             0.01, # vip cohesion mutliplier
-#             0.1, # vip separation multiplier
-#             0.01, # vip alignment multiplier
-#             5, # vip circle radius
-#             360, # vip circle num points
-#             7, # vip bounding distance
-#             2000, # velocity polling rate
-#             1, # testing truth value
-#             60 # time scale
-#         ]
-# sets = [12, 13, 14, 15, 16, 17, 18, 19, 20]
+# For the circle based algorithm
+algorithm_dir = "boids_follow_circle"
+string = "#define visionRange 1\r\n#define cohesionFactor 1\r\n#define avoidanceDistance 1\r\n#define avoidanceFactor 1\r\n#define avoidObstructionDistance 1\r\n#define avoidObstructionFactor 1\r\n#define vipMinDistance 1\r\n#define vipCohesionMultiplier 1\r\n#define vipSeparationMultiplier 1\r\n#define vipAlignmentMultiplier 1\r\n#define vipCircleRadius 1\r\n#define vipCircleNumPoints 1\r\n#define vipBoundingDistance 1\r\n#define velocityPollingRate 1\r\n#define testing 0\r\n#define timeScale 1"
+params = [
+            10, # vision range
+            0.005, # cohesion factor
+            2, # avoidance distance
+            0.3, # avoidance factor
+            3, # avoid obstruction distance
+            0.1, # avoid obstruction factor
+            3, # vip min distance
+            0.01, # vip cohesion mutliplier
+            0.1, # vip separation multiplier
+            0.01, # vip alignment multiplier
+            5, # vip circle radius
+            360, # vip circle num points
+            7, # vip bounding distance
+            2000, # velocity polling rate
+            1, # testing truth value
+            60 # time scale
+        ]
+sets = [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
 
-# # Running testing on parameter sets
-# test_all_sets(sets, params, string, algorithm_dir)
+# Running testing on parameter sets
+test_all_sets(sets, params, string, algorithm_dir)
 
 # For the classic approach algorithm
 algorithm_dir = "boids_follow_classic"
@@ -164,7 +164,7 @@ params = [
             1, # testing
             60, # timeScale
         ]
-sets = [12, 13, 14, 15, 16, 17, 18, 19, 20]
+sets = [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
 
 # Running testing on parameter sets
 test_all_sets(sets, params, string, algorithm_dir)

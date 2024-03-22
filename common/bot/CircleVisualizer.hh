@@ -6,6 +6,7 @@
 using namespace Stg;
 
 namespace CircleVIS {
+    // Class for drawing a circle around the VIP
     class CircleVisualizer : public Visualizer {
 
         #define numPoints 720

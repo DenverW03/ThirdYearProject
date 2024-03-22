@@ -17,6 +17,7 @@ void CircleVIS::CircleVisualizer::drawPoint(double x, double y){
     glVertex2f(x, y);
 }
 
+// Callback for drawing the visualisation
 void CircleVIS::CircleVisualizer::Visualize(Stg::Model* mod, Stg::Camera* cam) {
     glBegin(GL_LINES);
 

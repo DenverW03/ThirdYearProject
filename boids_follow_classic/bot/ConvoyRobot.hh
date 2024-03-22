@@ -26,12 +26,14 @@ namespace ConvoyRBT {
         double yvel;
     } HVelocities;
 
+    // Data structure for transferring sensor input data
     typedef struct {
         ConvoyRobot *robot;
         ModelBlobfinder *bf;
         int num;
     } SensorInputData;
 
+    // Structure of the necessary boids data
     typedef struct {
         double separateX;
         double separateY;
@@ -42,6 +44,7 @@ namespace ConvoyRBT {
         int numNeighbours;
     } BoidData;
 
+    // Alignment data structure, linked list of length 2 in implementation
     struct VipVelocityNode {
         double xpos;
         double ypos;
@@ -72,7 +75,6 @@ namespace ConvoyRBT {
         std::vector<double> testingDistances;
 
         // Function declarations
-
         ConvoyRobot();
         ConvoyRobot(ModelPosition *modelPos, Pose pose, int id);
         static int SensorUpdate(Model *, SensorInputData *data);
