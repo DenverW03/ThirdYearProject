@@ -122,8 +122,6 @@ int ConvoyRobot::SensorUpdate(Model *, SensorInputData* data) {
                 Pose pose = robot->GetPose();
                 auto position = CalculatePosition(robot->angles[data->num], pose, distance);
 
-                // If the distance is within the avoidance range of the robot
-
                 // Separation (prior guard clause already confirmed bot to be within avoidance distance)
                 if(distance <= avoidanceDistance) {
                     robot->boidData.separateX += pose.x - position.first;
@@ -245,11 +243,7 @@ int ConvoyRobot::PositionUpdate(Model *, ConvoyRobot* robot) {
             if(CalculateDistance(pose1, robot) < CalculateDistance(pose2, robot)) closest = points;
         }
 
-        // Add the position as a large weight
-        // robot->boidData.averageXPos += closest.first * vipCohesionMultiplier;
-        // robot->boidData.averageYPos += closest.second * vipCohesionMultiplier;
-        // robot->boidData.numNeighbours += vipCohesionMultiplier;
-
+        // Cohesion to the closest generated circle point
         robot->xVel += (closest.first - robot->GetPose().x) * vipCohesionMultiplier;
         robot->yVel += (closest.second - robot->GetPose().y) * vipCohesionMultiplier;
     }
@@ -389,15 +383,12 @@ ConvoyRobot::HVelocities ConvoyRobot::CalculateHolonomic(double linearvel, doubl
     HVelocities vels;
 
     // Calculating the angle difference
-
     double angleDiff = turnvel * (1.0/60.0);
 
     // Calculating the new direction
-
     double newDirection = angleDiff + robot->GetPose().a;
 
     // Using trig to convert from polar velocity to cartesian
-
     vels.xvel = linearvel * cos(newDirection);
     vels.yvel = linearvel * sin(newDirection);
 
@@ -409,11 +400,9 @@ ConvoyRobot::NHVelocities ConvoyRobot::CalculateNonHolonomic(double xvel, double
     NHVelocities vels;
 
     // Finding magnitude of linear velocity vector
-
     vels.linearVel = sqrt(pow((xvel), 2.0) + pow((yvel), 2.0));
 
     // Computing the rotational velocity
-
     double newDirection = atan2(yvel, xvel);
     double angleDiff = newDirection - robot->GetPose().a;
 

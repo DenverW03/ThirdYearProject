@@ -16,8 +16,7 @@ namespace ConvoyRBT {
         // The number of cameras used up to 16 for current model, vary number for testing
         #define camCount 16
 
-        // Defining a struct for passing converted speed values
-
+        // Structs for passing converted speed values
         typedef struct {
             double linearVel;
             double rotationalVel;
@@ -28,12 +27,14 @@ namespace ConvoyRBT {
             double yvel;
         } HVelocities;
 
+        // Data structure for the sensor input data
         typedef struct {
             ConvoyRobot *robot;
             ModelBlobfinder *bf;
             int num;
         } SensorInputData;
 
+        // Necessary boids data structure
         typedef struct {
             double separateX;
             double separateY;
@@ -46,6 +47,7 @@ namespace ConvoyRBT {
             int numNeighbours;
         } BoidData;
 
+        // Alignment estimation data structure, linked list of length 2
         struct VipVelocityNode {
             double xpos;
             double ypos;
@@ -53,7 +55,6 @@ namespace ConvoyRBT {
         };
         
         public:
-
             // Variable declarations
             ModelPosition *pos;
             ModelBlobfinder **cameras;
@@ -76,7 +77,6 @@ namespace ConvoyRBT {
             std::vector<double> testingDistances;
 
             // Function declarations
-
             ConvoyRobot();
             ConvoyRobot(ModelPosition *modelPos, Pose pose, int id);
             static int SensorUpdate(Model *, SensorInputData *data);

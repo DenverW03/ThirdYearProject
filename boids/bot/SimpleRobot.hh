@@ -25,8 +25,7 @@ namespace SimpleRBT {
     // The number of cameras used up to 16 for current model, vary number for testing
     #define camCount 16
 
-    // Defining a struct for passing converted speed values
-
+    // Defining structs for passing converted speed values
     typedef struct {
         double linearVel;
         double rotationalVel;
@@ -37,12 +36,14 @@ namespace SimpleRBT {
         double yvel;
     } HVelocities;
 
+    // Sensor setup data struct
     typedef struct {
         SimpleRobot *robot;
         ModelBlobfinder *bf;
         int num;
     } SensorInputData;
 
+    // Struct that holds the boids necessary data
     typedef struct {
         double separateX;
         double separateY;
@@ -54,9 +55,7 @@ namespace SimpleRBT {
     } BoidData;
     
     public:
-
         // Variable declarations
-
         ModelPosition *pos;
         ModelBlobfinder **cameras;
         double xVel;
@@ -64,11 +63,9 @@ namespace SimpleRBT {
         BoidData boidData;
 
         // Angles of the cameras places on the bot
-
         double angles[16] = {0, 22.5, 45, 67.5, 90, 112.5, 135, 157.5, 180, -22.5, -45, -67.5, -90, -112.5, -135, -157.5};
 
         // Function declarations
-
         SimpleRobot();
         SimpleRobot(ModelPosition *modelPos, Pose pose);
         static int SensorUpdate(Model *, SensorInputData *data);
