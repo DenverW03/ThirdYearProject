@@ -83,7 +83,7 @@ int SimpleRobot::SensorUpdate(Model *, SensorInputData* data) {
         // Case for handling obstacles and case for handling other bots
         switch(full) {
             case black: {
-                // // Need distance to fall equal to or lower than the obstacle avoidance distance
+                // Need distance to fall equal to or lower than the obstacle avoidance distance
                 if (distance > avoidObstructionDistance) break;
 
                 // Add this blob to the close stacks
@@ -101,8 +101,6 @@ int SimpleRobot::SensorUpdate(Model *, SensorInputData* data) {
                 Pose pose = robot->GetPose();
                 auto position = CalculatePosition(robot->angles[data->num], pose, distance);
 
-                // If the distance is within the avoidance range of the robot
-
                 // Separation (prior guard clause already confirmed bot to be within avoidance distance)
                 if(distance <= avoidanceDistance) {
                     robot->boidData.separateX += robot->GetPose().x - position.first;
@@ -111,10 +109,6 @@ int SimpleRobot::SensorUpdate(Model *, SensorInputData* data) {
 
                 // If the distance is within the vision range of the robot but outside avoidance range
                 if(distance <= visionRange) {
-                    // // Alignment
-                    // averageXVel += robot->robots[i].xVel;
-                    // averageYVel += robot->robots[i].yVel;
-
                     robot->boidData.numNeighbours += 1;
 
                     // Cohesion
@@ -139,7 +133,6 @@ std::pair<double, double> SimpleRobot::CalculatePosition(double a, Pose pose, do
     double hyp = distance;
 
     // Using a composite angle for real world sensor angle
-    // Pose pose = robot->GetPose();
     double botAngle = pose.a;
     if (botAngle < 0) botAngle = (2 * M_PI) - abs(botAngle);
     double compositeAngle = botAngle + theta;
@@ -159,7 +152,6 @@ std::pair<double, double> SimpleRobot::CalculatePosition(double a, Pose pose, do
 // Position update function for stage (necessary for the bot to actually move)
 int SimpleRobot::PositionUpdate(Model *, SimpleRobot* robot) {
     // Avoidance
-
     // For other bots
     robot->xVel += robot->boidData.separateX * avoidanceFactor;
     robot->yVel += robot->boidData.separateY * avoidanceFactor;
@@ -169,19 +161,10 @@ int SimpleRobot::PositionUpdate(Model *, SimpleRobot* robot) {
     robot->yVel -= robot->boidData.separateYObs * avoidObstructionFactor;
 
     // Cohesion and Alignment
-
     if(robot->boidData.numNeighbours > 0) {
-        // // Calculating the averages for velocity
-        // averageXVel = averageXVel / numNeighbours;
-        // averageYVel = averageYVel / numNeighbours;
-
         // Calculating the averages for position
         robot->boidData.averageXPos = robot->boidData.averageXPos / robot->boidData.numNeighbours;
         robot->boidData.averageYPos = robot->boidData.averageYPos / robot->boidData.numNeighbours;
-
-        // // Alignment
-        // robot->xVel += (averageXVel - robot->xVel) * alignmentFactor;
-        // robot->yVel += (averageYVel - robot->yVel) * alignmentFactor;
 
         // Cohesion
         robot->xVel += (robot->boidData.averageXPos - robot->GetPose().x) * cohesionFactor;
@@ -189,9 +172,7 @@ int SimpleRobot::PositionUpdate(Model *, SimpleRobot* robot) {
     }
 
     // Diagnostic printing
-
     HVelocities vels2 = CalculateHolonomic(robot->pos->GetVelocity().x, robot->pos->GetVelocity().a, robot);
-
 
     NHVelocities nonHolonomic = CalculateNonHolonomic(robot->xVel, robot->yVel, robot);
     robot->pos->SetSpeed(nonHolonomic.linearVel, 0, nonHolonomic.rotationalVel);
@@ -210,7 +191,6 @@ int SimpleRobot::PositionUpdate(Model *, SimpleRobot* robot) {
     robot->xVel = vels2.xvel;
     robot->yVel = vels2.yvel;
 
-
     return 0;
 }
 
@@ -219,16 +199,12 @@ SimpleRobot::HVelocities SimpleRobot::CalculateHolonomic(double linearvel, doubl
     HVelocities vels;
 
     // Calculating the angle difference
-
-    // double angleDiff = turnvel * (1.0/60.0);
+    double angleDiff = turnvel * (1.0/60.0);
 
     // Calculating the new direction
-
-    // double newDirection = angleDiff + robot->GetPose().a;
-    double newDirection = robot->GetPose().a;
+    double newDirection = angleDiff + robot->GetPose().a;
 
     // Using trig to convert from polar velocity to cartesian
-
     vels.xvel = linearvel * cos(newDirection);
     vels.yvel = linearvel * sin(newDirection);
 
@@ -240,11 +216,9 @@ SimpleRobot::NHVelocities SimpleRobot::CalculateNonHolonomic(double xvel, double
     NHVelocities vels;
 
     // Finding magnitude of linear velocity vector
-
     vels.linearVel = sqrt(pow((xvel), 2.0) + pow((yvel), 2.0));
 
     // Computing the rotational velocity
-
     double newDirection = atan2(yvel, xvel);
     double angleDiff = newDirection - robot->GetPose().a;
 
@@ -260,7 +234,6 @@ double SimpleRobot::CalculateDistance(Pose pose, SimpleRobot *robot) {
     double yDiff = (double)(poseThis.y - pose.y);
 
     // Pythagoras theorem used to calculate the distance between two points
-
     double distance = sqrt(abs((xDiff * xDiff) + (yDiff * yDiff)));
     return distance;
 }

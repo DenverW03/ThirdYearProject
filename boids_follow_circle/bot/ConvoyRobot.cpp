@@ -388,10 +388,13 @@ ConvoyRobot::HVelocities ConvoyRobot::CalculateHolonomic(double linearvel, doubl
     // Declaring a struct to hold velocity values
     HVelocities vels;
 
+    // Calculating the angle difference
+
+    double angleDiff = turnvel * (1.0/60.0);
+
     // Calculating the new direction
 
-    // double newDirection = angleDiff + robot->GetPose().a;
-    double newDirection = robot->GetPose().a;
+    double newDirection = angleDiff + robot->GetPose().a;
 
     // Using trig to convert from polar velocity to cartesian
 
