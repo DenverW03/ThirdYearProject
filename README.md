@@ -23,5 +23,6 @@ Note++: Compilation is set up using clang in makefile as I use macos, however yo
 
 - common: contains common files used between all of the different algorithms
 - boids: this directory contains the lowest level boids algorithm
-- boids_follow: this directory contains the boids algorithm that follows the VIP agent
-- proposal: contains the proposal pdf for the dissertation
+- boids_follow_circle: circle-based approach to protecting the VIP agent
+- boids_follow_classic: this directory contains the boids algorithm that follows the VIP agent using a classic boids weighted algorithm
+- testing: contains scripts for testing and evaluating the data
