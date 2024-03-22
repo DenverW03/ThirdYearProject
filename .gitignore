@@ -33,5 +33,6 @@ testing/boids_follow_classic_results/*.png
 testing/*.csv
 testing/*.png
 
-# JUST A TO DO LIST
+# SOME UNNECESSARY FILES
+proposal/
 todo.md
